@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sevastolink.local/schemas/similar-recipes-output.schema.json",
+  "title": "Similar Recipes Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "top_matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "similarity_score_band": {
+            "type": "string",
+            "enum": [
+              "very_high",
+              "high",
+              "moderate",
+              "low"
+            ]
+          },
+          "primary_similarity_reason": {
+            "type": "string"
+          },
+          "secondary_similarity_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "major_differences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "similarity_score_band",
+          "primary_similarity_reason",
+          "secondary_similarity_reasons",
+          "major_differences"
+        ]
+      }
+    },
+    "near_matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "similarity_score_band": {
+            "type": "string",
+            "enum": [
+              "very_high",
+              "high",
+              "moderate",
+              "low"
+            ]
+          },
+          "primary_similarity_reason": {
+            "type": "string"
+          },
+          "secondary_similarity_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "major_differences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "similarity_score_band",
+          "primary_similarity_reason",
+          "secondary_similarity_reasons",
+          "major_differences"
+        ]
+      }
+    },
+    "why_each_match_ranked": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "major_difference_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "top_matches",
+    "near_matches",
+    "why_each_match_ranked",
+    "major_difference_notes",
+    "confidence_notes"
+  ]
+}

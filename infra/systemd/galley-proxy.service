@@ -1,0 +1,24 @@
+[Unit]
+Description=Sevastolink Galley Archive (with nginx reverse proxy)
+Documentation=file:%h/sevastolink-galley-archive/docs/09_ops/local-deployment.md
+# Same as galley.service but activates the "proxy" compose profile.
+# This starts galley-api, galley-web, and galley-nginx together.
+# Default nginx port: 8080. Set NGINX_PORT in .env to change it.
+# Do not enable both galley.service and galley-proxy.service at the same time.
+
+[Service]
+Type=simple
+
+WorkingDirectory=%h/sevastolink-galley-archive
+EnvironmentFile=%h/sevastolink-galley-archive/.env
+
+ExecStart=/usr/bin/docker compose --profile proxy up
+ExecStop=/usr/bin/docker compose --profile proxy down
+
+Restart=on-failure
+RestartSec=15s
+TimeoutStartSec=120s
+TimeoutStopSec=60s
+
+[Install]
+WantedBy=default.target

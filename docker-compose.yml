@@ -1,0 +1,72 @@
+version: "3.9"
+
+# ── Galley Archive — local dev compose ────────────────────────────────────────
+#
+# Prerequisites:
+#   cp .env.example .env
+#   mkdir -p data/db data/media data/imports data/exports data/backups
+#
+# Usage: make up   (or: docker compose up --build)
+#
+# LM Studio: runs on the host machine, not in this compose stack.
+# Access it from containers via host.docker.internal (mapped below).
+# Update LM_STUDIO_BASE_URL in .env if your LM Studio is on a different host.
+
+services:
+
+  # ── API ─────────────────────────────────────────────────────────────────────
+  galley-api:
+    build:
+      context: ./apps/api
+    working_dir: /repo/apps/api
+    volumes:
+      # Full repo mounted so settings.py can resolve REPO_ROOT via parents[4]
+      - .:/repo
+      # Persistent data volumes — bind-mounted so data survives container rebuilds
+      - ./data/db:/repo/data/db
+      - ./data/media:/repo/data/media
+      - ./data/imports:/repo/data/imports
+      - ./data/exports:/repo/data/exports
+      - ./data/backups:/repo/data/backups
+    env_file: .env
+    ports:
+      - "8000:8000"
+    # LM Studio runs on host; host.docker.internal resolves to the host machine on Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # ── Web ─────────────────────────────────────────────────────────────────────
+  galley-web:
+    build:
+      context: ./apps/web
+    working_dir: /repo/apps/web
+    volumes:
+      - .:/repo
+      # Preserve node_modules built into the image — prevents host overwrite
+      - /repo/apps/web/node_modules
+    environment:
+      # Overrides the default localhost:8000 proxy target for in-compose routing
+      API_HOST: http://galley-api:8000
+    depends_on:
+      - galley-api
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # ── Nginx reverse proxy (optional) ──────────────────────────────────────────
+  # Activated only with the "proxy" profile: make up-proxy
+  # Serves both frontend and backend on a single port (default: 8080).
+  # Useful for home-network access without port numbers.
+  # Direct access on :3000 and :8000 remains available whether or not nginx is running.
+  galley-nginx:
+    image: nginx:alpine
+    profiles: ["proxy"]
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./infra/nginx/galley.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - galley-api
+      - galley-web
+    restart: unless-stopped

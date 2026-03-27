@@ -1,0 +1,10 @@
+/*
+ * Sevastolink Galley Archive — Token import shim for apps/web.
+ *
+ * Canonical token definitions live in packages/shared-ui-tokens/tokens.css.
+ * This file imports them so global.css can continue using @import "./tokens.css".
+ *
+ * To add app-specific overrides, add :root { } blocks below the import.
+ */
+
+@import "../../../../packages/shared-ui-tokens/tokens.css";

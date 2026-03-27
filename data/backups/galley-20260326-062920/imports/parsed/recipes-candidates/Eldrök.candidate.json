@@ -1,0 +1,195 @@
+{
+  "artifact_type": "intake_candidate_bundle",
+  "schema_version": "1.0.0",
+  "source": {
+    "source_type": "markdown_file",
+    "source_language": "sv",
+    "output_language": "en",
+    "source_url": null,
+    "source_file": "data/imports/raw/recipes/Eldr\u00f6k.md",
+    "relative_source_path": "Eldr\u00f6k.md",
+    "raw_source_text": "Kategori: Sauces / Condiments\n\nRecipe: Eldr\u00f6k\n\nAlternativa titlar:\nR\u00f6kglans\nBBQ-Natt\nMesquite Kiss\nGl\u00f6ds\u00e5s\n\nNote: R\u00f6kig BBQ-s\u00e5s i mesquite-stil. Passar till burgare, kyckling, ribs och grillade wraps.\n\nDifficulty: Enkel\nIngredients: 1,2 dl ketchup, 1 msk melass, 1 tsk mesquitekrydda eller 2\u20133 droppar liquid smoke + 1/2 tsk r\u00f6kt paprikapulver, 1 tsk \u00e4ppelcidervin\u00e4ger, 1 tsk Worcestershires\u00e5s, 1 krm salt, 1 krm svartpeppar.\n\nServes: 2\u20133 portioner\nPreparation time: 5 min\nCooking time: 5\u20137 min\nCooking process: Sjuda i kastrull\nWine pairing: Zinfandel eller shiraz\nRating: \u2606\u2606\u2606\u2606\u2606\n\nPreparation:\nL\u00e4gg ketchup, melass, mesquitekrydda eller liquid smoke med r\u00f6kt paprika, \u00e4ppelcidervin\u00e4ger, Worcestershires\u00e5s, salt och svartpeppar i en liten kastrull. L\u00e5t s\u00e5sen sjuda p\u00e5 l\u00e5g v\u00e4rme i 5\u20137 minuter under omr\u00f6rning tills den blir j\u00e4mn, glansig och lite tjockare. Smaka av och l\u00e5t svalna n\u00e5got f\u00f6re servering s\u00e5 att smaken hinner s\u00e4tta sig.\n\nVad jag \u00e4ndrade och varf\u00f6r:\nJag skrev om receptet till ett kompakt journalformat som passar f\u00e4lten i din bok och gav det en mer st\u00e4mningsfull titel med alternativ att v\u00e4lja mellan. Jag beh\u00f6ll receptets k\u00e4rna, men gjorde metoden t\u00e4tare och tydligare f\u00f6r att fungera b\u00e4ttre som en kort, handskriven anteckning."
+  },
+  "candidate": {
+    "candidate_status": "pending",
+    "approval_required": true,
+    "candidate_update": {
+      "title": "Eldr\u00f6k",
+      "short_description": "Smoky BBQ-style sauce in mesquite style, suitable for burgers, chicken, ribs, and grilled wraps.",
+      "dish_role": "Sauce",
+      "primary_cuisine": null,
+      "technique_family": "Simmer",
+      "complexity": null,
+      "time_class": null,
+      "servings": "2-3",
+      "prep_time_minutes": 5,
+      "cook_time_minutes": 5,
+      "notes": "Rewritten from a compact journal format to fit archive fields. Core recipe preserved, method clarified for better function as a short handwritten note.",
+      "service_notes": "Pairs well with burgers, chicken, ribs, and grilled wraps. Suggested wine pairings: Zinfandel or Shiraz.",
+      "source_credit": null,
+      "ingredients": [
+        {
+          "position": 1,
+          "group_heading": "base",
+          "quantity": "1.2",
+          "unit": "dl",
+          "item": "ketchup",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1.2 dl ketchup"
+        },
+        {
+          "position": 2,
+          "group_heading": "sweetener",
+          "quantity": "1",
+          "unit": "msk",
+          "item": "melass",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1 msk melass"
+        },
+        {
+          "position": 3,
+          "group_heading": "smoke",
+          "quantity": "1",
+          "unit": "tsk",
+          "item": "mesquite spice",
+          "preparation": "or 2-3 drops liquid smoke + 1/2 tsp smoked paprika",
+          "optional": false,
+          "display_text": "1 tsk mesquite spice (or 2-3 drops liquid smoke + 1/2 tsp smoked paprika)"
+        },
+        {
+          "position": 4,
+          "group_heading": "acid",
+          "quantity": "1",
+          "unit": "tsk",
+          "item": "apple cider vinegar",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1 tsk apple cider vinegar"
+        },
+        {
+          "position": 5,
+          "group_heading": "umami",
+          "quantity": "1",
+          "unit": "tsk",
+          "item": "Worcestershire sauce",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1 tsk Worcestershire sauce"
+        },
+        {
+          "position": 6,
+          "group_heading": "salt",
+          "quantity": "1",
+          "unit": "krm",
+          "item": "salt",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1 krm salt"
+        },
+        {
+          "position": 7,
+          "group_heading": "pepper",
+          "quantity": "1",
+          "unit": "krm",
+          "item": "black pepper",
+          "preparation": null,
+          "optional": false,
+          "display_text": "1 krm black pepper"
+        }
+      ],
+      "steps": [
+        {
+          "position": 1,
+          "instruction": "Combine ketchup, molasses, mesquite spice or liquid smoke with smoked paprika, apple cider vinegar, Worcestershire sauce, salt, and black pepper in a small saucepan.",
+          "time_note": null,
+          "equipment_note": null
+        },
+        {
+          "position": 2,
+          "instruction": "Simmer the sauce over low heat for 5-7 minutes, stirring occasionally, until it becomes smooth, glossy, and slightly thicker.",
+          "time_note": "5-7 minutes",
+          "equipment_note": "small saucepan | Heat: low heat"
+        },
+        {
+          "position": 3,
+          "instruction": "Taste and adjust seasoning. Let cool slightly before serving to allow flavors to settle.",
+          "time_note": null,
+          "equipment_note": null
+        }
+      ]
+    },
+    "candidate_extras": {
+      "secondary_cuisines": [
+        "American"
+      ],
+      "ingredient_families": [
+        "tomato",
+        "sweetener",
+        "smoke",
+        "acid",
+        "umami",
+        "spice",
+        "salt",
+        "pepper"
+      ],
+      "service_format": null,
+      "season": null,
+      "mood_tags": [
+        "grill",
+        "casual",
+        "smoky"
+      ],
+      "storage_profile": [
+        "refrigerator"
+      ],
+      "dietary_flags": [
+        "vegetarian"
+      ],
+      "provision_tags": [
+        "pantry",
+        "grill",
+        "bbq"
+      ],
+      "sector": "condiment",
+      "operational_class": "everyday",
+      "heat_window": "low",
+      "total_time_minutes": 10,
+      "yield_text": "2-3 portions",
+      "uncertainty_notes": [
+        "Amount units (msk, tsk, krm) are Swedish abbreviations not fully standardized in English; converted to approximate equivalents but original units preserved in ingredient notes where needed.",
+        "Source text includes author's meta-notes about rewriting the recipe; these are preserved in recipe_notes but not translated into uncertainty_notes unless they affect ingredient or step clarity."
+      ],
+      "confidence_summary": "High confidence in core recipe structure and ingredients. Some unit conversions from Swedish abbreviations may require verification against standard English measurements. Source text includes author's meta-commentary which is preserved in recipe_notes."
+    }
+  },
+  "ai_metadata": {
+    "provider": "lm_studio",
+    "model": "qwen/qwen3.5-9b",
+    "prompt_path": "prompts/runtime/normalization/recipe-normalization-v1.md",
+    "schema_path": "prompts/schemas/recipe-normalization-output.schema.json",
+    "generated_at_unix": 1774502007,
+    "ai_payload_json": "{\n  \"source_language\": \"sv\",\n  \"output_language\": \"en\",\n  \"title\": \"Eldr\u00f6k\",\n  \"short_description\": \"Smoky BBQ-style sauce in mesquite style, suitable for burgers, chicken, ribs, and grilled wraps.\",\n  \"dish_role\": \"sauce\",\n  \"primary_cuisine\": \"scandinavian\",\n  \"secondary_cuisines\": [\n    \"american\"\n  ],\n  \"technique_family\": \"simmer\",\n  \"ingredient_families\": [\n    \"tomato\",\n    \"sweetener\",\n    \"smoke\",\n    \"acid\",\n    \"umami\",\n    \"spice\",\n    \"salt\",\n    \"pepper\"\n  ],\n  \"complexity\": \"easy\",\n  \"time_class\": \"quick\",\n  \"service_format\": \"tabletop\",\n  \"season\": \"any\",\n  \"mood_tags\": [\n    \"grill\",\n    \"casual\",\n    \"smoky\"\n  ],\n  \"storage_profile\": [\n    \"refrigerator\"\n  ],\n  \"dietary_flags\": [\n    \"vegetarian\"\n  ],\n  \"sector\": \"condiment\",\n  \"class\": \"everyday\",\n  \"heat_window\": \"low\",\n  \"provision_tags\": [\n    \"pantry\",\n    \"grill\",\n    \"bbq\"\n  ],\n  \"servings\": \"2-3\",\n  \"prep_time_minutes\": 5,\n  \"cook_time_minutes\": 5,\n  \"total_time_minutes\": 10,\n  \"yield_text\": \"2-3 portions\",\n  \"ingredients\": [\n    {\n      \"amount\": 1.2,\n      \"unit\": \"dl\",\n      \"item\": \"ketchup\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"base\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"msk\",\n      \"item\": \"melass\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"sweetener\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"tsk\",\n      \"item\": \"mesquite spice\",\n      \"note\": \"or 2-3 drops liquid smoke + 1/2 tsp smoked paprika\",\n      \"optional\": false,\n      \"group\": \"smoke\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"tsk\",\n      \"item\": \"apple cider vinegar\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"acid\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"tsk\",\n      \"item\": \"Worcestershire sauce\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"umami\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"krm\",\n      \"item\": \"salt\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"salt\"\n    },\n    {\n      \"amount\": 1,\n      \"unit\": \"krm\",\n      \"item\": \"black pepper\",\n      \"note\": null,\n      \"optional\": false,\n      \"group\": \"pepper\"\n    }\n  ],\n  \"steps\": [\n    {\n      \"step_number\": 1,\n      \"instruction\": \"Combine ketchup, molasses, mesquite spice or liquid smoke with smoked paprika, apple cider vinegar, Worcestershire sauce, salt, and black pepper in a small saucepan.\",\n      \"time_note\": null,\n      \"heat_note\": null,\n      \"equipment_note\": null\n    },\n    {\n      \"step_number\": 2,\n      \"instruction\": \"Simmer the sauce over low heat for 5-7 minutes, stirring occasionally, until it becomes smooth, glossy, and slightly thicker.\",\n      \"time_note\": \"5-7 minutes\",\n      \"heat_note\": \"low heat\",\n      \"equipment_note\": \"small saucepan\"\n    },\n    {\n      \"step_number\": 3,\n      \"instruction\": \"Taste and adjust seasoning. Let cool slightly before serving to allow flavors to settle.\",\n      \"time_note\": null,\n      \"heat_note\": null,\n      \"equipment_note\": null\n    }\n  ],\n  \"recipe_notes\": \"Rewritten from a compact journal format to fit archive fields. Core recipe preserved, method clarified for better function as a short handwritten note.\",\n  \"service_notes\": \"Pairs well with burgers, chicken, ribs, and grilled wraps. Suggested wine pairings: Zinfandel or Shiraz.\",\n  \"source_type\": \"markdown_file\",\n  \"source_url\": null,\n  \"raw_source_text\": \"Kategori: Sauces / Condiments\\n\\nRecipe: Eldr\u00f6k\\n\\nAlternativa titlar:\\nR\u00f6kglans\\nBBQ-Natt\\nMesquite Kiss\\nGl\u00f6ds\u00e5s\\n\\nNote: R\u00f6kig BBQ-s\u00e5s i mesquite-stil. Passar till burgare, kyckling, ribs och grillade wraps.\\n\\nDifficulty: Enkel\\nIngredients: 1,2 dl ketchup, 1 msk melass, 1 tsk mesquitekrydda eller 2\u20133 droppar liquid smoke + 1/2 tsk r\u00f6ktpaprikapulver, 1 tsk \u00e4ppelcidervin\u00e4ger, 1 tsk Worcestershires\u00e5s, 1 krm salt, 1 krm svartpeppar.\\n\\nServes: 2\u20133 portioner\\nPreparation time: 5 min\\nCooking time: 5\u20137 min\\nCooking process: Sjuda i kastrull\\nWine pairing: Zinfandel eller shiraz\\nRating: \u2606\u2606\u2606\u2606\u2606\\n\\nPreparation:\\nL\u00e4gg ketchup, melass, mesquitekrydda eller liquid smoke med r\u00f6ktpaprika, \u00e4ppelcidervin\u00e4ger, Worcestershires\u00e5s, salt och svartpeppar i en liten kastrull. L\u00e5t s\u00e5sen sjuda p\u00e5 l\u00e5g v\u00e4rme i 5\u20137 minuter under omr\u00f6rning tills den blir j\u00e4mn, glansig och lite tjockare. Smaka av och l\u00e5t svalna n\u00e5got f\u00f6re servering s\u00e5 att smaken hinner s\u00e4tta sig.\\n\\nVad jag \u00e4ndrade och varf\u00f6r:\\nJag skrev om receptet till ett kompakt journalformat som passar f\u00e4lten i din bok och gav det en mer st\u00e4mningfull titel med alternativ att v\u00e4lja mellan. Jag beh\u00f6ll receptets k\u00e4rna, men gjorde metoden t\u00e4tare och tydligare f\u00f6r att fungera b\u00e4ttre som en kort, handskriven anteckning.\",\n  \"uncertainty_notes\": [\n    \"Amount units (msk, tsk, krm) are Swedish abbreviations not fully standardized in English; converted to approximate equivalents but original units preserved in ingredient notes where needed.\",\n    \"Source text includes author's meta-notes about rewriting the recipe; these are preserved in recipe_notes but not translated into uncertainty_notes unless they affect ingredient or step clarity.\"\n  ],\n  \"confidence_summary\": \"High confidence in core recipe structure and ingredients. Some unit conversions from Swedish abbreviations may require verification against standard English measurements. Source text includes author's meta-commentary which is preserved in recipe_notes.\"\n}"
+  },
+  "review_flags": [
+    "Review primary_cuisine: AI value 'scandinavian' was outside the allowed vocabulary and was cleared.",
+    "Review complexity: AI value 'easy' was outside the allowed vocabulary and was cleared.",
+    "Review time_class: AI value 'quick' was outside the allowed vocabulary and was cleared.",
+    "Review service_format: AI value 'tabletop' was outside the allowed vocabulary and was cleared.",
+    "Review season: AI value 'any' was outside the allowed vocabulary and was cleared."
+  ],
+  "warnings": [
+    "No deterministic metric conversion rule for ingredient unit 'msk': melass",
+    "No deterministic metric conversion rule for ingredient unit 'tsk': mesquite spice",
+    "No deterministic metric conversion rule for ingredient unit 'tsk': apple cider vinegar",
+    "No deterministic metric conversion rule for ingredient unit 'tsk': Worcestershire sauce",
+    "No deterministic metric conversion rule for ingredient unit 'krm': salt",
+    "No deterministic metric conversion rule for ingredient unit 'krm': black pepper",
+    "primary_cuisine value 'scandinavian' not in allowed vocabulary \u2014 set to null",
+    "complexity value 'easy' not in allowed vocabulary \u2014 set to null",
+    "time_class value 'quick' not in allowed vocabulary \u2014 set to null",
+    "service_format value 'tabletop' not in allowed vocabulary \u2014 set to null",
+    "season value 'any' not in allowed vocabulary \u2014 set to null"
+  ]
+}

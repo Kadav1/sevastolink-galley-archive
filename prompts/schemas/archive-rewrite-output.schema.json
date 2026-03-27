@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sevastolink.local/schemas/archive-rewrite-output.schema.json",
+  "title": "Archive Rewrite Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "short_description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "item": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "optional": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "group": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "amount",
+          "unit",
+          "item",
+          "note",
+          "optional",
+          "group"
+        ]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "step_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "time_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "heat_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "equipment_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "step_number",
+          "instruction",
+          "time_note",
+          "heat_note",
+          "equipment_note"
+        ]
+      }
+    },
+    "recipe_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rewrite_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "uncertainty_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "short_description",
+    "ingredients",
+    "steps",
+    "recipe_notes",
+    "service_notes",
+    "rewrite_notes",
+    "uncertainty_notes"
+  ]
+}

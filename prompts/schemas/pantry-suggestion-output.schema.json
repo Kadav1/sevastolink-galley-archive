@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sevastolink.local/schemas/pantry-suggestion-output.schema.json",
+  "title": "Pantry Suggestion Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "direct_matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "match_type": {
+            "type": "string"
+          },
+          "why_it_matches": {
+            "type": "string"
+          },
+          "missing_items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommended_adjustments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_fit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "match_type",
+          "why_it_matches",
+          "missing_items",
+          "recommended_adjustments",
+          "time_fit"
+        ]
+      }
+    },
+    "near_matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "match_type": {
+            "type": "string"
+          },
+          "why_it_matches": {
+            "type": "string"
+          },
+          "missing_items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommended_adjustments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_fit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "match_type",
+          "why_it_matches",
+          "missing_items",
+          "recommended_adjustments",
+          "time_fit"
+        ]
+      }
+    },
+    "pantry_gap_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "substitution_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "quick_ideas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "direct_matches",
+    "near_matches",
+    "pantry_gap_notes",
+    "substitution_suggestions",
+    "quick_ideas",
+    "confidence_notes"
+  ]
+}

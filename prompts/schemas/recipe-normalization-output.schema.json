@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sevastolink.local/schemas/recipe-normalization-output.schema.json",
+  "title": "Recipe Normalization Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_language": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "output_language": {
+      "type": "string",
+      "const": "en"
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "short_description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dish_role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "primary_cuisine": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "secondary_cuisines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "technique_family": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ingredient_families": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "complexity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "time_class": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_format": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "season": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mood_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "storage_profile": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dietary_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sector": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "class": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "heat_window": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provision_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "servings": {
+      "type": [
+        "number",
+        "integer",
+        "string",
+        "null"
+      ]
+    },
+    "prep_time_minutes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "cook_time_minutes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "total_time_minutes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "yield_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "item": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "optional": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "group": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "amount",
+          "unit",
+          "item",
+          "note",
+          "optional",
+          "group"
+        ]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "step_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "time_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "heat_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "equipment_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "step_number",
+          "instruction",
+          "time_note",
+          "heat_note",
+          "equipment_note"
+        ]
+      }
+    },
+    "recipe_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "raw_source_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "uncertainty_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "source_language",
+    "output_language",
+    "title",
+    "short_description",
+    "dish_role",
+    "primary_cuisine",
+    "secondary_cuisines",
+    "technique_family",
+    "ingredient_families",
+    "complexity",
+    "time_class",
+    "service_format",
+    "season",
+    "mood_tags",
+    "storage_profile",
+    "dietary_flags",
+    "sector",
+    "class",
+    "heat_window",
+    "provision_tags",
+    "servings",
+    "prep_time_minutes",
+    "cook_time_minutes",
+    "total_time_minutes",
+    "yield_text",
+    "ingredients",
+    "steps",
+    "recipe_notes",
+    "service_notes",
+    "source_type",
+    "source_url",
+    "raw_source_text",
+    "uncertainty_notes",
+    "confidence_summary"
+  ]
+}

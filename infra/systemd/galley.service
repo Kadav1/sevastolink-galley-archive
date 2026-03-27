@@ -1,0 +1,45 @@
+[Unit]
+Description=Sevastolink Galley Archive
+Documentation=file:%h/sevastolink-galley-archive/docs/09_ops/local-deployment.md
+# Docker daemon is a system service; this unit retries if Docker is not yet available.
+# Ensure the Docker daemon is running before enabling this service.
+
+[Service]
+Type=simple
+
+# ── Working directory ─────────────────────────────────────────────────────────
+# Set to the absolute path of the cloned repo on this machine.
+# %h expands to the user's home directory.
+# Change if the repo lives elsewhere (e.g. /opt/galley, /media/disk/galley).
+WorkingDirectory=%h/sevastolink-galley-archive
+
+# ── Environment ───────────────────────────────────────────────────────────────
+# Loads the same .env used by docker compose directly.
+# Run 'cp .env.example .env' in the repo before enabling this service.
+EnvironmentFile=%h/sevastolink-galley-archive/.env
+
+# ── Startup ───────────────────────────────────────────────────────────────────
+# Starts containers without rebuilding. Run 'make build' or 'make rebuild'
+# in the repo before starting the service for the first time, or after
+# adding new dependencies.
+ExecStart=/usr/bin/docker compose up
+
+# ── Shutdown ──────────────────────────────────────────────────────────────────
+ExecStop=/usr/bin/docker compose down
+
+# ── Restart behavior ──────────────────────────────────────────────────────────
+# Restarts the service if docker compose exits unexpectedly.
+# Does not restart on clean ExecStop (e.g. systemctl stop galley).
+Restart=on-failure
+RestartSec=15s
+TimeoutStartSec=120s
+TimeoutStopSec=60s
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+# Container output is captured by journald.
+# View with: journalctl --user -u galley -f
+
+[Install]
+# Starts when the user's default session target is reached.
+# For start-on-boot without login, run: loginctl enable-linger $USER
+WantedBy=default.target

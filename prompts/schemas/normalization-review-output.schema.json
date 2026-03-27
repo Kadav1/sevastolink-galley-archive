@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sevastolink.local/schemas/normalization-review-output.schema.json",
+  "title": "Normalization Review Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "fidelity_assessment": {
+      "type": "string"
+    },
+    "missing_information": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "likely_inventions_or_overreaches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ingredient_issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "step_issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata_confidence": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "review_recommendation": {
+      "type": "string",
+      "enum": [
+        "safe_for_human_review",
+        "review_with_caution",
+        "needs_major_correction"
+      ]
+    },
+    "reviewer_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "fidelity_assessment",
+    "missing_information",
+    "likely_inventions_or_overreaches",
+    "ingredient_issues",
+    "step_issues",
+    "metadata_confidence",
+    "review_recommendation",
+    "reviewer_notes"
+  ]
+}

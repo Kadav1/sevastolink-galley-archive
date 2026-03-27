@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_language": {
+      "type": "string"
+    },
+    "output_language": {
+      "type": "string",
+      "const": "en"
+    },
+    "translated_text": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "source_language",
+    "output_language",
+    "translated_text"
+  ]
+}
