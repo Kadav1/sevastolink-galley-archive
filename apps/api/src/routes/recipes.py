@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from src.ai.lm_studio_client import LMStudioClient
 from src.ai.metadata_suggester import MetadataErrorKind, suggest_metadata
 from src.ai.rewriter import RewriteErrorKind, rewrite_recipe
+from src.ai.similarity_engine import SimilarityErrorKind, find_similar_recipes
 from src.config.settings import settings
 from src.db.database import get_db
-from src.schemas.ai_outputs import ArchiveRewriteOut, MetadataSuggestionOut
+from src.schemas.ai_outputs import ArchiveRewriteOut, MetadataSuggestionOut, SimilarityIn, SimilarRecipesOut
 from src.schemas.common import ApiResponse, ListMeta, ListResponse
 from src.schemas.recipe import (
     RecipeArchiveResult,
@@ -223,3 +224,55 @@ def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)):
         )
 
     return ApiResponse(data=ArchiveRewriteOut.model_validate(result.payload))
+
+
+# ── Similar Recipes (AI-assisted) ─────────────────────────────────────────────
+
+@router.post("/{id_or_slug}/similar", response_model=ApiResponse[SimilarRecipesOut])
+def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Depends(get_db)):
+    """
+    Return AI-ranked similar recipes from the archive.
+
+    Fetches up to 20 other non-archived recipes and ranks them by culinary
+    similarity to the source recipe. Pass `emphasis` in the body to focus on
+    a specific similarity dimension (e.g. "cuisine", "technique", "ingredient").
+    Requires LM_STUDIO_ENABLED=true.
+    """
+    if not settings.lm_studio_enabled:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "ai_disabled", "message": "AI similarity is not enabled. Set LM_STUDIO_ENABLED=true."}},
+        )
+    recipe = recipe_service.get_recipe(db, id_or_slug)
+    if not recipe:
+        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+
+    candidates_orm, _ = recipe_service.list_recipes(
+        db, archived=False, limit=21, offset=0, sort="updated_at_desc"
+    )
+    source_recipe_dict = _detail(recipe).model_dump()
+    candidate_dicts = [
+        _summary(r).model_dump() for r in candidates_orm if r.id != recipe.id
+    ][:20]
+
+    client = LMStudioClient(settings.lm_studio_base_url)
+    result, err = find_similar_recipes(
+        client,
+        source_recipe=source_recipe_dict,
+        candidates=candidate_dicts,
+        emphasis=body.emphasis,
+        model=settings.lm_studio_model,
+    )
+
+    if err is not None:
+        if err.kind == SimilarityErrorKind.transport_failure:
+            raise HTTPException(
+                status_code=503,
+                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+            )
+        raise HTTPException(
+            status_code=502,
+            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+        )
+
+    return ApiResponse(data=SimilarRecipesOut.model_validate(result.payload))
