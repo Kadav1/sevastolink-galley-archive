@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from src.ai.evaluator import EvaluationErrorKind, EvaluationResult, evaluate_normalization
 from src.ai.lm_studio_client import LMStudioClient
 from src.ai.normalizer import NormalizationErrorKind, normalize_recipe
 from src.config.settings import settings
 from src.db.database import get_db
 from src.schemas.common import ApiResponse
+from src.schemas.ai_outputs import EvaluationOut
 from src.schemas.intake import (
     ApproveIntakeIn,
     ApproveIntakeOut,
@@ -189,4 +191,71 @@ def approve_intake_job(job_id: str, body: ApproveIntakeIn, db: Session = Depends
     return ApiResponse(data=ApproveIntakeOut(
         recipe=RecipeSummaryOut.from_orm_with_json(recipe),
         intake_job_id=job_id,
+    ))
+
+
+# ── Evaluate (AI quality review) ──────────────────────────────────────────────
+
+@router.post("/{job_id}/evaluate", response_model=ApiResponse[EvaluationOut])
+def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
+    """
+    Run an AI quality review of the current candidate against the raw source.
+
+    Returns a structured review with faithfulness assessment and a recommendation.
+    Does NOT modify the candidate — this is a read-only review endpoint.
+    Requires LM_STUDIO_ENABLED=true.
+    """
+    if not settings.lm_studio_enabled:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "ai_disabled", "message": "AI evaluation is not enabled. Set LM_STUDIO_ENABLED=true."}},
+        )
+
+    job = intake_service.get_intake_job(db, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+
+    if not job.raw_source_text:
+        raise HTTPException(
+            status_code=422,
+            detail={"error": {"code": "no_source_text", "message": "Intake job has no raw source text to evaluate against."}},
+        )
+
+    candidate = job.candidate
+    if not candidate:
+        raise HTTPException(
+            status_code=422,
+            detail={"error": {"code": "no_candidate", "message": "Intake job has no structured candidate to evaluate."}},
+        )
+
+    candidate_dict = _candidate_out(candidate).model_dump()
+
+    client = LMStudioClient(settings.lm_studio_base_url)
+    result, err = evaluate_normalization(
+        client,
+        raw_source_text=job.raw_source_text,
+        candidate=candidate_dict,
+        model=settings.lm_studio_model,
+    )
+
+    if err is not None:
+        if err.kind == EvaluationErrorKind.transport_failure:
+            raise HTTPException(
+                status_code=503,
+                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+            )
+        raise HTTPException(
+            status_code=502,
+            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+        )
+
+    return ApiResponse(data=EvaluationOut(
+        fidelity_assessment=result.fidelity_assessment,
+        missing_information=result.missing_information,
+        likely_inventions_or_overreaches=result.likely_inventions_or_overreaches,
+        ingredient_issues=result.ingredient_issues,
+        step_issues=result.step_issues,
+        metadata_confidence=result.metadata_confidence,
+        review_recommendation=result.review_recommendation,
+        reviewer_notes=result.reviewer_notes,
     ))
