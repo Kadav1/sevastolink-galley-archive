@@ -49,6 +49,9 @@ data/backups/
 data/embeddings/
 data/logs/
 
+# ── LM Studio logs ────────────────────────────────────────────────────────────
+lm-studio-server-logs/
+
 # ── Docker ────────────────────────────────────────────────────────────────────
 .dockerignore
 
