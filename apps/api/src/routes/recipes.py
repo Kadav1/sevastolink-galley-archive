@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 
 from src.ai.lm_studio_client import LMStudioClient
 from src.ai.metadata_suggester import MetadataErrorKind, suggest_metadata
+from src.ai.rewriter import RewriteErrorKind, rewrite_recipe
 from src.config.settings import settings
 from src.db.database import get_db
-from src.schemas.ai_outputs import MetadataSuggestionOut
+from src.schemas.ai_outputs import ArchiveRewriteOut, MetadataSuggestionOut
 from src.schemas.common import ApiResponse, ListMeta, ListResponse
 from src.schemas.recipe import (
     RecipeArchiveResult,
@@ -184,3 +185,41 @@ def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)):
         )
 
     return ApiResponse(data=MetadataSuggestionOut.model_validate(result.payload))
+
+
+# ── Archive Rewrite (AI-assisted) ─────────────────────────────────────────────
+
+@router.post("/{id_or_slug}/rewrite", response_model=ApiResponse[ArchiveRewriteOut])
+def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)):
+    """
+    Return an archive-style rewrite of a recipe via AI.
+
+    Returns a suggested rewrite for human review. Does NOT apply changes —
+    use PATCH /recipes/{id_or_slug} to apply the rewrite.
+    Requires LM_STUDIO_ENABLED=true.
+    """
+    if not settings.lm_studio_enabled:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "ai_disabled", "message": "AI rewrite is not enabled. Set LM_STUDIO_ENABLED=true."}},
+        )
+    recipe = recipe_service.get_recipe(db, id_or_slug)
+    if not recipe:
+        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+
+    recipe_dict = _detail(recipe).model_dump()
+    client = LMStudioClient(settings.lm_studio_base_url)
+    result, err = rewrite_recipe(client, recipe=recipe_dict, model=settings.lm_studio_model)
+
+    if err is not None:
+        if err.kind == RewriteErrorKind.transport_failure:
+            raise HTTPException(
+                status_code=503,
+                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+            )
+        raise HTTPException(
+            status_code=502,
+            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+        )
+
+    return ApiResponse(data=ArchiveRewriteOut.model_validate(result.payload))
