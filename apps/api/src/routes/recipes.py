@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from src.ai.lm_studio_client import LMStudioClient
+from src.ai.metadata_suggester import MetadataErrorKind, suggest_metadata
+from src.config.settings import settings
 from src.db.database import get_db
+from src.schemas.ai_outputs import MetadataSuggestionOut
 from src.schemas.common import ApiResponse, ListMeta, ListResponse
 from src.schemas.recipe import (
     RecipeArchiveResult,
@@ -142,3 +146,41 @@ def delete_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     deleted = recipe_service.delete_recipe(db, id_or_slug)
     if not deleted:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+
+
+# ── Suggest Metadata (AI-assisted) ───────────────────────────────────────────
+
+@router.post("/{id_or_slug}/suggest-metadata", response_model=ApiResponse[MetadataSuggestionOut])
+def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)):
+    """
+    Suggest taxonomy and classification fields for an existing recipe via AI.
+
+    Returns suggested metadata for human review. Does NOT apply changes —
+    use PATCH /recipes/{id_or_slug} to apply suggestions.
+    Requires LM_STUDIO_ENABLED=true.
+    """
+    if not settings.lm_studio_enabled:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "ai_disabled", "message": "AI metadata suggestion is not enabled. Set LM_STUDIO_ENABLED=true."}},
+        )
+    recipe = recipe_service.get_recipe(db, id_or_slug)
+    if not recipe:
+        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+
+    recipe_dict = _detail(recipe).model_dump()
+    client = LMStudioClient(settings.lm_studio_base_url)
+    result, err = suggest_metadata(client, recipe=recipe_dict, model=settings.lm_studio_model)
+
+    if err is not None:
+        if err.kind == MetadataErrorKind.transport_failure:
+            raise HTTPException(
+                status_code=503,
+                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+            )
+        raise HTTPException(
+            status_code=502,
+            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+        )
+
+    return ApiResponse(data=MetadataSuggestionOut.model_validate(result.payload))
