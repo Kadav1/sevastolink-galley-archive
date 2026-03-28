@@ -19,6 +19,8 @@ It establishes:
 
 This is an implementation-aware workflow document for the current repository.
 
+For the wider current import baseline and missing import work, see [implemented-imports.md](./implemented-imports.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## 2. Workflow philosophy
@@ -102,6 +104,10 @@ Current expectations:
 * the runtime prompt and schema files must exist
 * output is written as candidate bundle JSON, not directly into the database
 
+Current note:
+
+* the normalization script also supports optional translation-model configuration, but the simplest current workflow remains single-model normalization unless a separate translation pass is intentionally being used
+
 ### 4.3 Stage 3: Review candidate bundles
 
 List available bundles:
@@ -143,6 +149,10 @@ Current behavior:
 * `edit` mutates the bundle file itself
 * it does not modify the raw source file
 * it does not approve anything by itself
+
+Related implemented tooling:
+
+* `scripts/import/repair_candidates.py` provides a deterministic bulk cleanup pass for recurring candidate issues after normalization
 
 ### 4.5 Stage 5: Ingest reviewed candidates into intake
 
@@ -248,6 +258,8 @@ The CLI import flow is the better fit when:
 * preserving source files in bulk
 * reviewing normalization output outside the web UI
 * patching candidate bundles directly before ingest or approval
+
+This matters because the repository does not yet provide a broader dedicated AI review application surface for bulk candidate work.
 
 The web flow is the better fit when:
 

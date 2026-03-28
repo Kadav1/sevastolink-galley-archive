@@ -47,7 +47,10 @@ def db_session():
 @pytest.fixture(scope="function")
 def client(db_session):
     """HTTPX async client with test DB override."""
-    app.dependency_overrides[get_db] = lambda: db_session
+    async def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
     yield  # we create client in each test
     app.dependency_overrides.clear()
 

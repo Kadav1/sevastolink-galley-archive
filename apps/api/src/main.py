@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Make packages/shared-prompts importable without a formal pip install.
 # The repo is always present at REPO_ROOT (volume-mounted or local clone).
-_SHARED_PROMPTS_SRC = str(Path(__file__).resolve().parents[4] / "packages" / "shared-prompts" / "src")
+_SHARED_PROMPTS_SRC = str(Path(__file__).resolve().parents[3] / "packages" / "shared-prompts" / "src")
 if _SHARED_PROMPTS_SRC not in sys.path:
     sys.path.insert(0, _SHARED_PROMPTS_SRC)
 
@@ -19,8 +19,10 @@ from src.config.settings import settings
 from src.db.init_db import init_db
 from src.routes.health import router as health_router
 from src.routes.intake import router as intake_router
+from src.routes.media import router as media_router
 from src.routes.pantry import router as pantry_router
 from src.routes.recipes import router as recipes_router
+from src.routes.settings import router as settings_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,5 +56,7 @@ app.include_router(health_router, prefix="/api")
 v1_router = APIRouter(prefix="/api/v1")
 v1_router.include_router(recipes_router)
 v1_router.include_router(intake_router)
+v1_router.include_router(media_router)
 v1_router.include_router(pantry_router)
+v1_router.include_router(settings_router)
 app.include_router(v1_router)

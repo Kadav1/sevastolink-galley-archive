@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Boolean, CheckConstraint, ForeignKey, Integer, String, Text,
     Computed,
@@ -21,7 +21,7 @@ class RecipeSource(Base):
     source_media_asset_id: Mapped[str | None] = mapped_column(
         ForeignKey("media_assets.id", ondelete="SET NULL")
     )
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
 
     recipe: Mapped["Recipe | None"] = relationship(back_populates="source")
 
@@ -72,6 +72,11 @@ class Recipe(Base):
     # Search support
     ingredient_text: Mapped[str | None] = mapped_column(Text)
 
+    # Cover image
+    cover_media_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("media_assets.id", ondelete="SET NULL")
+    )
+
     # Linkage
     source_id: Mapped[str | None] = mapped_column(
         ForeignKey("recipe_sources.id", ondelete="SET NULL")
@@ -81,8 +86,8 @@ class Recipe(Base):
     )
 
     # Timestamps
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
-    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
     last_viewed_at: Mapped[str | None] = mapped_column(String)
     last_cooked_at: Mapped[str | None] = mapped_column(String)
 
@@ -142,7 +147,7 @@ class RecipeNote(Base):
     recipe_id: Mapped[str] = mapped_column(ForeignKey("recipes.id", ondelete="CASCADE"))
     note_type: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
-    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
 
     recipe: Mapped[Recipe] = relationship(back_populates="notes")

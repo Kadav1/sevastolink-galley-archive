@@ -211,3 +211,4 @@ When adding frontend docs or implementation work:
 * describe current routes separately from planned routes
 * update this document when a spec-only route becomes real
 * avoid documenting placeholder pages as functioning settings or AI workflows
+* use `docs/02_ux/implementation-backlog.md` for the prioritized target-state gap list

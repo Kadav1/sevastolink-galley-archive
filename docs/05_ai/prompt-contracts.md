@@ -4,6 +4,13 @@
 
 ---
 
+Current implementation note:
+
+* the prompt-contract layer is implemented and used by multiple backend AI tasks
+* some registered prompt families are still backend-only or asset-only from a product perspective
+* use [implemented-ai.md](./implemented-ai.md) for the current AI workflow baseline
+* use [implementation-backlog.md](./implementation-backlog.md) for remaining AI productization work
+
 ## 1. Purpose
 
 This document defines the prompt contracts and structured output contracts for AI workflows in Sevastolink Galley Archive.

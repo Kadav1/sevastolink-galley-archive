@@ -4,6 +4,13 @@
 
 ---
 
+Current implementation note:
+
+* LM Studio integration is real and used by multiple backend AI workflows today
+* not every AI workflow described across the `05_ai` docs is fully surfaced in the routed product yet
+* use [implemented-ai.md](./implemented-ai.md) for the current AI baseline
+* use [implementation-backlog.md](./implementation-backlog.md) for the prioritized AI gap list
+
 ## 1. Purpose
 
 This document defines how LM Studio integrates into Sevastolink Galley Archive as the local optional AI backend.

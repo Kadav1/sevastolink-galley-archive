@@ -1,6 +1,8 @@
-Sevastolink Galley Archive
+# Sevastolink Galley Archive
 
-Information Architecture Spec v1.0
+## Information Architecture Spec v1.0
+
+---
 
 1. Purpose
 
@@ -14,7 +16,39 @@ Its job is to establish:
 	•	what the primary flows are
 	•	how the system should scale without becoming messy
 
-This is the structural backbone of the product.
+This is the target-state structural backbone of the product.
+
+Current implementation note:
+
+* this document describes the intended information architecture
+* it does not describe the narrower current route set shipped in the app today
+* use `docs/02_ux/implemented-routes-and-flows.md` for the implementation-aware route baseline
+
+---
+
+## Current-state gap note
+
+The current frontend does not yet implement most of the route and navigation expansion described below.
+
+Implemented today:
+
+* library landing and browse
+* recipe detail
+* kitchen mode
+* intake hub
+* manual entry
+* paste-text intake
+* settings placeholder
+
+Not yet implemented today:
+
+* library sub-routes such as favorites, recent, verified, drafts, and search results
+* AI tools routes
+* URL import and file intake routes
+* recipe edit route
+* settings sub-pages
+
+The remainder of this document should be read as target-state IA, not as a description of the current app.
 
 ⸻
 
@@ -713,4 +747,3 @@ That document should define:
 	•	usage rules across screens
 
 ⸻
-

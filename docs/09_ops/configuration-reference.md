@@ -19,6 +19,8 @@ It establishes:
 
 This is an implementation-aware companion to `.env.example`, local deployment guidance, and the application settings code.
 
+For the wider implemented ops surface and remaining operations gaps, see [implemented-ops.md](./implemented-ops.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## 2. Configuration philosophy

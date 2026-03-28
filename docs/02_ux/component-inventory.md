@@ -1,6 +1,8 @@
-Sevastolink Galley Archive
+# Sevastolink Galley Archive
 
-Component Inventory & Behavior Spec v1.0
+## Component Inventory & Behavior Spec v1.0
+
+---
 
 1. Purpose
 
@@ -14,7 +16,32 @@ It establishes:
 	•	how components should behave
 	•	how they should scale across desktop, tablet, mobile, and kitchen mode
 
-This is the component-level source of truth for design and implementation.
+This is the component-level target-state design reference.
+
+Current implementation note:
+* this document describes the intended component system at a broader level than the current frontend implementation
+* it should not be treated as a one-to-one inventory of currently shipped React components
+* use `docs/02_ux/implemented-routes-and-flows.md` plus `apps/web/src/components/` and `apps/web/src/pages/` for current implementation truth
+
+---
+
+## Current-state gap note
+
+The current frontend does implement:
+* app shell with left navigation
+* library search and filter controls
+* recipe detail content blocks
+* intake pages for manual entry and paste text
+* kitchen mode surfaces
+
+The current frontend does not yet implement many of the broader component categories described below, including:
+* standalone AI tools components
+* breadcrumb/context-trail patterns
+* nested settings component groups
+* review-specific intake component suites beyond the current paste-text page
+* richer shell variants such as top search/action zones and right-side context panes
+
+The remainder of this document should be read as target-state component guidance.
 
 ⸻
 

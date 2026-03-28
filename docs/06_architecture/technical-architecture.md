@@ -17,7 +17,37 @@ It establishes:
 * how configuration, logging, backup, and restore should work
 * what is in scope for v1 and what is deferred
 
-This is the implementation architecture source of truth for the product.
+This is the canonical target-state architecture reference for the product.
+
+Current implementation note:
+
+* the repository already implements the recommended core stack in broad terms
+* the repository does not yet fully realize every target-state backend domain and layering boundary described here
+* use `docs/06_architecture/implemented-architecture.md` for the current implementation baseline
+* use `docs/06_architecture/implementation-backlog.md` for the prioritized target-state gap list
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* React, Vite, React Router, and TanStack Query frontend stack
+* FastAPI, Pydantic, SQLAlchemy, and SQLite backend stack
+* SQLite FTS5 search
+* local filesystem persistence under `data/`
+* optional LM Studio integration
+* compose-based local stack and shell-based backup workflows
+
+Not yet fully implemented today:
+
+* separate mounted backend domains for search, media, settings, backup, and system
+* fully separated repository/data-access layer
+* functional settings workflows
+* real media-management surfaces
+* richer dev, migrate, and seed helper tooling
+
+The remainder of this document should therefore be read as target-state architecture guidance rather than as a complete description of the current runtime implementation.
 
 ---
 

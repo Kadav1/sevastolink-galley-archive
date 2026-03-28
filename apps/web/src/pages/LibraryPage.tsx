@@ -4,12 +4,13 @@ import { FilterPanel, type ActiveFilters } from "../components/library/FilterPan
 import { RecipeRow } from "../components/library/RecipeRow";
 import { SearchBar } from "../components/library/SearchBar";
 import { useRecipes } from "../hooks/useRecipes";
+import { useSettings } from "../hooks/useSettings";
 import type { RecipeListParams, VerificationState } from "../types/recipe";
 
 const PAGE_LIMIT = 50;
 
-function buildParams(q: string, filters: ActiveFilters, offset: number): RecipeListParams {
-  const params: RecipeListParams = { limit: PAGE_LIMIT, offset };
+function buildParams(q: string, filters: ActiveFilters, offset: number, sort: string): RecipeListParams {
+  const params: RecipeListParams = { limit: PAGE_LIMIT, offset, sort };
   if (q) params.q = q;
   if (filters.verification_state) params.verification_state = filters.verification_state;
   if (filters.dish_role) params.dish_role = filters.dish_role;
@@ -39,7 +40,10 @@ export function LibraryPage() {
   const filters = filtersFromSearch(searchParams);
   const offset = Math.max(0, parseInt(searchParams.get("offset") ?? "0", 10) || 0);
 
-  const queryParams = buildParams(q, filters, offset);
+  const { data: settingsData } = useSettings();
+  const sort = settingsData?.library_default_sort ?? "updated_at_desc";
+
+  const queryParams = buildParams(q, filters, offset, sort);
   const { data, isLoading, isError } = useRecipes(queryParams);
 
   const handleSearch = useCallback((value: string) => {

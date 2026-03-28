@@ -229,6 +229,7 @@ class RecipeSummaryOut(BaseModel):
     rating: int | None = None
     created_at: str
     updated_at: str
+    cover_media_asset_id: str | None = None
     last_cooked_at: str | None = None
 
     model_config = {"from_attributes": True}
@@ -291,6 +292,7 @@ class RecipeDetail(BaseModel):
     notes: list[NoteOut] = []
     source: SourceOut | None = None
 
+    cover_media_asset_id: str | None = None
     intake_job_id: str | None = None
     created_at: str
     updated_at: str
@@ -347,6 +349,7 @@ class RecipeDetail(BaseModel):
             steps=[StepOut.model_validate(s, from_attributes=True) for s in recipe.steps],
             notes=[NoteOut.model_validate(n, from_attributes=True) for n in recipe.notes],
             source=SourceOut.model_validate(recipe.source, from_attributes=True) if recipe.source else None,
+            cover_media_asset_id=recipe.cover_media_asset_id,
             intake_job_id=recipe.intake_job_id,
             created_at=recipe.created_at,
             updated_at=recipe.updated_at,

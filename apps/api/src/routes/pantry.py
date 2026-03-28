@@ -18,7 +18,7 @@ router = APIRouter(prefix="/pantry", tags=["pantry"])
 
 
 @router.post("/suggest", response_model=ApiResponse[PantrySuggestionOut], status_code=status.HTTP_200_OK)
-def pantry_suggest(body: PantryQueryIn, db: Session = Depends(get_db)):
+async def pantry_suggest(body: PantryQueryIn, db: Session = Depends(get_db)):
     """
     Suggest recipes based on available ingredients.
 

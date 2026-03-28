@@ -8,6 +8,8 @@
 
 Sevastolink Galley Archive is a local-first recipe archive and cooking workspace for home use. It runs as a self-hosted web application on a home server or personal machine, accessible to any device on the home network through a browser. It provides a structured, searchable archive for storing, refining, and retrieving recipes — including personal recipes, transcribed family recipes, imported web recipes, and cookbook references — along with an active cooking workspace for in-kitchen use. The product is designed to feel premium, calm, and operational: a serious personal culinary system, not a consumer recipe aggregator or social food app. Optional integration with a local language model (LM Studio) provides AI-assisted normalization, metadata enrichment, and retrieval, but the product is fully functional without it.
 
+This document defines the target product direction and intended product scope. For the current shipped product surface and missing product work, see [implemented-product.md](./implemented-product.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## 2. Core User Scenarios
@@ -123,6 +125,10 @@ The product does not scrape, fetch, or sync from recipe services. It does not in
 ## 5. Functional Scope for v1
 
 v1 is the first complete and usable version. It must be stable, coherent, and genuinely useful as a standalone product.
+
+Current note:
+
+The repository already implements a meaningful subset of this scope, but not every item below is fully surfaced yet in the routed product or API.
 
 ### 5.1 Archive
 

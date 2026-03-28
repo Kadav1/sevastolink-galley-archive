@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,8 +25,8 @@ class IntakeJob(Base):
     resulting_recipe_id: Mapped[str | None] = mapped_column(
         ForeignKey("recipes.id", ondelete="SET NULL")
     )
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
-    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
     completed_at: Mapped[str | None] = mapped_column(String)
 
     candidate: Mapped["StructuredCandidate | None"] = relationship(
@@ -75,8 +75,8 @@ class StructuredCandidate(Base):
 
     ai_payload_json: Mapped[str | None] = mapped_column(Text)
 
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
-    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
 
     intake_job: Mapped[IntakeJob] = relationship(back_populates="candidate")
     ingredients: Mapped[list["CandidateIngredient"]] = relationship(

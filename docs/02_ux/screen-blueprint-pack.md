@@ -16,7 +16,38 @@ It establishes:
 * responsive behavior across desktop, tablet, and mobile
 * important states and accessibility expectations
 
-This is the canonical screen blueprint reference for product design and implementation.
+This is the canonical target-state screen blueprint reference for product design.
+
+Current implementation note:
+
+* these blueprints are broader than the screens currently implemented in the app
+* they should be treated as design intent, not as a literal map of shipped routes
+* use `docs/02_ux/implemented-routes-and-flows.md` for the implementation-aware screen baseline
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* library
+* recipe detail
+* kitchen mode
+* intake hub
+* manual entry
+* paste-text intake
+* settings placeholder
+
+Not yet implemented today:
+
+* AI tools screens
+* URL import and file intake screens
+* dedicated review queue screens
+* recipe edit screens
+* settings sub-pages and settings workflows
+* library sub-route screens such as favorites, recent, verified, drafts, and search-results views
+
+The remainder of this document should be read as target-state screen planning.
 
 ---
 

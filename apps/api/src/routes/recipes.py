@@ -33,7 +33,7 @@ def _summary(recipe) -> RecipeSummaryOut:
 # ── List ──────────────────────────────────────────────────────────────────────
 
 @router.get("", response_model=ListResponse[RecipeSummaryOut])
-def list_recipes(
+async def list_recipes(
     q: str | None = Query(None),
     verification_state: str | None = Query(None),
     favorite: bool | None = Query(None),
@@ -72,7 +72,7 @@ def list_recipes(
 # ── Create ────────────────────────────────────────────────────────────────────
 
 @router.post("", response_model=ApiResponse[RecipeDetail], status_code=status.HTTP_201_CREATED)
-def create_recipe(data: RecipeCreate, db: Session = Depends(get_db)):
+async def create_recipe(data: RecipeCreate, db: Session = Depends(get_db)):
     recipe = recipe_service.create_recipe(db, data)
     return ApiResponse(data=_detail(recipe))
 
@@ -80,7 +80,7 @@ def create_recipe(data: RecipeCreate, db: Session = Depends(get_db)):
 # ── Get by ID or slug ─────────────────────────────────────────────────────────
 
 @router.get("/{id_or_slug}", response_model=ApiResponse[RecipeDetail])
-def get_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def get_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -90,7 +90,7 @@ def get_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Update ────────────────────────────────────────────────────────────────────
 
 @router.patch("/{id_or_slug}", response_model=ApiResponse[RecipeDetail])
-def update_recipe(id_or_slug: str, data: RecipeUpdate, db: Session = Depends(get_db)):
+async def update_recipe(id_or_slug: str, data: RecipeUpdate, db: Session = Depends(get_db)):
     recipe = recipe_service.update_recipe(db, id_or_slug, data)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -100,7 +100,7 @@ def update_recipe(id_or_slug: str, data: RecipeUpdate, db: Session = Depends(get
 # ── Archive / Unarchive ───────────────────────────────────────────────────────
 
 @router.post("/{id_or_slug}/archive", response_model=ApiResponse[RecipeArchiveResult])
-def archive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def archive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.archive_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -112,7 +112,7 @@ def archive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 
 
 @router.post("/{id_or_slug}/unarchive", response_model=ApiResponse[RecipeArchiveResult])
-def unarchive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def unarchive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.unarchive_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -126,7 +126,7 @@ def unarchive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Favorite / Unfavorite ─────────────────────────────────────────────────────
 
 @router.post("/{id_or_slug}/favorite", response_model=ApiResponse[RecipeSummaryOut])
-def favorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def favorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.set_favorite(db, id_or_slug, True)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -134,7 +134,7 @@ def favorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 
 
 @router.post("/{id_or_slug}/unfavorite", response_model=ApiResponse[RecipeSummaryOut])
-def unfavorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def unfavorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.set_favorite(db, id_or_slug, False)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -144,7 +144,7 @@ def unfavorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Delete ────────────────────────────────────────────────────────────────────
 
 @router.delete("/{id_or_slug}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_recipe(id_or_slug: str, db: Session = Depends(get_db)):
+async def delete_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     deleted = recipe_service.delete_recipe(db, id_or_slug)
     if not deleted:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
@@ -153,7 +153,7 @@ def delete_recipe(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Suggest Metadata (AI-assisted) ───────────────────────────────────────────
 
 @router.post("/{id_or_slug}/suggest-metadata", response_model=ApiResponse[MetadataSuggestionOut])
-def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)):
+async def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)):
     """
     Suggest taxonomy and classification fields for an existing recipe via AI.
 
@@ -191,7 +191,7 @@ def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Archive Rewrite (AI-assisted) ─────────────────────────────────────────────
 
 @router.post("/{id_or_slug}/rewrite", response_model=ApiResponse[ArchiveRewriteOut])
-def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)):
+async def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)):
     """
     Return an archive-style rewrite of a recipe via AI.
 
@@ -229,7 +229,7 @@ def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)):
 # ── Similar Recipes (AI-assisted) ─────────────────────────────────────────────
 
 @router.post("/{id_or_slug}/similar", response_model=ApiResponse[SimilarRecipesOut])
-def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Depends(get_db)):
+async def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Depends(get_db)):
     """
     Return AI-ranked similar recipes from the archive.
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,7 +18,7 @@ class MediaAsset(Base):
     width: Mapped[int | None] = mapped_column(Integer)
     height: Mapped[int | None] = mapped_column(Integer)
     duration_seconds: Mapped[float | None] = mapped_column(Float)
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
 
 
 class AIJob(Base):
@@ -37,5 +37,5 @@ class AIJob(Base):
     raw_response_json: Mapped[str | None] = mapped_column(Text)
     validated_payload: Mapped[str | None] = mapped_column(Text)
     error_message: Mapped[str | None] = mapped_column(Text)
-    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.utcnow().isoformat())
+    created_at: Mapped[str] = mapped_column(String, default=lambda: datetime.now(timezone.utc).isoformat())
     completed_at: Mapped[str | None] = mapped_column(String)

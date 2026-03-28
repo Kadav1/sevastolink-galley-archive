@@ -20,6 +20,35 @@ It establishes:
 
 This document supersedes schema-spec v1.0. It is aligned with content-taxonomy-spec v2.0.
 
+This is the canonical target-state database schema reference for the product.
+
+Current implementation note:
+
+* the repository already implements most of the structural schema described here through the current initial migration
+* the repository does not yet fully surface every stored entity and workflow described by the broader schema story
+* use `docs/08_database/implemented-database.md` for the current runtime database baseline
+* use `docs/08_database/implementation-backlog.md` for the prioritized target-state gap list
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* initial SQLite schema migration
+* archive, intake, candidate, media, settings, AI job, and FTS tables
+* migration tracking through `schema_migrations`
+* JSON-array approach for multi-select taxonomy fields
+
+Not yet fully implemented today:
+
+* surfaced workflows for every stored entity
+* seed/example data workflows implied by this broader schema document
+* complete alignment between the full stored schema and all currently exposed API models
+* follow-up migrations beyond the initial schema
+
+The remainder of this document should therefore be read as target-state schema guidance rather than as a complete description of current runtime behavior.
+
 ---
 
 ## 2. Schema Philosophy

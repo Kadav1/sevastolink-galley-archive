@@ -73,7 +73,7 @@ def _candidate_out(candidate) -> CandidateOut:
 # ── Create ─────────────────────────────────────────────────────────────────────
 
 @router.post("", response_model=ApiResponse[IntakeJobOut], status_code=status.HTTP_201_CREATED)
-def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)):
+async def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)):
     if body.intake_type == "paste_text" and not body.raw_source_text:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -88,7 +88,7 @@ def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)):
 # ── Get ────────────────────────────────────────────────────────────────────────
 
 @router.get("/{job_id}", response_model=ApiResponse[IntakeJobOut])
-def get_intake_job(job_id: str, db: Session = Depends(get_db)):
+async def get_intake_job(job_id: str, db: Session = Depends(get_db)):
     job = intake_service.get_intake_job(db, job_id)
     if not job:
         raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
@@ -98,7 +98,7 @@ def get_intake_job(job_id: str, db: Session = Depends(get_db)):
 # ── Update candidate ──────────────────────────────────────────────────────────
 
 @router.patch("/{job_id}/candidate", response_model=ApiResponse[CandidateOut])
-def update_candidate(job_id: str, body: CandidateUpdate, db: Session = Depends(get_db)):
+async def update_candidate(job_id: str, body: CandidateUpdate, db: Session = Depends(get_db)):
     candidate = intake_service.update_candidate(db, job_id, body)
     if candidate is None:
         raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
@@ -110,7 +110,7 @@ def update_candidate(job_id: str, body: CandidateUpdate, db: Session = Depends(g
 # ── Normalize (AI-assisted) ───────────────────────────────────────────────────
 
 @router.post("/{job_id}/normalize", response_model=ApiResponse[CandidateOut])
-def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
+async def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
     """
     Run AI normalization against the job's raw source text.
 
@@ -167,7 +167,7 @@ def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
 # ── Approve ────────────────────────────────────────────────────────────────────
 
 @router.post("/{job_id}/approve", response_model=ApiResponse[ApproveIntakeOut], status_code=status.HTTP_201_CREATED)
-def approve_intake_job(job_id: str, body: ApproveIntakeIn, db: Session = Depends(get_db)):
+async def approve_intake_job(job_id: str, body: ApproveIntakeIn, db: Session = Depends(get_db)):
     job = intake_service.get_intake_job(db, job_id)
     if not job:
         raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
@@ -197,7 +197,7 @@ def approve_intake_job(job_id: str, body: ApproveIntakeIn, db: Session = Depends
 # ── Evaluate (AI quality review) ──────────────────────────────────────────────
 
 @router.post("/{job_id}/evaluate", response_model=ApiResponse[EvaluationOut])
-def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
+async def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
     """
     Run an AI quality review of the current candidate against the raw source.
 

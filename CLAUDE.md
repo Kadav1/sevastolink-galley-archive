@@ -57,7 +57,7 @@ npm run dev           # Vite dev server
 npm run build         # production build
 ```
 
-Shared packages live in `packages/` (shared-types, shared-taxonomy, shared-prompts, shared-ui-tokens) — not yet implemented.
+Shared packages live in `packages/` (shared-types, shared-taxonomy, shared-ui-tokens) — not yet implemented. `packages/shared-prompts` is implemented and used by all AI modules.
 
 ## Architecture
 
@@ -101,6 +101,14 @@ Verification states (`Draft`, `Unverified`, `Verified`, `Archived`) are user-con
 - LM Studio integration via `LM_STUDIO_BASE_URL` (default: `http://localhost:1234/v1`)
 - Recommended local normalization model: `Qwen/Qwen2.5-7B-Instruct`
 
+**Implemented AI endpoints:**
+- `POST /intake-jobs/:id/normalize` — normalize raw source text into a structured candidate
+- `POST /intake-jobs/:id/evaluate` — evaluate a structured candidate against the original raw source
+- `POST /recipes/:id/suggest-metadata` — suggest taxonomy/classification fields for a recipe
+- `POST /recipes/:id/rewrite` — produce an archive-style prose rewrite of a recipe
+- `POST /recipes/:id/similar` — find similar recipes from the archive by culinary similarity
+- `POST /pantry/suggest` — suggest recipes based on available ingredients
+
 ## Local Data Paths
 
 ```
@@ -123,11 +131,11 @@ Copy `.env.example` to `.env`. Key variables:
 
 ## Implementation Status
 
-**Backend (`apps/api/`):** Recipe CRUD + search, intake pipeline (create job → update candidate → approve), AI normalize endpoint (`POST /intake-jobs/:id/normalize`), LM Studio client + normalizer.
+**Backend (`apps/api/`):** Recipe CRUD + search, intake pipeline (create job → update candidate → approve), 6 AI endpoints (normalize, evaluate, suggest-metadata, rewrite, similar, pantry/suggest), settings API (`GET/PATCH /api/v1/settings`), LM Studio client, `shared-prompts` contract loader.
 
-**Frontend (`apps/web/`):** Library page, Recipe Detail, Kitchen Mode (`/recipe/:slug/kitchen`), Intake Hub, Manual Entry, Paste Text (with AI normalize button).
+**Frontend (`apps/web/`):** Library page, Recipe Detail, Kitchen Mode (`/recipe/:slug/kitchen`), Intake Hub, Manual Entry, Paste Text (with AI normalize button), Settings page (real load/save).
 
-**Tests:** `apps/api/tests/test_intake.py` — 13 tests covering intake lifecycle and normalize endpoint.
+**Tests:** 87 tests across `apps/api/tests/` — intake lifecycle, normalize, evaluate, suggest-metadata, rewrite, similar, pantry, and settings endpoints.
 
 ## Known Gotchas
 
@@ -139,11 +147,9 @@ Copy `.env.example` to `.env`. Key variables:
 
 **TypeScript lib** — `tsconfig.json` uses `lib: ["ES2022", ...]` (not ES2020) to support `Array.at()`.
 
-**AI module imports** — import `normalize_recipe` at module level in route files, not inside function bodies, or mock patching in tests will fail.
+**AI module imports** — import all AI functions (`normalize_recipe`, `evaluate_normalization`, `suggest_metadata`, `rewrite_recipe`, `find_similar_recipes`, `suggest_pantry`) at module level in route files, not inside function bodies, or mock patching in tests will fail. Mock path must match the import location: `patch("src.routes.<module>.<function_name>", ...)`.
 
-**AI prompt/schema paths** — normalizer loads from:
-- `prompts/runtime/normalization/recipe-normalization-v1.md`
-- `prompts/schemas/recipe-normalization-output.schema.json`
+**AI prompt contracts** — each AI module loads its prompt contract at module level via `shared_prompts.get_contract("<family>")` (families: `normalization`, `evaluation`, `metadata`, `rewrite`, `similarity`, `pantry`). Contracts live in `packages/shared-prompts/src/shared_prompts/contracts/`.
 
 **Kitchen Mode** — `/recipe/:slug/kitchen` lives outside `AppShell` (no side nav). Root element uses `data-mode="kitchen"` which activates larger type/spacing overrides already defined in `apps/web/src/styles/tokens.css`.
 
@@ -152,6 +158,12 @@ Copy `.env.example` to `.env`. Key variables:
 **Step-text scaling** — `scaleStepText()` in `apps/web/src/lib/scaling.ts`; used by both `StepList` (recipe detail) and `KitchenSteps` (kitchen mode). `KitchenSteps` already accepts `scale: ScaleFactor` prop.
 
 **Favorite toggle** — `apps/web/src/hooks/useFavorite.ts`; used by both `RecipeRow` and `RecipePage`. Invalidates `["recipes"]` and `["recipe", slug]` on success.
+
+**Settings domain** — only `default_verification_state` and `library_default_sort` are persisted in the DB and writable via `PATCH /api/v1/settings`. All operator config (LM Studio URL, DB path, ports, directories) is file-driven only and must not be surfaced as UI-editable. `ai_enabled` in the settings response is read-only (mirrors `LM_STUDIO_ENABLED`). Use `useSettings()` / `useUpdateSettings()` from `apps/web/src/hooks/useSettings.ts` in any page that needs preferences.
+
+**`MetadataSuggestionOut.operational_class`** — the AI returns a field named `"class"` which is a Python reserved word. The schema uses `operational_class: str | None = Field(None, alias="class")` with `model_config = {"populate_by_name": True}`. Use `model_validate(payload)` to deserialize — Pydantic v2 resolves the alias automatically.
+
+**`prompts/build/` is gitignored** — the `build/` entry in `.gitignore` matches this directory. Session prompt files in `prompts/build/claude/sessions/` exist on disk only and must not be committed. Edit them in place; never use `git add -f` on them.
 
 ## What Is Explicitly Out of Scope (v1)
 

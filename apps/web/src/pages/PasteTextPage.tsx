@@ -7,6 +7,7 @@ import {
   updateCandidate,
 } from "../lib/intake-api";
 import type { CandidateOut } from "../lib/intake-api";
+import { attachIntakeMedia } from "../lib/media-api";
 import type { VerificationState } from "../types/recipe";
 
 // ── Shared input style ────────────────────────────────────────────────────────
@@ -132,6 +133,10 @@ export function PasteTextPage() {
   // Intake job created after first AI call or at save time
   const [jobId, setJobId] = useState<string | null>(null);
 
+  // Optional source file — attached to the job after creation
+  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [sourceFileAttached, setSourceFileAttached] = useState(false);
+
   // Structured fields (editable; may be pre-filled by AI)
   const [title, setTitle] = useState("");
   const [shortDesc, setShortDesc] = useState("");
@@ -158,6 +163,18 @@ export function PasteTextPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  // ── Source file attach ─────────────────────────────────────────────────────
+
+  async function attachFileIfPresent(currentJobId: string) {
+    if (!sourceFile || sourceFileAttached) return;
+    try {
+      await attachIntakeMedia(currentJobId, sourceFile);
+      setSourceFileAttached(true);
+    } catch {
+      // Non-fatal — attachment failure doesn't block the intake workflow
+    }
+  }
+
   // ── AI normalize ───────────────────────────────────────────────────────────
 
   async function handleNormalize() {
@@ -176,6 +193,7 @@ export function PasteTextPage() {
         currentJobId = jobRes.data.id;
         setJobId(currentJobId);
       }
+      await attachFileIfPresent(currentJobId);
 
       const res = await normalizeCandidate(currentJobId);
       applyCandidate(res.data);
@@ -254,6 +272,7 @@ export function PasteTextPage() {
         currentJobId = jobRes.data.id;
         setJobId(currentJobId);
       }
+      await attachFileIfPresent(currentJobId);
 
       await updateCandidate(currentJobId, {
         title: title.trim(),
@@ -327,6 +346,25 @@ export function PasteTextPage() {
               style={{ ...inputStyle, resize: "vertical" as const }}
             />
           </Field>
+
+          {/* Optional source image / PDF */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+            <span style={labelStyle}>Source image or PDF (optional)</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              onChange={(e) => {
+                setSourceFile(e.target.files?.[0] ?? null);
+                setSourceFileAttached(false);
+              }}
+              style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)" }}
+            />
+            {sourceFileAttached && (
+              <p style={{ fontSize: "var(--text-xs)", color: "var(--state-verified)" }}>
+                Source file attached.
+              </p>
+            )}
+          </div>
 
           {/* Normalize button */}
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>

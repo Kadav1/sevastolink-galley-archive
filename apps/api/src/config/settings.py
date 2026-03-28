@@ -1,8 +1,8 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Repo root is two levels up from apps/api/
-REPO_ROOT = Path(__file__).resolve().parents[4]
+# Repo root is three levels up from apps/api/src/config/
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):

@@ -1,6 +1,8 @@
-Sevastolink Galley Archive
+# Sevastolink Galley Archive
 
-UI/UX Design Foundations v1.0
+## UI/UX Design Foundations v1.0
+
+---
 
 1. Purpose
 
@@ -20,6 +22,12 @@ Sevastolink Galley Archive should feel like a calm operational archive for domes
 	•	precise
 	•	quiet
 	•	reliable
+
+Current implementation note:
+
+* this document is a design-language reference, not a route or feature inventory
+* its main value is visual and interaction direction rather than implementation completeness
+* specific current route and feature availability should be taken from `docs/02_ux/implemented-routes-and-flows.md`
 
 ⸻
 

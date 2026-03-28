@@ -17,7 +17,37 @@ It establishes:
 * three viable visual directions
 * the final recommended visual direction
 
-This is the canonical visual source of truth for the product.
+This is the canonical target-state visual source of truth for the product.
+
+Current implementation note:
+
+* the repository already implements the core shared token layer, global visual baseline, and kitchen-mode overrides
+* the repository does not yet implement every layout, component, and transient-surface pattern described here
+* use `docs/03_visual-system/implemented-visual-system.md` for the current implementation baseline
+* use `docs/03_visual-system/implementation-backlog.md` for the prioritized target-state gap list
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* shared CSS token source
+* global dark visual baseline
+* quiet archive-first palette and typography direction
+* metadata-led recipe styling patterns
+* kitchen-mode token overrides
+
+Not yet fully implemented today:
+
+* responsive breakpoint-specific layout behavior
+* reusable visual primitives for buttons, panels, and overlays
+* overlay, drawer, modal, and sheet surfaces
+* iconography system
+* image handling surfaces
+* broad component-level adoption of the TypeScript token helper layer
+
+The remainder of this document should therefore be read as target-state visual guidance rather than as a complete description of the current frontend.
 
 ---
 

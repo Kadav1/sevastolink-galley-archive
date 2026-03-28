@@ -29,15 +29,27 @@ The current backend mounts:
 * `/api/health`
 * `/api/v1/recipes`
 * `/api/v1/intake-jobs`
+* `/api/v1/pantry`
+* `/api/v1/settings`
 
-The backend does not currently mount implemented route groups for:
+Media attach is available as a sub-resource of intake jobs:
+
+* `POST /api/v1/intake-jobs/{job_id}/media`
+
+The backend does not currently mount standalone route groups for:
 
 * `/search`
 * `/media-assets`
 * `/ai-jobs`
-* `/settings`
 * `/backups`
 * `/system`
+
+One important nuance:
+
+* recipe listing already supports free-text search and multiple structured filters on `/api/v1/recipes`
+* this behavior is implemented inside the current recipe service, not as a separate mounted search domain
+
+Consumers should therefore treat search as partially implemented list behavior rather than as a standalone `/search` API surface.
 
 ### Current standard
 
@@ -145,6 +157,11 @@ Response:
 
 * list envelope with `meta.total`, `meta.limit`, and `meta.offset`
 
+Current implementation note:
+
+* this endpoint is also the repository's only implemented free-text search surface
+* there is no separate search router or search-specific resource group mounted today
+
 ### 5.2 Create recipe
 
 ```http
@@ -232,6 +249,51 @@ Purpose:
 Current behavior:
 
 * success returns `204 No Content`
+
+### 5.10 Suggest metadata
+
+```http
+POST /api/v1/recipes/{id_or_slug}/suggest-metadata
+```
+
+Purpose:
+
+* return AI-suggested metadata for human review
+
+Current behavior:
+
+* requires LM Studio to be enabled
+* does not mutate the recipe directly
+
+### 5.11 Rewrite recipe
+
+```http
+POST /api/v1/recipes/{id_or_slug}/rewrite
+```
+
+Purpose:
+
+* return an archive-style AI rewrite for human review
+
+Current behavior:
+
+* requires LM Studio to be enabled
+* does not mutate the recipe directly
+
+### 5.12 Similar recipes
+
+```http
+POST /api/v1/recipes/{id_or_slug}/similar
+```
+
+Purpose:
+
+* return AI-ranked similar recipes from archive context
+
+Current behavior:
+
+* requires LM Studio to be enabled
+* uses other archive recipes as ranking context
 
 ---
 
@@ -325,9 +387,140 @@ Current outcome:
 * links the resulting recipe to the intake job
 * marks the candidate as accepted
 
+### 6.6 Evaluate candidate
+
+```http
+POST /api/v1/intake-jobs/{job_id}/evaluate
+```
+
+Purpose:
+
+* run AI quality review against the current candidate and raw source
+
+Current behavior:
+
+* requires LM Studio to be enabled
+* returns a read-only review result and does not mutate the candidate
+
 ---
 
-## 7. Current error behavior
+## 7. Pantry endpoint
+
+### 7.1 Suggest from pantry ingredients
+
+```http
+POST /api/v1/pantry/suggest
+```
+
+Purpose:
+
+* suggest recipe directions based on available ingredients
+
+Current behavior:
+
+* requires LM Studio to be enabled
+* uses up to 20 archive recipes as context
+
+---
+
+## 8. Settings endpoints
+
+Settings expose two persisted user product preferences and one read-only runtime signal.
+
+The settings boundary is explicit:
+
+* `default_verification_state` and `library_default_sort` are user preferences — persisted in the database, writable through the API
+* `ai_enabled` reflects `LM_STUDIO_ENABLED` from the server environment — read-only, not writable through the API
+
+### 8.1 Get settings
+
+```http
+GET /api/v1/settings
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "default_verification_state": "Draft",
+    "library_default_sort": "updated_at_desc",
+    "ai_enabled": false
+  }
+}
+```
+
+### 8.2 Update settings
+
+```http
+PATCH /api/v1/settings
+```
+
+Accepted body fields:
+
+| Field | Type | Allowed values |
+|---|---|---|
+| `default_verification_state` | string (optional) | `"Draft"`, `"Unverified"` |
+| `library_default_sort` | string (optional) | `"updated_at_desc"`, `"created_at_desc"`, `"title_asc"`, `"title_desc"` |
+
+Returns the full settings object after update.
+
+Empty body is valid — returns current settings without error.
+
+`ai_enabled` is not accepted as a body field. Attempting to change it has no effect.
+
+---
+
+## 9. Media endpoint
+
+### 9.1 Attach source media to intake job
+
+```http
+POST /api/v1/intake-jobs/{job_id}/media
+```
+
+Purpose:
+
+* attach a source image or PDF to an existing intake job
+* sets `intake_jobs.source_media_asset_id` to the created asset
+
+Request:
+
+* multipart/form-data with a `file` field
+* accepted MIME types: `image/jpeg`, `image/png`, `image/webp`, `application/pdf`
+* maximum file size: 20 MB
+
+Current behavior:
+
+* saves the file to local media storage under `data/media/intake/`
+* persists a `media_assets` row with checksum, byte size, and original filename
+* returns the created asset record
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "...",
+    "asset_kind": "source_image",
+    "original_filename": "photo.png",
+    "mime_type": "image/png",
+    "relative_path": "intake/{id}.png",
+    "byte_size": 12345,
+    "created_at": "..."
+  }
+}
+```
+
+Current scope:
+
+* this endpoint is the first real media domain surface
+* it covers intake source files only — recipe image workflows are not yet implemented
+* there is no standalone `/media-assets` resource group yet
+
+---
+
+## 10. Current error behavior
 
 ### Common codes in current use
 
@@ -350,7 +543,7 @@ This is a documentation and consistency gap, not a hidden feature.
 
 ---
 
-## 8. Known differences from the broader API spec
+## 11. Known differences from the broader API spec
 
 The broader API spec documents a larger surface area than the current backend implements.
 
@@ -360,6 +553,8 @@ Notable differences:
 * not all target-state endpoint families exist yet
 * the current error envelope is not fully uniform
 * the current health route lives outside `/api/v1`
+* search is implemented through recipe listing rather than a standalone `/search` resource
+* AI-assisted capabilities exist, but they are exposed through focused task endpoints rather than a first-class `/ai-jobs` resource
 * the current app relies on a smaller subset of recipe and intake features than the target-state spec describes
 
 When documenting or integrating against the live application, use this document first.

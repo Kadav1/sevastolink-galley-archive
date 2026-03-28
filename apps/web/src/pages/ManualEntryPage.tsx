@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api";
+import { useSettings } from "../hooks/useSettings";
 import type { VerificationState } from "../types/recipe";
 
 // ── Form field components ─────────────────────────────────────────────────────
@@ -255,6 +256,7 @@ const VERIFICATION_OPTIONS: { value: VerificationState; label: string }[] = [
 
 export function ManualEntryPage() {
   const navigate = useNavigate();
+  const { data: settingsData } = useSettings();
 
   // Core fields
   const [title, setTitle] = useState("");
@@ -279,8 +281,13 @@ export function ManualEntryPage() {
   const [sourceAuthor, setSourceAuthor] = useState("");
   const [sourceNotes, setSourceNotes] = useState("");
 
-  // Trust state
+  // Trust state — seeded from settings once loaded; user can override in-form
   const [verificationState, setVerificationState] = useState<VerificationState>("Draft");
+  useEffect(() => {
+    if (settingsData?.default_verification_state) {
+      setVerificationState(settingsData.default_verification_state);
+    }
+  }, [settingsData?.default_verification_state]);
 
   // UI state
   const [saving, setSaving] = useState(false);

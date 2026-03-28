@@ -13,6 +13,8 @@ Both services are defined in `docker-compose.yml`. You run them together with `m
 
 LM Studio is a separate optional process you run on your own machine. It is not part of the compose stack.
 
+This document describes the current implemented local deployment path. For the current ops baseline and missing areas, see [implemented-ops.md](./implemented-ops.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## Prerequisites

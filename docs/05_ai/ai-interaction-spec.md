@@ -21,6 +21,8 @@ It establishes:
 
 This document governs all AI behavior in the product, including intake, archive enrichment, retrieval assistance, and any future AI-adjacent features.
 
+This document defines the target-state AI interaction model. For the current implemented AI surface and missing AI work, see [implemented-ai.md](./implemented-ai.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## 2. AI Philosophy

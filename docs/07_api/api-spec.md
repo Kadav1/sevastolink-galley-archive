@@ -22,6 +22,40 @@ It establishes:
 
 This document supersedes API Spec v1.0. It is aligned with schema-spec v2.0 and ai-interaction-spec v1.0.
 
+This is the canonical target-state API reference for the product.
+
+Current implementation note:
+
+* the repository already implements a substantial subset of this API
+* the repository does not yet implement every resource group described here
+* use `docs/07_api/implemented-api.md` for the current runtime API baseline
+* use `docs/07_api/implementation-backlog.md` for the prioritized target-state gap list
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* health endpoint
+* recipe CRUD and action routes
+* recipe-list search and filtering
+* intake job workflow endpoints
+* pantry suggestion endpoint
+* several AI-assisted recipe and intake endpoints
+
+Not yet fully implemented today:
+
+* separate `/search` resource group
+* `/media-assets`
+* `/ai-jobs`
+* `/settings`
+* `/backups`
+* `/system`
+* one fully uniform error envelope across all routes
+
+The remainder of this document should therefore be read as target-state API guidance rather than as a complete description of current runtime behavior.
+
 ---
 
 ## 2. API Philosophy

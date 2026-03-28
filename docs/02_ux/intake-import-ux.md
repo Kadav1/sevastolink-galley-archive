@@ -18,7 +18,34 @@ It establishes:
 * trust-state logic for imported records
 * the recommended v1 and v2 intake flows
 
-This document is the canonical intake and import reference for the product.
+This document is the canonical target-state intake and import reference for the product.
+
+Current implementation note:
+
+* the current app only implements `Manual Entry` and `Paste Text`
+* URL import, image intake, PDF intake, and broader review queue surfaces are still future-facing
+* the CLI importer provides additional bulk-review capability that the web app does not yet expose
+* use `docs/10_imports/recipe-import-workflow.md` and `docs/02_ux/implemented-routes-and-flows.md` for current implementation behavior
+
+---
+
+## Current-state gap note
+
+Implemented today:
+
+* intake hub
+* manual entry flow
+* paste-text intake flow
+* optional AI normalization during paste-text intake
+
+Not yet implemented today:
+
+* URL import route and workflow
+* image or PDF intake route and workflow
+* dedicated intake review route keyed by intake job ID
+* broader AI-assisted intake surfaces beyond the current paste-text normalization path
+
+The remainder of this document should therefore be read as target-state intake UX.
 
 ---
 

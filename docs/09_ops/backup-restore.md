@@ -6,6 +6,8 @@ Backup and restore are first-class operations for Sevastolink Galley Archive. Th
 
 All backup and restore operations are file-based, local, and human-inspectable. There is no cloud backup dependency.
 
+This document describes the current implemented backup workflow. For the wider operations baseline and unresolved ops work, see [implemented-ops.md](./implemented-ops.md) and [implementation-backlog.md](./implementation-backlog.md).
+
 ---
 
 ## What needs to be backed up

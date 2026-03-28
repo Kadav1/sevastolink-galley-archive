@@ -375,3 +375,59 @@ The clearest build-session ownership for the remaining partial areas is:
   * no single numbered session fully owns this area
   * the closest implementation prompt is `prompts/build/claude/codegen/tests-and-dev-ergonomics.md`
   * `prompts/build/claude/sessions/session-07-docker-compose-integration.md` also references migrate/seed follow-through
+
+---
+
+## 12. Audit findings and next implementation areas
+
+### 12.1 Search is only partially implemented
+
+The current repository does support free-text recipe search and structured filtering on the recipe list endpoint.
+
+However:
+
+* search logic still lives inside the generic recipe service layer
+* `apps/api/src/search/` remains scaffold-only
+* there is no separately mounted search router matching the broader target-state API shape
+
+Search therefore exists as implemented behavior, but not yet as a completed standalone backend domain.
+
+### 12.2 AI review and prompt-family adoption are incomplete
+
+The repository does implement AI-assisted normalization and approval through the current intake pipeline.
+
+However:
+
+* the practical review flow is still centered on paste-text intake and CLI candidate review
+* there is no broader dedicated AI review surface keyed around evaluation or job-history workflows
+* runtime prompt families for evaluation, metadata, rewrite, pantry, and similarity remain prompt assets rather than implemented product features
+
+Normalization is implemented, but the wider AI workflow implied by the prompt inventory has not fully materialized.
+
+### 12.3 Dev, test, and operator scaffolding remain thin
+
+The repository has working core commands, backend tests, and a passing frontend build.
+
+However:
+
+* `scripts/dev/`, `scripts/migrate/`, and `scripts/seed/` remain placeholder directories
+* `tests/e2e/` and `tests/integration/` remain placeholder directories
+* current developer and operator workflows still rely mostly on direct commands and documented manual steps rather than higher-level wrappers
+
+This means the application is usable, but the surrounding ergonomics and higher-level safety rails remain thinner than some build prompts imply.
+
+### 12.4 Settings is still a routed placeholder
+
+The frontend exposes `/settings`, but the current settings page remains a placeholder surface rather than an implemented management workflow.
+
+This also means there is no matching implemented HTTP settings API in the backend today.
+
+### 12.5 New session prompts created from the audit
+
+The repository now includes follow-on session prompts for the clearest unfinished areas:
+
+* `prompts/build/claude/sessions/session-13-search-domain-and-library-search.md`
+* `prompts/build/claude/sessions/session-14-ai-review-and-prompt-family-adoption.md`
+* `prompts/build/claude/sessions/session-15-dev-test-and-ops-scaffolding.md`
+
+These are next-step implementation prompts, not evidence that those areas are already complete.

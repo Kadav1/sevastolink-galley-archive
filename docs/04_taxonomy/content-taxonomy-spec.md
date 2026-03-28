@@ -4,6 +4,37 @@
 
 ---
 
+## Current implementation note
+
+This document is the canonical target-state taxonomy reference for the product.
+
+The repository currently implements only part of this taxonomy model in a fully operational way.
+
+Current implementation guidance:
+
+* use `docs/04_taxonomy/implemented-taxonomy.md` for the current runtime taxonomy baseline
+* use `docs/04_taxonomy/implementation-backlog.md` for the prioritized target-state gap list
+* do not assume every taxonomy layer described here is already exposed, validated, or shared consistently across backend and frontend code
+
+## Current-state gap note
+
+Implemented today:
+
+* core taxonomy fields in recipe and intake schemas
+* a narrower taxonomy subset in the current frontend
+* limited normalizer vocabulary enforcement for major single-select fields
+
+Not yet fully implemented today:
+
+* one canonical shared taxonomy package
+* complete validation for all controlled taxonomy fields
+* full frontend support for the broader taxonomy surface
+* complete alignment between the spec and all runtime value lists
+
+The remainder of this document should therefore be read as target-state taxonomy guidance rather than as a complete description of current runtime behavior.
+
+---
+
 ## 1. Taxonomy Philosophy
 
 ### 1.1 The problem with cookbook taxonomy
