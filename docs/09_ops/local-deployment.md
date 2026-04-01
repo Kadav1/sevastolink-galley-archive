@@ -17,9 +17,9 @@ This document describes the current implemented local deployment path. For the c
 
 Target-state note:
 
-A separate Android wrapper delivery path is being tracked as a target-state design in `docs/superpowers/specs/2026-04-01-mobile-wrapper-delivery-design.md`.
+A separate Android wrapper delivery path is being tracked as an approved future-state design in `docs/superpowers/specs/2026-04-01-mobile-wrapper-delivery-design.md`.
 
-That design does not change the meaning of this document. This file remains the source of truth for the currently implemented local deployment path only.
+That design does not change the meaning of this document. Wrapper implementation is deferred while the browser-based product is still incomplete, and this file remains the source of truth for the currently implemented local deployment path only.
 
 ---
 

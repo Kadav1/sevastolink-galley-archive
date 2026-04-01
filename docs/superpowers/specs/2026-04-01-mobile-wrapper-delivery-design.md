@@ -4,13 +4,13 @@
 
 Date: 2026-04-01
 
-Status: proposed target-state design
+Status: approved future-state design; implementation deferred
 
 ---
 
 ## 1. Purpose
 
-This document captures the approved target-state design for delivering Sevastolink Galley Archive as a separate Android wrapper application without converting the current repository into a native mobile codebase.
+This document captures the approved future-state design for delivering Sevastolink Galley Archive as a separate Android wrapper application without converting the current repository into a native mobile codebase.
 
 It defines:
 
@@ -61,7 +61,7 @@ No implementation-aware document should be updated to describe mobile wrapper be
 
 ## 3. Approved Direction
 
-The approved direction is:
+The approved future-state direction is:
 
 `separate Capacitor-based Android wrapper repository that packages the existing web client as an installable app shell while continuing to use the current FastAPI backend`
 
@@ -72,6 +72,7 @@ This direction is governed by these approved constraints:
 * the wrapper repository owns Android packaging and runtime concerns only
 * the backend remains the system of record
 * the wrapper phase does not commit the project to React Native, Expo, or a permanent native-first architecture
+* implementation is deferred until the browser-based product is sufficiently complete to justify a wrapper delivery surface
 
 This direction does not change current shipped scope by itself.
 
@@ -116,6 +117,7 @@ These are new proposals approved by this design:
 * use Capacitor as the Android wrapper technology
 * package a production build artifact of the current web app into the wrapper
 * treat the wrapper as a delivery shell around the existing system rather than a duplicate product implementation
+* keep the wrapper as a deferred future initiative rather than an active implementation track while the web app remains incomplete
 
 ### 4.4 Future / not committed
 
@@ -195,6 +197,19 @@ Deliberately out of scope for this wrapper phase:
 * mobile-local SQLite persistence
 * offline mutation queue and sync engine
 * mobile-specific domain logic that diverges from the web app
+
+### 6.1 Implementation gate
+
+This wrapper should remain a future initiative until the core web product is more complete.
+
+At minimum, wrapper implementation planning should wait until all of the following are true:
+
+* the current browser-based product has a stable and coherent baseline across the major archive, recipe, pantry, intake, and settings surfaces
+* the web app is good enough that packaging it would not simply freeze unfinished UX into an Android shell
+* responsive and kitchen-mode behavior are already strong enough on phone and tablet screens to justify mobile packaging work
+* backend API, media, and environment configuration are stable enough that a wrapper would not be forced to absorb avoidable churn
+
+Until those conditions are met, the correct use of this document is architectural guidance and backlog discipline, not active implementation planning.
 
 ---
 
@@ -356,7 +371,7 @@ Known risks in the current codebase:
 
 ### 9.3 Verification standard
 
-The wrapper phase should not be considered complete until all of the following are true:
+When implementation eventually begins, the wrapper phase should not be considered complete until all of the following are true:
 
 * the production web build succeeds
 * the wrapper loads the embedded app shell correctly on Android
@@ -386,7 +401,7 @@ The Android-specific guidance in this design is informed by current official And
 * Android settings guidance
 * Android app quality guidance
 
-These references should be revisited when implementation planning starts so the wrapper plan reflects the then-current Android recommendations.
+These references should be revisited when implementation planning eventually starts so the wrapper plan reflects the then-current Android recommendations.
 
 ---
 
@@ -398,7 +413,16 @@ Before implementation planning begins, the repository should keep the documentat
 * implementation-aware documents should not mention mobile wrapper delivery until code exists
 * any later implementation plan should explicitly separate source-repo changes from mobile-repo work
 
-When implementation planning starts, the plan should cover:
+Near-term priority should remain on completing the browser-based product.
+
+That means the immediate follow-on work should favor:
+
+* finishing incomplete web routes and workflows
+* stabilizing the API and media behavior the web client already depends on
+* improving phone and tablet responsiveness inside the existing web application
+* deferring wrapper-repository bootstrap until the implementation gate in section `6.1` is met
+
+When implementation planning eventually starts, the plan should cover:
 
 * frontend API configuration cleanup
 * backend CORS and production-origin configuration
