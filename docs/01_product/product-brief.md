@@ -6,7 +6,7 @@
 
 ## 1. Product Definition
 
-Sevastolink Galley Archive is a local-first recipe archive and cooking workspace for home use. It runs as a self-hosted web application on a home server or personal machine, accessible to any device on the home network through a browser. It provides a structured, searchable archive for storing, refining, and retrieving recipes — including personal recipes, transcribed family recipes, imported web recipes, and cookbook references — along with an active cooking workspace for in-kitchen use. The product is designed to feel premium, calm, and operational: a serious personal culinary system, not a consumer recipe aggregator or social food app. Optional integration with a local language model (LM Studio) provides AI-assisted normalization, metadata enrichment, and retrieval, but the product is fully functional without it.
+Sevastolink Galley Archive is a local-first, archive-first recipe archive and cooking workspace for home use. It runs as a self-hosted web application on a home server or personal machine, accessible to any device on the home network through a browser. It provides a structured, searchable archive for storing, refining, and retrieving recipes — including personal recipes, transcribed family recipes, imported web recipes, and cookbook references — along with an active cooking workspace for in-kitchen use. Pantry, storage-aware retrieval, and optional AI assistance support the archive rather than replacing it. The product is designed to feel premium, calm, and operational: a serious personal culinary system, not a consumer recipe aggregator or social food app. Optional integration with a local language model (LM Studio) provides AI-assisted normalization, metadata enrichment, and retrieval, but the product is fully functional without it.
 
 This document defines the target product direction and intended product scope. For the current shipped product surface and missing product work, see [implemented-product.md](./implemented-product.md) and [implementation-backlog.md](./implementation-backlog.md).
 
@@ -47,6 +47,10 @@ The user has a large number of bookmarks, notes, and screenshots accumulated ove
 ### 2.8 Searching by what you have available
 
 The user knows they have specific ingredients and wants to see what archived recipes use them. They search the archive by ingredient. Matching recipes surface.
+
+### 2.9 Deciding what to use soon
+
+The user wants to avoid waste. They look at what is already in the fridge or pantry, see which ingredients or prepared components should be used soon, and use the archive to find suitable recipes or kitchen-use components.
 
 ---
 
@@ -96,13 +100,17 @@ No sharing, publishing, following, liking, or commenting. The archive is private
 
 Meal planning and scheduling are not in scope for v1. The product does not generate weekly menus or shopping lists.
 
-### 4.3 Not a nutritional tracking tool
+Light planning and scheduling overlays may exist later, but the product does not become a full weekly planning system with complex scheduling logic.
 
-Nutritional analysis, calorie counting, and dietary compliance tracking are not in scope.
+### 4.3 Not a personal nutrition tracking tool
+
+The product does not track daily intake, goals, compliance, or health metrics.
+
+Recipe-level nutrition reference may exist later as advisory metadata on recipe records, but the product is not a diet tracker or health-management application.
 
 ### 4.4 Not a grocery or shopping tool
 
-No shopping list generation, no pantry tracking, no e-commerce integration.
+No shopping list generation, no grocery workflow, and no e-commerce integration are in scope unless the product direction is explicitly revised later.
 
 ### 4.5 Not a cloud product
 
@@ -206,31 +214,43 @@ v2 builds on a stable v1. Items here are anticipated but not committed.
 * Related recipe suggestions
 * AI-assisted query interpretation
 
-### 6.4 Collections and organization
+### 6.4 Storage-aware retrieval
+
+* advisory storage and use-soon guidance tied to archive records
+* leftovers and preservation-oriented retrieval
+* pantry and fridge input as retrieval context
+
+### 6.5 Collections and organization
 
 * Named collections and folders
 * Custom tags beyond taxonomy fields
 * Pinned recipes and curated sets
 
-### 6.5 Recipe history and versioning
+### 6.6 Recipe history and versioning
 
 * Change history on recipe records
 * Version comparison
 * Revert to earlier version
 
-### 6.6 Expanded media support
+### 6.7 Expanded media support
 
 * Multiple photos per recipe
 * Step-by-step photos
 * Source file viewer (PDF, image)
 
-### 6.7 Home network improvements
+### 6.8 Nutrition reference
+
+* recipe-level nutrition reference metadata
+* dietary and allergen cues on recipe records
+* retrieval support based on nutrition-related metadata later
+
+### 6.9 Home network improvements
 
 * Configurable hostname and port
 * HTTPS on local network
 * Optional simple access controls
 
-### 6.8 Meal planning (light)
+### 6.10 Meal planning (light)
 
 * Planned date field on recipes
 * Simple weekly view of planned dishes
