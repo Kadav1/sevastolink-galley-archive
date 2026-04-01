@@ -56,7 +56,7 @@ The remainder of this document should be read as target-state IA, not as a descr
 
 Sevastolink Galley Archive should be structured as a local operational archive, not as a content feed.
 
-The architecture should optimize for four things:
+The architecture should optimize for five things:
 
 2.1 Retrieval
 
@@ -92,6 +92,15 @@ Recipes should not feel disposable. The architecture should support:
 	•	revisions
 	•	long-term archive value
 
+2.5 Storage-aware decision support
+
+The architecture should also help the user answer:
+	•	what should be used soon
+	•	which archive records fit current pantry or fridge conditions
+	•	how storage-aware metadata should inform retrieval without replacing archive judgment
+
+This support should remain subordinate to the archive rather than becoming a separate grocery or inventory product.
+
 ⸻
 
 3. Product Structure Model
@@ -117,6 +126,8 @@ All flows for adding, normalizing, and structuring recipes.
 3.5 Intelligence Layer
 
 Optional AI-assisted tools for structuring, enrichment, and retrieval.
+
+Storage-aware guidance and pantry-driven decision support should live inside archive and retrieval flows, optionally assisted by this layer. They should not become a separate top-level product zone.
 
 3.6 System / Settings
 
@@ -248,6 +259,14 @@ Suggested route model:
 /settings/export        → backup/export/settings
 
 This structure keeps the product understandable and leaves room for expansion.
+
+Target-state note:
+
+* Library and pantry flows may later surface use-soon contexts
+* leftovers and preservation-oriented retrieval may appear as archive-connected browse states
+* storage-reference support may be linked from recipe and pantry views
+
+These should be treated as archive-connected retrieval aids, not as a separate app within the product.
 
 ⸻
 
@@ -413,6 +432,8 @@ Flow:
 	6.	Cook or save to favorites
 
 Later semantic/AI support can enrich this, but the structured system should support it already.
+
+The same flow may later include use-soon and leftovers-aware framing, but it should still feel like archive retrieval rather than recommendation-feed behavior.
 
 ⸻
 
