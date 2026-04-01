@@ -13,6 +13,15 @@ It complements:
 * [implemented-product.md](./implemented-product.md)
 * [product-brief.md](./product-brief.md)
 
+Backlog items in this document should be read through four lenses:
+
+* implemented now
+* already in pipeline
+* new target-state proposal
+* future / not committed
+
+Use the implementation-aware docs and the approved implementation-session pipeline before treating a product idea as missing work.
+
 ---
 
 ## 2. Priority summary
@@ -72,12 +81,17 @@ Current state:
 
 * the library page supports searching and filtering
 * the broader browsing model described in the product brief is only partly surfaced
+* deterministic ingredient-first retrieval is recognized as a distinct next slice in the implementation-session pipeline rather than a brand-new proposal
 
 Missing work:
 
 * recent, verified, and draft-oriented views
 * stronger inspiration browsing by cuisine or technique
 * clearer ingredient-first retrieval
+
+Planning note:
+
+* deterministic ingredient-first retrieval is already owned by Session 39 and should not be reintroduced as a separate greenfield proposal
 
 ### 3.4 Settings and product completeness
 
@@ -103,8 +117,11 @@ Missing work:
 * version history
 * richer media support
 * planning overlays
+* storage guidance as a first-class advisory product layer
+* stronger use-soon and leftovers-aware retrieval
+* recipe-level nutrition reference metadata, only after the product brief revision is accepted
 
-These should remain secondary until the core archive and intake product is complete.
+These should remain secondary until the core archive, intake, and retrieval pipeline work is complete.
 
 ---
 
