@@ -33,7 +33,6 @@ The frontend currently implements:
 * intake hub
 * manual entry flow
 * paste-text intake flow with optional AI normalization
-* first-slice AI retrieval and enrichment surfaces through the pantry workflow and recipe-detail helpers
 * settings placeholder page
 
 The frontend does not yet implement:
@@ -180,7 +179,7 @@ Primary source docs:
 
 Current state:
 
-* AI retrieval and enrichment are already surfaced in a first slice through the pantry workflow and recipe-detail helpers
+* AI helper workflows exist, but they are not organized as a dedicated routed AI tools area
 * there is no `AI Tools` route or navigation entry
 
 Missing target-state items:
@@ -201,7 +200,7 @@ Likely implementation work:
 Retrieval note:
 
 * deterministic ingredient-first retrieval and inspiration are already owned by Session 39
-* AI-assisted pantry and similar-recipe surfacing are already implemented in a first slice and should now be treated as refinement work rather than greenfield capability
+* AI-assisted pantry and similar-recipe work belongs to a separate AI-assisted retrieval track and should not be conflated with the deterministic Session 39 slice
 
 Primary source docs:
 
