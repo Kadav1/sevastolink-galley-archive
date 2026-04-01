@@ -154,8 +154,7 @@ Galley Archive
 │   ├── Ingredients
 │   ├── Method
 │   ├── Notes / Service
-│   ├── Source / Status
-│   └── Revision / History
+│   └── Source / Status
 ├── Kitchen Mode
 ├── Intake
 │   ├── Manual Entry
@@ -163,7 +162,7 @@ Galley Archive
 │   ├── URL Import
 │   ├── Image / PDF Intake
 │   └── Normalize / Review
-├── AI Tools
+├── AI Tools (optional later route group)
 │   ├── Normalize Recipe
 │   ├── Suggest Metadata
 │   ├── Rewrite Recipe
@@ -187,8 +186,10 @@ Galley Archive
 The app should have a stable primary navigation with these top-level entries:
 	•	Library
 	•	Intake
-	•	AI Tools
 	•	Settings
+
+Optional later utility route group:
+	•	AI Tools
 
 Recipe Detail and Kitchen Mode should not feel like separate “apps.”
 They should feel like focused states within the archive system.
@@ -312,12 +313,12 @@ Primary content hierarchy
 	4.	Method
 	5.	Service notes
 	6.	Source/status
-	7.	Revision/history
 
 Secondary content
 	•	image
 	•	related recipes
 	•	AI suggestions
+	•	optional revision history later if adopted
 	•	archival metadata
 
 ⸻

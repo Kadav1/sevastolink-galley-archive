@@ -54,9 +54,10 @@ The frontend does not yet implement:
 |---|---|---|---|---|
 | P1 | Library expansion | Single library route with query/filter state | Dedicated library contexts and route states | `information-architecture.md`, `screen-blueprint-pack.md` |
 | P1 | Recipe edit flow | Read-only recipe detail | Editable recipe workflow | `information-architecture.md`, `screen-blueprint-pack.md` |
-| P1 | Intake expansion | Manual + paste only | URL import, file intake, review route | `intake-import-ux.md`, `screen-blueprint-pack.md` |
+| P1 | Intake expansion | Manual + paste only | URL import and review route | `intake-import-ux.md`, `screen-blueprint-pack.md` |
+| P2 | File/image intake | No routed file or image intake flow | File, image, and PDF intake after core review paths | `intake-import-ux.md`, `screen-blueprint-pack.md` |
 | P2 | Settings | Placeholder page only | Functional settings landing and sub-pages | `information-architecture.md`, `screen-blueprint-pack.md` |
-| P2 | AI tools area | No routed AI area | Dedicated AI utility surfaces | `information-architecture.md`, `screen-blueprint-pack.md`, `component-inventory.md` |
+| P3 | AI tools area | No routed AI area | Optional later AI utility route group | `information-architecture.md`, `screen-blueprint-pack.md`, `component-inventory.md` |
 | P3 | Storage-guidance surfaces | No first-class storage-guidance product module | Advisory storage-aware retrieval tied to archive and pantry workflows | `information-architecture.md`, `component-inventory.md` |
 | P3 | Shell and navigation refinement | Side nav + main outlet only | Richer shell, context patterns, route hierarchy | `component-inventory.md`, `screen-blueprint-pack.md` |
 | P3 | Component-system completion | Partial real component set | Broader component families from UX docs | `component-inventory.md` |
@@ -130,14 +131,12 @@ Current state:
 Missing target-state items:
 
 * `/intake/url`
-* `/intake/file`
 * `/intake/review/:id`
 * broader review queue concepts
 
 Likely implementation work:
 
 * add URL import route and page
-* add file/image intake route and page shell
 * add dedicated review route keyed by intake job
 * refactor shared intake-review UI out of the paste-text page
 * align web review surfaces with the current backend intake job lifecycle
@@ -147,7 +146,30 @@ Primary source docs:
 * `docs/02_ux/intake-import-ux.md`
 * `docs/02_ux/screen-blueprint-pack.md`
 
-### 4.4 P2: Settings implementation
+### 4.4 P2: File/image intake
+
+Current state:
+
+* there is no routed file, image, or PDF intake flow in the current UX
+
+Missing target-state items:
+
+* `/intake/file`
+* image and PDF intake flow
+* attachment/review affordances that fit the existing intake model
+
+Likely implementation work:
+
+* add file/image intake route and page shell after URL/review flow foundations are in place
+* align file/image intake with the same source/candidate/review model as other intake paths
+* avoid making file intake outrun the core review UX
+
+Primary source docs:
+
+* `docs/02_ux/intake-import-ux.md`
+* `docs/02_ux/screen-blueprint-pack.md`
+
+### 4.5 P2: Settings implementation
 
 Current state:
 
@@ -175,7 +197,7 @@ Primary source docs:
 * `docs/02_ux/information-architecture.md`
 * `docs/02_ux/screen-blueprint-pack.md`
 
-### 4.5 P2: AI tools area
+### 4.6 P3: AI tools area
 
 Current state:
 
@@ -208,7 +230,7 @@ Primary source docs:
 * `docs/02_ux/screen-blueprint-pack.md`
 * `docs/02_ux/component-inventory.md`
 
-### 4.6 P3: Storage-guidance surfaces
+### 4.7 P3: Storage-guidance surfaces
 
 Current state:
 
@@ -236,7 +258,7 @@ Primary source docs:
 * `docs/02_ux/information-architecture.md`
 * `docs/02_ux/component-inventory.md`
 
-### 4.7 P3: Shell and navigation refinement
+### 4.8 P3: Shell and navigation refinement
 
 Current state:
 
@@ -263,7 +285,7 @@ Primary source docs:
 * `docs/02_ux/component-inventory.md`
 * `docs/02_ux/screen-blueprint-pack.md`
 
-### 4.8 P3: Component-system completion
+### 4.9 P3: Component-system completion
 
 Current state:
 
@@ -298,19 +320,18 @@ Build the missing route-bearing surfaces that complete the current archive and i
 * library sub-routes
 * recipe edit
 * URL intake
-* file intake
 * intake review route
 
 ### Phase 2
 
 Build the functional support areas that become credible once the core routes exist:
 
+* file/image intake
 * settings
-* first AI tools surfaces
 
 ### Phase 3
 
-Refine the shell, navigation model, and component system after the real route map is in place.
+Refine the shell, navigation model, component system, and optional later AI tools area after the real route map is in place.
 
 This sequencing reduces speculative UI work and keeps the component layer grounded in actual product surfaces.
 
