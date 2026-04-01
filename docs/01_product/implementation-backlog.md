@@ -84,8 +84,13 @@ Current state:
 
 Classification:
 
-* recent, verified, and inspiration-oriented browse contexts remain `missing work`
 * deterministic ingredient-first retrieval is `already in pipeline` through Session 39 (`ingredient-first-retrieval-and-inspiration`)
+* broader route contexts for trusted, draft, recent, and inspiration-oriented browsing remain `missing work`
+
+Already in pipeline:
+
+* deterministic ingredient-first retrieval through Session 39
+* archive-first inspiration tied to that ingredient-first retrieval slice
 
 Missing work:
 
@@ -120,12 +125,15 @@ Classification:
 * storage guidance and stronger use-soon retrieval are `new target-state proposals`
 * recipe-level nutrition reference is a `new target-state proposal` bounded to recipe metadata rather than personal tracking
 
-Missing work:
+Future / not committed:
 
 * collections
 * version history
 * richer media support
 * planning overlays
+
+New target-state proposals:
+
 * storage guidance as a first-class advisory product layer
 * stronger use-soon and leftovers-aware retrieval
 * recipe-level nutrition reference metadata, bounded to recipe-level reference rather than personal tracking
