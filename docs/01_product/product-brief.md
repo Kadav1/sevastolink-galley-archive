@@ -6,7 +6,7 @@
 
 ## 1. Product Definition
 
-Sevastolink Galley Archive is a local-first, archive-first recipe archive and cooking workspace for home use. It runs as a self-hosted web application on a home server or personal machine, accessible to any device on the home network through a browser. It provides a structured, searchable archive for storing, refining, and retrieving recipes — including personal recipes, transcribed family recipes, imported web recipes, and cookbook references — along with an active cooking workspace for in-kitchen use. Pantry, storage-aware retrieval, and optional AI assistance support the archive rather than replacing it. The product is designed to feel premium, calm, and operational: a serious personal culinary system, not a consumer recipe aggregator or social food app. Optional integration with a local language model (LM Studio) provides AI-assisted normalization, metadata enrichment, and retrieval, but the product is fully functional without it.
+Sevastolink Galley Archive is a local-first recipe archive and cooking workspace for home use. It runs as a self-hosted web application on a home server or personal machine, accessible to any device on the home network through a browser. It provides a structured, searchable archive for storing, refining, and retrieving recipes — including personal recipes, transcribed family recipes, imported web recipes, and cookbook references — along with an active cooking workspace for in-kitchen use. It is archive-first: recipe records, source evidence, trust state, and refinement remain the system core. Pantry, storage-aware retrieval, and optional AI assistance support the archive rather than replacing it. The product is designed to feel premium, calm, and operational: a serious personal culinary system, not a consumer recipe aggregator or social food app. Optional integration with a local language model (LM Studio) provides AI-assisted normalization, metadata enrichment, and retrieval, but the product is fully functional without it.
 
 This document defines the target product direction and intended product scope. For the current shipped product surface and missing product work, see [implemented-product.md](./implemented-product.md) and [implementation-backlog.md](./implementation-backlog.md).
 
@@ -50,7 +50,7 @@ The user knows they have specific ingredients and wants to see what archived rec
 
 ### 2.9 Deciding what to use soon
 
-The user wants to avoid waste. They look at what is already in the fridge or pantry, identify ingredients or leftover recipe components that should be used soon, and use the archive to find suitable recipes.
+The user wants to avoid waste. They look at what is already in the fridge or pantry, see which ingredients or leftover recipe components should be used soon, and use the archive to find suitable recipes.
 
 ---
 
@@ -96,21 +96,17 @@ These are explicitly out of scope. They may seem adjacent but must not be allowe
 
 No sharing, publishing, following, liking, or commenting. The archive is private and personal.
 
-### 4.2 Not a meal planning application
+### 4.2 Not a full meal planning application
 
-Full meal planning and scheduling are out of scope for v1. The product does not generate weekly menus or shopping lists.
-
-Light planning overlays may exist later, but the product does not become a full weekly planning system with complex scheduling logic.
+Meal planning and scheduling are not in scope for v1. Light planning and scheduling overlays may exist later, but the product does not become a full weekly planning system and does not generate weekly menus or shopping lists.
 
 ### 4.3 Not a personal nutrition tracking tool
 
-Personal nutrition tracking remains out of scope. The product does not track daily intake, goals, compliance, or health metrics.
-
-Recipe-level nutrition reference may exist later as advisory metadata on recipe records, but the product is not a diet tracker or health-management application.
+The product does not track daily intake, goals, compliance, or health metrics. Recipe-level nutrition reference may exist later as advisory metadata on recipe records, but the product is not a diet tracker or health-management application.
 
 ### 4.4 Not a grocery or shopping tool
 
-No shopping list generation, no grocery workflow, and no e-commerce integration are in scope unless the product direction is explicitly revised later.
+No shopping list generation, no grocery workflow, no pantry stock-management system, and no e-commerce integration are in scope unless the product direction is explicitly revised later.
 
 ### 4.5 Not a cloud product
 
@@ -214,42 +210,41 @@ v2 builds on a stable v1. Items here are anticipated but not committed.
 * Related recipe suggestions
 * AI-assisted query interpretation
 
-### 6.4 Storage-aware retrieval
-
-* advisory storage and use-soon guidance tied to archive records
-* leftovers and preservation-oriented retrieval
-* pantry and fridge input as retrieval context
-
-### 6.5 Collections and organization
+### 6.4 Collections and organization
 
 * Named collections and folders
 * Custom tags beyond taxonomy fields
 * Pinned recipes and curated sets
 
-### 6.6 Recipe history and versioning
+### 6.5 Recipe history and versioning
 
 * Change history on recipe records
 * Version comparison
 * Revert to earlier version
 
-### 6.7 Expanded media support
+### 6.6 Expanded media support
 
 * Multiple photos per recipe
 * Step-by-step photos
 * Source file viewer (PDF, image)
 
-### 6.8 Nutrition reference
-
-* recipe-level nutrition reference metadata
-* dietary and allergen cues on recipe records
-* retrieval support based on nutrition-related metadata later
-
-### 6.9 Home network improvements
+### 6.7 Home network improvements
 
 * Configurable hostname and port
 * HTTPS on local network
 * Optional simple access controls
 
+### 6.8 Storage-aware retrieval
+
+* Advisory storage and use-soon guidance tied to archive records
+* Leftovers and preservation-oriented retrieval
+* Pantry and fridge input as retrieval context
+
+### 6.9 Nutrition reference
+
+* Recipe-level nutrition reference metadata
+* Dietary and allergen cues on recipe records
+* Retrieval support based on nutrition-related metadata later
 ### 6.10 Meal planning (light)
 
 * Planned date field on recipes
@@ -374,7 +369,7 @@ LM Studio runs on the user's machine. No recipe content is sent to remote AI ser
 
 ### What it is not
 
-Not a recipe discovery app. Not a meal planner. Not an AI-first product. Not a social platform. Not a subscription service. Not dependent on any company's infrastructure.
+Not a recipe discovery app. Not a full meal planner. Not a personal nutrition tracker. Not an AI-first product. Not a social platform. Not a subscription service. Not dependent on any company's infrastructure.
 
 ### Who it is for
 
@@ -395,7 +390,7 @@ Everything in the product design should be measured against that standard.
 3. AI is scoped as optional and assistive. No core workflow depends on it.
 4. LM Studio is the designated AI runtime. All AI processing is local.
 5. v1 scope is bounded: archive, intake (manual + paste + URL), Kitchen Mode, optional AI normalization, local deployment, backup/restore.
-6. Meal planning, nutritional tracking, shopping tools, and social features are explicitly out of scope.
+6. Full meal planning, personal nutrition tracking, shopping tools, and social features are explicitly out of scope. Light planning overlays and recipe-level nutrition reference may exist later within the archive-first model.
 7. Verified trust state is user-assigned only. AI cannot set it.
 8. Backup is a first-class v1 feature, not deferred.
 9. Deployment path is Docker Compose with documented setup procedure.
