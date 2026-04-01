@@ -50,7 +50,7 @@ The user knows they have specific ingredients and wants to see what archived rec
 
 ### 2.9 Deciding what to use soon
 
-The user wants to avoid waste. They look at what is already in the fridge or pantry, see which ingredients or prepared components should be used soon, and use the archive to find suitable recipes or kitchen-use components.
+The user wants to avoid waste. They look at what is already in the fridge or pantry, identify ingredients or leftover recipe components that should be used soon, and use the archive to find suitable recipes.
 
 ---
 
@@ -98,13 +98,13 @@ No sharing, publishing, following, liking, or commenting. The archive is private
 
 ### 4.2 Not a meal planning application
 
-Meal planning and scheduling are not in scope for v1. The product does not generate weekly menus or shopping lists.
+Full meal planning and scheduling are out of scope for v1. The product does not generate weekly menus or shopping lists.
 
-Light planning and scheduling overlays may exist later, but the product does not become a full weekly planning system with complex scheduling logic.
+Light planning overlays may exist later, but the product does not become a full weekly planning system with complex scheduling logic.
 
 ### 4.3 Not a personal nutrition tracking tool
 
-The product does not track daily intake, goals, compliance, or health metrics.
+Personal nutrition tracking remains out of scope. The product does not track daily intake, goals, compliance, or health metrics.
 
 Recipe-level nutrition reference may exist later as advisory metadata on recipe records, but the product is not a diet tracker or health-management application.
 
