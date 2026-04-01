@@ -20,7 +20,7 @@ Backlog items in this document should be read through four lenses:
 * new target-state proposal
 * future / not committed
 
-Use the implementation-aware docs and the approved implementation-session pipeline before treating a product idea as missing work.
+Use the implementation-aware docs first. Where a backlog area is already owned by a named implementation session, that is called out inline instead of being treated as greenfield work.
 
 ---
 
@@ -81,17 +81,20 @@ Current state:
 
 * the library page supports searching and filtering
 * the broader browsing model described in the product brief is only partly surfaced
-* deterministic ingredient-first retrieval is recognized as a distinct next slice in the implementation-session pipeline rather than a brand-new proposal
+
+Classification:
+
+* recent, verified, and inspiration-oriented browse contexts remain `missing work`
+* deterministic ingredient-first retrieval is `already in pipeline` through Session 39 (`ingredient-first-retrieval-and-inspiration`)
 
 Missing work:
 
 * recent, verified, and draft-oriented views
 * stronger inspiration browsing by cuisine or technique
-* clearer ingredient-first retrieval
 
 Planning note:
 
-* deterministic ingredient-first retrieval is already owned by Session 39 and should not be reintroduced as a separate greenfield proposal
+* deterministic ingredient-first retrieval should be advanced through Session 39 rather than reintroduced as a separate greenfield proposal in the product backlog
 
 ### 3.4 Settings and product completeness
 
@@ -111,6 +114,12 @@ Current state:
 
 * the current product is still focused on archive, intake, and cooking
 
+Classification:
+
+* collections, version history, richer media support, and planning overlays remain `future / not committed`
+* storage guidance and stronger use-soon retrieval are `new target-state proposals`
+* recipe-level nutrition reference is a `new target-state proposal` bounded to recipe metadata rather than personal tracking
+
 Missing work:
 
 * collections
@@ -119,7 +128,7 @@ Missing work:
 * planning overlays
 * storage guidance as a first-class advisory product layer
 * stronger use-soon and leftovers-aware retrieval
-* recipe-level nutrition reference metadata, only after the product brief revision is accepted
+* recipe-level nutrition reference metadata, bounded to recipe-level reference rather than personal tracking
 
 These should remain secondary until the core archive, intake, and retrieval pipeline work is complete.
 
