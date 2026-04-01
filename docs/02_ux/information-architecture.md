@@ -56,7 +56,7 @@ The remainder of this document should be read as target-state IA, not as a descr
 
 Sevastolink Galley Archive should be structured as a local operational archive, not as a content feed.
 
-The architecture should optimize for five things:
+The architecture should optimize for four things:
 
 2.1 Retrieval
 
@@ -92,9 +92,7 @@ Recipes should not feel disposable. The architecture should support:
 	•	revisions
 	•	long-term archive value
 
-2.5 Storage-aware decision support
-
-The architecture should also help the user answer:
+Storage-aware decision support should be treated as a supporting retrieval and preservation aid rather than as a separate top-level product priority. It should help the user answer:
 	•	what should be used soon
 	•	which archive records fit current pantry or fridge conditions
 	•	how storage-aware metadata should inform retrieval without replacing archive judgment
@@ -262,9 +260,9 @@ This structure keeps the product understandable and leaves room for expansion.
 
 Target-state note:
 
-* Library and pantry flows may later surface use-soon contexts
+* Library retrieval modes and the existing ingredient-first flow may later surface use-soon contexts
 * leftovers and preservation-oriented retrieval may appear as archive-connected browse states
-* storage-reference support may be linked from recipe and pantry views
+* storage-reference support may be linked from recipe detail and ingredient-first retrieval surfaces
 
 These should be treated as archive-connected retrieval aids, not as a separate app within the product.
 
@@ -713,9 +711,7 @@ AI / LM Studio
 The architecture should be able to grow without breaking.
 
 Safe later expansions
-	•	pantry inventory
-	•	shopping list
-	•	menu planning
+	•	storage-aware retrieval refinements
 	•	semantic search
 	•	OCR/file processing
 	•	recipe comparison
