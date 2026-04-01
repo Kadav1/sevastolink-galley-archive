@@ -15,6 +15,12 @@ LM Studio is a separate optional process you run on your own machine. It is not 
 
 This document describes the current implemented local deployment path. For the current ops baseline and missing areas, see [implemented-ops.md](./implemented-ops.md) and [implementation-backlog.md](./implementation-backlog.md).
 
+Target-state note:
+
+A separate Android wrapper delivery path is being tracked as a target-state design in `docs/superpowers/specs/2026-04-01-mobile-wrapper-delivery-design.md`.
+
+That design does not change the meaning of this document. This file remains the source of truth for the currently implemented local deployment path only.
+
 ---
 
 ## Prerequisites

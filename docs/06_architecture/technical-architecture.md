@@ -25,6 +25,7 @@ Current implementation note:
 * the repository does not yet fully realize every target-state backend domain and layering boundary described here
 * use `docs/06_architecture/implemented-architecture.md` for the current implementation baseline
 * use `docs/06_architecture/implementation-backlog.md` for the prioritized target-state gap list
+* use `docs/superpowers/specs/2026-04-01-mobile-wrapper-delivery-design.md` for the approved target-state design of a separate Android wrapper delivery surface; that document is directional only and does not describe current runtime behavior
 
 ---
 
@@ -124,6 +125,20 @@ Express is viable, but FastAPI is the stronger recommendation for v1 because:
 * local service complexity remains low
 
 This is a recommendation, not an established fact.
+
+### Android wrapper note
+
+The target-state product may later gain a separate Android wrapper delivery surface around the existing web client.
+
+If pursued, that work should follow `docs/superpowers/specs/2026-04-01-mobile-wrapper-delivery-design.md`.
+
+That wrapper path does not change the recommended core application architecture in this document:
+
+* the current repository remains the source of truth for the web client and backend
+* the wrapper remains a downstream packaging surface
+* the backend remains the system of record
+
+Until such a wrapper exists in code, it should not be treated as part of the implemented architecture baseline.
 
 ---
 
