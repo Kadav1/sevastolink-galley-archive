@@ -1,8 +1,8 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Repo root is three levels up from apps/api/src/config/
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# Repo root is four levels up from apps/api/src/config/
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 class Settings(BaseSettings):
@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     imports_dir: Path = REPO_ROOT / "data" / "imports"
     exports_dir: Path = REPO_ROOT / "data" / "exports"
     backups_dir: Path = REPO_ROOT / "data" / "backups"
+
+    # Logging
+    log_level: str = "INFO"
+    logs_dir: Path = REPO_ROOT / "data" / "logs"
 
     # LM Studio (optional). The model remains user-configurable; the repo's
     # recommended tested default for normalization is Qwen/Qwen2.5-7B-Instruct.

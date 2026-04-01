@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ApiError } from "../lib/api";
 import {
   approveIntakeJob,
   createIntakeJob,
+  evaluateCandidate,
   normalizeCandidate,
   updateCandidate,
 } from "../lib/intake-api";
-import type { CandidateOut } from "../lib/intake-api";
+import type { CandidateOut, EvaluationOut } from "../lib/intake-api";
 import { attachIntakeMedia } from "../lib/media-api";
 import type { VerificationState } from "../types/recipe";
 
@@ -121,6 +123,104 @@ function parseSteps(text: string) {
     }));
 }
 
+// ── Evaluation panel ──────────────────────────────────────────────────────────
+
+const RECOMMENDATION_META: Record<
+  EvaluationOut["review_recommendation"],
+  { label: string; color: string; bg: string }
+> = {
+  safe_for_human_review: {
+    label: "Safe for review",
+    color: "var(--state-verified)",
+    bg: "var(--state-verified-bg)",
+  },
+  review_with_caution: {
+    label: "Review with caution",
+    color: "var(--state-advisory)",
+    bg: "var(--state-advisory-bg)",
+  },
+  needs_major_correction: {
+    label: "Needs major correction",
+    color: "var(--state-error)",
+    bg: "var(--state-error-bg)",
+  },
+};
+
+function IssueList({ heading, items }: { heading: string; items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+      <span style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "var(--tracking-wide)" }}>
+        {heading}
+      </span>
+      <ul style={{ margin: 0, paddingLeft: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+        {items.map((item, i) => (
+          <li key={i} style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function EvaluationPanel({
+  evaluation,
+  onDismiss,
+}: {
+  evaluation: EvaluationOut;
+  onDismiss: () => void;
+}) {
+  const meta = RECOMMENDATION_META[evaluation.review_recommendation] ?? RECOMMENDATION_META.review_with_caution;
+  return (
+    <div style={{
+      border: `1px solid ${meta.color}`,
+      borderRadius: "var(--radius-sm)",
+      overflow: "hidden",
+    }}>
+      {/* Header */}
+      <div style={{
+        background: meta.bg,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "var(--space-2) var(--space-3)",
+      }}>
+        <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: meta.color, letterSpacing: "var(--tracking-wide)", textTransform: "uppercase" as const }}>
+          {meta.label}
+        </span>
+        <button
+          type="button"
+          onClick={onDismiss}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-tertiary)", fontSize: "var(--text-sm)", lineHeight: 1, padding: 0 }}
+          aria-label="Dismiss evaluation"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: "var(--space-3)", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+        <p style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)", lineHeight: "var(--leading-relaxed)", margin: 0 }}>
+          {evaluation.fidelity_assessment}
+        </p>
+
+        <IssueList heading="Missing information" items={evaluation.missing_information} />
+        <IssueList heading="Possible inventions" items={evaluation.likely_inventions_or_overreaches} />
+        <IssueList heading="Ingredient issues" items={evaluation.ingredient_issues} />
+        <IssueList heading="Step issues" items={evaluation.step_issues} />
+        <IssueList heading="Reviewer notes" items={evaluation.reviewer_notes} />
+
+        {evaluation.metadata_confidence && (
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", margin: 0 }}>
+            Metadata confidence: {evaluation.metadata_confidence}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function PasteTextPage() {
@@ -159,6 +259,9 @@ export function PasteTextPage() {
   // UI state
   const [normalizing, setNormalizing] = useState(false);
   const [normalizeError, setNormalizeError] = useState<string | null>(null);
+  const [evaluating, setEvaluating] = useState(false);
+  const [evaluateError, setEvaluateError] = useState<string | null>(null);
+  const [evaluation, setEvaluation] = useState<EvaluationOut | null>(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -184,6 +287,7 @@ export function PasteTextPage() {
     }
     setNormalizing(true);
     setNormalizeError(null);
+    setEvaluation(null); // clear any stale evaluation from before re-normalize
 
     try {
       // Create the intake job if we haven't yet
@@ -198,15 +302,33 @@ export function PasteTextPage() {
       const res = await normalizeCandidate(currentJobId);
       applyCandidate(res.data);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Normalization failed.";
       // Surface AI-specific errors as degraded-mode notice rather than hard failure
-      if (msg.includes("ai_disabled") || msg.includes("ai_unavailable")) {
+      if (err instanceof ApiError && (err.code === "ai_disabled" || err.code === "ai_unavailable")) {
         setNormalizeError("AI normalization is unavailable. Fill in the fields manually.");
       } else {
-        setNormalizeError(msg);
+        setNormalizeError(err instanceof Error ? err.message : "Normalization failed.");
       }
     } finally {
       setNormalizing(false);
+    }
+  }
+
+  async function handleEvaluate() {
+    if (!jobId) return;
+    setEvaluating(true);
+    setEvaluateError(null);
+    setEvaluation(null);
+    try {
+      const res = await evaluateCandidate(jobId);
+      setEvaluation(res.data);
+    } catch (err: unknown) {
+      if (err instanceof ApiError && (err.code === "ai_disabled" || err.code === "ai_unavailable")) {
+        setEvaluateError("AI evaluation is unavailable. Continue reviewing manually.");
+      } else {
+        setEvaluateError(err instanceof Error ? err.message : "Evaluation failed.");
+      }
+    } finally {
+      setEvaluating(false);
     }
   }
 
@@ -387,6 +509,33 @@ export function PasteTextPage() {
               </p>
             )}
           </div>
+
+          {/* Evaluate button — only shown after a job exists (normalize was run or job was saved) */}
+          {jobId && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+              <button
+                type="button"
+                onClick={handleEvaluate}
+                disabled={evaluating || normalizing}
+                style={styles.evaluateBtn}
+              >
+                {evaluating ? "Evaluating…" : "Evaluate normalization"}
+              </button>
+              {evaluateError && (
+                <p style={{ fontSize: "var(--text-xs)", color: "var(--state-advisory)" }}>
+                  {evaluateError}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Evaluation result panel */}
+          {evaluation && (
+            <EvaluationPanel
+              evaluation={evaluation}
+              onDismiss={() => setEvaluation(null)}
+            />
+          )}
         </div>
 
         {/* Right: structured form */}
@@ -637,6 +786,19 @@ const styles = {
     fontWeight: 500,
     padding: "var(--space-2) var(--space-4)",
     alignSelf: "flex-start" as const,
+    letterSpacing: "var(--tracking-wide)",
+  } as React.CSSProperties,
+  evaluateBtn: {
+    background: "none",
+    border: "none",
+    borderRadius: "var(--radius-sm)",
+    color: "var(--text-tertiary)",
+    cursor: "pointer",
+    fontSize: "var(--text-xs)",
+    fontWeight: 400,
+    padding: "var(--space-1) 0",
+    alignSelf: "flex-start" as const,
+    textDecoration: "underline",
     letterSpacing: "var(--tracking-wide)",
   } as React.CSSProperties,
   formBody: {

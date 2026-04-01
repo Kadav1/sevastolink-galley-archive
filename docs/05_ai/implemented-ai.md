@@ -69,45 +69,60 @@ Interpretation:
 Implemented today:
 
 * the backend can run a read-only AI evaluation of a candidate against its raw source
+* the paste-text intake page exposes an "Evaluate normalization" button after a job has been created
+* the evaluation result renders inline in the raw source panel with a recommendation badge, fidelity assessment, and issue lists
+* result is dismissable; does not modify the candidate
 
-Current surface:
+Current surfaces:
 
 * `POST /api/v1/intake-jobs/{job_id}/evaluate`
+* web paste-text intake page — evaluate button visible once `job_id` is set (after normalize or save)
 
 Interpretation:
 
-* evaluation is implemented in the API
-* it is not yet a fully surfaced routed web review workflow
+* evaluation is a read-only review aid during the intake workflow
+* the recommendation badge (safe / caution / needs correction) gives a quick quality signal before approval
 
 ### 3.3 Recipe metadata suggestion
 
 Implemented today:
 
 * the backend can suggest structured taxonomy and metadata fields for an existing recipe
+* the Recipe Detail page exposes a "Suggest metadata" button in an AI Tools section at the bottom
+* AI-suggested fields are shown in a panel with per-field "Apply" buttons
+* applying a field PATCHes the recipe and invalidates the TanStack Query cache
+* the `"class"` alias returned by the AI is mapped to `"operational_class"` in the PATCH body
+* confidence and uncertainty notes are displayed below the field list
+* AI unavailable state shows an inline message without crashing
 
-Current surface:
+Current surfaces:
 
 * `POST /api/v1/recipes/{id_or_slug}/suggest-metadata`
+* web Recipe Detail page — AI Tools section (bottom of page)
 
 Interpretation:
 
-* metadata suggestion is implemented in the API
-* it is not yet a broader dedicated user-facing route area
+* metadata suggestion is now a complete user-facing workflow
+* users can selectively apply individual suggested fields or dismiss the panel
 
 ### 3.4 Recipe rewrite
 
 Implemented today:
 
 * the backend can return an archive-style rewrite suggestion for an existing recipe
+* the Recipe Detail page exposes a "Rewrite recipe" button in the AI Tools section
+* the rewrite is shown in a read-only panel with title, description, ingredients, steps, and notes
+* the panel is dismissable; it does not modify the stored recipe
 
-Current surface:
+Current surfaces:
 
 * `POST /api/v1/recipes/{id_or_slug}/rewrite`
+* web Recipe Detail page — AI Tools section (bottom of page)
 
 Interpretation:
 
-* rewrite is implemented as a suggestion workflow
-* it does not directly modify stored recipes
+* rewrite is now surfaced as a visible suggestion workflow in the UI
+* it remains read-only and does not apply changes to stored recipes
 
 ### 3.5 Similar recipes
 
@@ -115,14 +130,15 @@ Implemented today:
 
 * the backend can rank similar recipes relative to a source recipe
 
-Current surface:
+Current surfaces:
 
 * `POST /api/v1/recipes/{id_or_slug}/similar`
+* web Recipe Detail page — AI Tools section (bottom of page)
 
 Interpretation:
 
-* similarity is implemented as an API capability
-* it is not yet a larger routed discovery product surface
+* similarity is implemented in the API and surfaced from the recipe detail workflow
+* it is not yet a larger standalone discovery product surface
 
 ### 3.6 Pantry suggestions
 
@@ -130,20 +146,27 @@ Implemented today:
 
 * the backend can suggest candidate recipe directions from available ingredients
 
-Current surface:
+Current surfaces:
 
 * `POST /api/v1/pantry/suggest`
+* web Pantry page at `/pantry`
 
 Interpretation:
 
-* pantry suggestion is implemented in the API
-* it is not yet a broader dedicated pantry product area
+* pantry suggestion is implemented in the API and exposed through a routed pantry workspace
+* it is still narrower than the broader pantry target-state docs
 
-### 3.7 Translation in import tooling
+### 3.7 Preprocessing in import tooling
 
-Implemented today:
+Current status:
 
-* the CLI importer supports an optional translation pass before normalization
+* the CLI importer can run a semantics-first staged pipeline before normalization for non-English source text
+* stage 1 translation/preprocessing returns a `TranslationArtifact` with required `translated_text` and optional `segments`
+* stage 1.5 performs deterministic reference matching against the active Swedish reference assets
+* stage 2 assembles an explicit normalization request with `render_profile`, `locale`, `stage1_translation`, `stage1_reference_match`, and `normalization_policy`
+* weak stage-1 quality checks can escalate into `warnings` and `review_flags` without blocking candidate emission
+* the preprocessing stage can be executed inline or saved as `.preprocessed.txt` artifacts for later normalization
+* when `--use-preprocessed-dir` has no matching saved artifact, the importer currently falls back to inline preprocessing instead of failing
 
 Current surface:
 
@@ -151,7 +174,10 @@ Current surface:
 
 Interpretation:
 
-* translation is implemented as importer tooling, not as a routed product workflow
+* preprocessing is importer tooling, not a routed product workflow
+* the saved-artifact mode exists to support one-model-at-a-time LM Studio setups
+* the importer AI behavior is structured and review-centric rather than chat-based
+* candidate-bundle output remains backward-compatible with `scripts/import/review_candidates.py`
 
 ---
 
@@ -202,10 +228,8 @@ The broader AI docs describe more AI-facing product behavior than the current ro
 Current gaps include:
 
 * no dedicated AI tools route group
-* no broader web review flow for intake evaluation
-* no user-facing archive enrichment panel on recipe pages
-* no first-class routed surfaces for rewrite, metadata suggestion, pantry, or similarity
 * no surfaced `ai_jobs` resource even though the table exists
+* no standalone routed surfaces dedicated solely to rewrite, metadata suggestion, or similarity beyond the Recipe Detail AI Tools section
 * no AI-backed retrieval assistant beyond direct endpoint capability
 
 ### Current interpretation

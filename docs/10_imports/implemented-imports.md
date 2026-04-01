@@ -36,6 +36,7 @@ Use this document when the question is:
 The current supported pipeline is:
 
 * raw source files on disk
+* semantics-first normalization with stage 1 translation/preprocessing, stage 1.5 reference matching, and stage 2 request assembly
 * normalization into `.candidate.json` artifacts
 * manual review and patching
 * optional deterministic repair pass
@@ -68,16 +69,30 @@ Bulk and single-file normalization are implemented in:
 Current implemented behavior includes:
 
 * single-file normalization
+* repeated `--file` selection for multi-file runs
 * directory normalization
 * LM Studio-backed normalization
-* optional translation model support in the script
+* stage 1 translation/preprocessing that yields a `TranslationArtifact` with required `translated_text` and optional `segments`
+* deterministic stage-1.5 reference matching against the active Swedish reference files
+* explicit stage-2 request assembly with `render_profile`, `locale`, `stage1_translation`, `stage1_reference_match`, and `normalization_policy`
+* weak stage-1 quality assessment that can surface `warnings` and escalate into `review_flags`
+* optional `.preprocessed.txt` artifact emission for a separate preprocessing pass
+* normalization from saved preprocessing artifacts via `--use-preprocessed-dir`
+* fallback to inline preprocessing when `--use-preprocessed-dir` has no matching saved artifact
+* Swedish reference-driven preprocessing guardrails using `data/reference/swedish_recipe_units.json` and `data/reference/swedish_recipe_terms.json`
 * candidate bundle emission to disk
+* JSON run report emission under `data/reports/`
 * prompt/schema provenance recorded in output artifacts
-* overwrite control and batch file resolution
+* overwrite control and continue-on-error batch file resolution
 
 Interpretation:
 
 * normalization is a real implemented stage
+* preprocessing-aware Swedish imports now have deterministic unit and term drift checks before bundle emission
+* the Swedish reference files are canonical active inputs rather than passive glossary docs
+* stage-2 normalization request assembly is policy-driven rather than ad hoc text handoff
+* weak stage-1 assessments can preserve the run while escalating human-review attention through `review_flags`
+* candidate bundles remain backward-compatible with `scripts/import/review_candidates.py`
 * it is still a local script, not an orchestrated background service
 
 ### 3.3 Candidate review CLI

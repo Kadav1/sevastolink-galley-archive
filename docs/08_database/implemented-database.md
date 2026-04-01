@@ -26,9 +26,14 @@ This is the implementation-aware database baseline for contributors.
 The current repository uses:
 
 * SQLite as the system of record
-* one SQL migration file for the initial schema
-* startup-driven migration application through `init_db()`
+* numbered SQL migration files under `src/db/migrations/` applied at startup by `init_db()`
 * SQLAlchemy models mapped to the current SQLite schema
+
+Current applied migrations:
+
+* `001_initial_schema.sql` — all tables, indexes, and FTS5 virtual table
+* `002_recipe_source_notes.sql` — adds `source_notes` column to `recipe_sources`
+* `003_intake_jobs_source_notes.sql` — adds `source_notes` column to `intake_jobs`
 
 The current schema already creates these major table groups:
 
@@ -51,7 +56,7 @@ However, not every created table is equally surfaced through application routes 
 
 ### 3.1 Tables created by the current migration set
 
-The current `001_initial_schema.sql` migration creates:
+The `001_initial_schema.sql` migration creates:
 
 * `schema_migrations`
 * `media_assets`

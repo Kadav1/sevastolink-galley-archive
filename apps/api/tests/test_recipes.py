@@ -221,3 +221,65 @@ async def test_slug_collision(client):
     assert r1.status_code == 201
     assert r2.status_code == 201
     assert r1.json()["data"]["slug"] != r2.json()["data"]["slug"]
+
+
+@pytest.mark.asyncio
+async def test_list_recipes_summary_includes_ingredient_count(client):
+    """RecipeSummaryOut must include ingredient_count."""
+    recipe = {**MINIMAL_RECIPE, "ingredients": [
+        {"position": 1, "item": "eggs", "quantity": "4"},
+        {"position": 2, "item": "olive oil", "quantity": "2 tbsp"},
+        {"position": 3, "item": "tomatoes", "quantity": "400 g"},
+    ]}
+    async with await _client() as c:
+        await c.post("/api/v1/recipes", json=recipe)
+        r = await c.get("/api/v1/recipes")
+    assert r.status_code == 200
+    summary = r.json()["data"][0]
+    assert "ingredient_count" in summary
+    assert summary["ingredient_count"] == 3
+
+
+@pytest.mark.asyncio
+async def test_list_recipes_filter_sector(client):
+    """sector filter returns only matching recipes."""
+    async with await _client() as c:
+        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "sector": "Galley"})
+        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Other Recipe"})
+        r_galley = await c.get("/api/v1/recipes", params={"sector": "Galley"})
+        r_other = await c.get("/api/v1/recipes", params={"sector": "Shoreside"})
+    assert r_galley.json()["meta"]["total"] == 1
+    assert r_other.json()["meta"]["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_list_recipes_filter_operational_class(client):
+    """operational_class filter returns only matching recipes."""
+    async with await _client() as c:
+        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "operational_class": "Passage"})
+        r_match = await c.get("/api/v1/recipes", params={"operational_class": "Passage"})
+        r_no = await c.get("/api/v1/recipes", params={"operational_class": "Harbor"})
+    assert r_match.json()["meta"]["total"] == 1
+    assert r_no.json()["meta"]["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_list_recipes_filter_heat_window(client):
+    """heat_window filter returns only matching recipes."""
+    async with await _client() as c:
+        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "heat_window": "No Heat"})
+        r_match = await c.get("/api/v1/recipes", params={"heat_window": "No Heat"})
+        r_no = await c.get("/api/v1/recipes", params={"heat_window": "Open Flame"})
+    assert r_match.json()["meta"]["total"] == 1
+    assert r_no.json()["meta"]["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_list_recipes_sort_title_desc(client):
+    """sort=title_desc returns recipes in reverse alphabetical order."""
+    async with await _client() as c:
+        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Anchovy Toast"})
+        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Zucchini Fritters"})
+        r = await c.get("/api/v1/recipes", params={"sort": "title_desc"})
+    titles = [item["title"] for item in r.json()["data"]]
+    assert titles == sorted(titles, reverse=True)

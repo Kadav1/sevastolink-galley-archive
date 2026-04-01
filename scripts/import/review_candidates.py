@@ -116,7 +116,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def candidate_files(directory: Path) -> list[Path]:
-    return sorted(path for path in directory.glob("*.candidate.json") if path.is_file())
+    return sorted(path for path in directory.rglob("*.candidate.json") if path.is_file())
 
 
 def load_bundle(path: Path) -> dict[str, Any]:

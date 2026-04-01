@@ -135,7 +135,7 @@ Copy `.env.example` to `.env`. Key variables:
 
 **Frontend (`apps/web/`):** Library page, Recipe Detail, Kitchen Mode (`/recipe/:slug/kitchen`), Intake Hub, Manual Entry, Paste Text (with AI normalize button), Settings page (real load/save).
 
-**Tests:** 87 tests across `apps/api/tests/` — intake lifecycle, normalize, evaluate, suggest-metadata, rewrite, similar, pantry, and settings endpoints.
+**Tests:** 112 tests across `apps/api/tests/` — intake lifecycle, normalize, evaluate, suggest-metadata, rewrite, similar, pantry, settings, error-envelope contract, and recipe list/filter/sort alignment tests.
 
 ## Known Gotchas
 
@@ -164,6 +164,14 @@ Copy `.env.example` to `.env`. Key variables:
 **`MetadataSuggestionOut.operational_class`** — the AI returns a field named `"class"` which is a Python reserved word. The schema uses `operational_class: str | None = Field(None, alias="class")` with `model_config = {"populate_by_name": True}`. Use `model_validate(payload)` to deserialize — Pydantic v2 resolves the alias automatically.
 
 **`prompts/build/` is gitignored** — the `build/` entry in `.gitignore` matches this directory. Session prompt files in `prompts/build/claude/sessions/` exist on disk only and must not be committed. Edit them in place; never use `git add -f` on them.
+
+**Never use `sed` on Python/TS files** — use the `Edit` or `Write` tool. `sed -i` with complex patterns can silently wipe files to 1 line (happened on `intake.py`).
+
+**Parallel pytest runs corrupt the test DB** — `sqlite3.OperationalError: disk I/O error` means multiple pytest processes are competing on the SQLite test database. Kill background pytest jobs before running again.
+
+**`status.HTTP_422_UNPROCESSABLE_ENTITY` is deprecated** — use `422` directly as an integer in `HTTPException(status_code=422, ...)`.
+
+**Error envelope** — all errors use `{"error": {"code": "...", "message": "..."}}`. Use `error_detail(code, message)` from `schemas/common.py` as the `HTTPException.detail`. A custom handler in `main.py` wraps it. Never use bare strings or nested `{"error": {...}}` shapes in `detail`.
 
 ## What Is Explicitly Out of Scope (v1)
 

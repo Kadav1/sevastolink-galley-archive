@@ -1,0 +1,1155 @@
+{
+  "version": "2026-03-28",
+  "language": "sv-SE",
+  "purpose": "Broad Swedish culinary lexicon for recipe import preprocessing, guarded translation, ingredient identity checks, and post-translation drift detection.",
+  "verification_scope": {
+    "externally_verified": [
+      "lexical existence and meanings for a subset of Swedish culinary nouns and measurement words checked against svenska.se",
+      "specific culinary noun support such as spiskummin, vinäger, and vitlök compounds where dictionary evidence is available"
+    ],
+    "repo_derived_or_modeled": [
+      "English canonical renderings for importer use",
+      "category labels",
+      "contextual guard rules",
+      "false-friend risk annotations",
+      "broad ingredient coverage beyond terms individually checked in external dictionaries"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Svenska Akademiens ordlista: spiskummin",
+      "url": "https://svenska.se/saol/?id=2904457&pz=5",
+      "used_for": [
+        "lexical existence of spiskummin"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: vinäger",
+      "url": "https://svenska.se/so/?id=193359",
+      "used_for": [
+        "vinäger meaning",
+        "support for vitvinsvinäger and rödvinsvinäger compounds"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: spad",
+      "url": "https://svenska.se/so/?id=177011",
+      "used_for": [
+        "spad meaning as cooking liquid or jar liquid",
+        "support for contextual brine handling"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: vitlök",
+      "url": "https://svenska.se/saob/?sok=vitl%C3%B6k",
+      "used_for": [
+        "support for vitlök compound forms including vitlökspulver"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: lök",
+      "url": "https://svenska.se/so/?sok=l%C3%B6k",
+      "used_for": [
+        "support for onion-family lexical base terms and compounds"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: hummus",
+      "url": "https://svenska.se/so/?sok=hummus",
+      "used_for": [
+        "cross-check for culinary usage of spiskummin in dictionary examples"
+      ]
+    }
+  ],
+  "notes": [
+    "This file is intentionally structured to support deterministic mapping, not just freeform glossary lookup.",
+    "Canonical English values favor archive-ready ingredient names and preparation phrases rather than literal word-by-word translation.",
+    "Context-sensitive terms are kept in dedicated guard sections to avoid silent semantic drift.",
+    "This file is partly source-verified and partly repository-modeled. It should not be treated as an exhaustive official bilingual culinary dictionary.",
+    "Where svenska.se is cited, it validates lexical existence and Swedish meaning, not necessarily the exact importer-facing English gloss used here."
+  ],
+  "verification_buckets": {
+    "verified_terms": [
+      "spiskummin",
+      "vinäger",
+      "vitlök",
+      "lök",
+      "hummus",
+      "spad",
+      "matsked",
+      "tesked"
+    ],
+    "modeled_terms": [
+      "headings",
+      "difficulty_terms",
+      "time_phrases",
+      "technique_terms",
+      "preparation_terms",
+      "descriptor_terms",
+      "ingredient_terms"
+    ],
+    "requires_review": [
+      "contextual_guard_terms",
+      "false_friend_risks",
+      "ingredient entries whose English gloss depends on culinary context",
+      "terms that are lexically supported by a base noun but not individually dictionary-verified as compounds"
+    ]
+  },
+  "headings": {
+    "kategori": "Category",
+    "recept": "Recipe",
+    "notering": "Note",
+    "anteckning": "Note",
+    "ingredienser": "Ingredients",
+    "portioner": "Serves",
+    "förberedelsetid": "Preparation time",
+    "tillagningstid": "Cooking time",
+    "tillagning": "Preparation",
+    "tillagningssätt": "Cooking method",
+    "tillagningsmetod": "Cooking method",
+    "arbetsgång": "Method",
+    "gör så här": "Method",
+    "instruktioner": "Instructions",
+    "vintips": "Wine pairing",
+    "vinmatchning": "Wine pairing",
+    "betyg": "Rating",
+    "vad jag ändrade och varför": "What I changed and why"
+  },
+  "difficulty_terms": {
+    "enkel": "Basic",
+    "lätt": "Basic",
+    "medel": "Intermediate",
+    "medelsvår": "Intermediate",
+    "avancerad": "Advanced",
+    "svår": "Advanced",
+    "projekt": "Project"
+  },
+  "time_phrases": {
+    "vila": "rest",
+    "vilotid": "rest time",
+    "kylning": "chilling",
+    "chilla": "chill",
+    "ställ i kylen": "refrigerate",
+    "låt svalna": "let cool",
+    "över natten": "overnight",
+    "minst": "at least",
+    "cirka": "about",
+    "ca": "about"
+  },
+  "technique_terms": {
+    "rör": "stir",
+    "rör ihop": "mix together",
+    "rörs kall": "mixed cold",
+    "blanda": "mix",
+    "vispa": "whisk",
+    "vänd ner": "fold in",
+    "stek": "fry",
+    "fräs": "saute",
+    "bryn": "brown",
+    "koka": "boil",
+    "sjud": "simmer",
+    "ugnsbaka": "bake",
+    "baka": "bake",
+    "grilla": "grill",
+    "rosta": "roast",
+    "mixa": "blend",
+    "mortla": "grind",
+    "marinera": "marinate",
+    "hacka": "chop",
+    "skiva": "slice",
+    "riv": "grate",
+    "pressa": "press"
+  },
+  "preparation_terms": {
+    "finhackad": "finely chopped",
+    "grovhackad": "roughly chopped",
+    "hackad": "chopped",
+    "tärnad": "diced",
+    "strimlad": "shredded",
+    "skivad": "sliced",
+    "tunt skivad": "thinly sliced",
+    "grovriven": "coarsely grated",
+    "finriven": "finely grated",
+    "riven": "grated",
+    "krossad": "crushed",
+    "pressad": "pressed",
+    "smält": "melted",
+    "brynt": "browned",
+    "vispad": "whipped",
+    "rumstempererad": "room temperature",
+    "kall": "cold",
+    "iskall": "ice cold",
+    "ljummen": "lukewarm",
+    "avrunnen": "drained",
+    "sköljd": "rinsed",
+    "urtagen": "pitted",
+    "skalad": "peeled",
+    "urkärnad": "cored",
+    "urbenad": "boneless"
+  },
+  "descriptor_terms": {
+    "syrlig": "tangy",
+    "söt": "sweet",
+    "salt": "salty",
+    "krämig": "creamy",
+    "mustig": "hearty",
+    "frisk": "fresh",
+    "rökig": "smoky",
+    "stark": "spicy",
+    "mild": "mild",
+    "het": "hot",
+    "seg": "chewy",
+    "frasig": "crispy",
+    "saftig": "juicy",
+    "mör": "tender"
+  },
+  "ingredient_terms": [
+    {
+      "swedish": "majonnäs",
+      "english": "mayonnaise",
+      "category": "condiment",
+      "aliases": [
+        "majonnäs"
+      ]
+    },
+    {
+      "swedish": "gurkrelish",
+      "english": "pickle relish",
+      "category": "condiment",
+      "aliases": [
+        "söt gurkrelish",
+        "relish"
+      ]
+    },
+    {
+      "swedish": "gul senap",
+      "english": "yellow mustard",
+      "category": "condiment",
+      "aliases": [
+        "senap"
+      ]
+    },
+    {
+      "swedish": "dijonsenap",
+      "english": "Dijon mustard",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "grov senap",
+      "english": "whole grain mustard",
+      "category": "condiment",
+      "aliases": [
+        "slotts senap"
+      ]
+    },
+    {
+      "swedish": "ketchup",
+      "english": "ketchup",
+      "category": "condiment",
+      "aliases": [
+        "tomatketchup"
+      ]
+    },
+    {
+      "swedish": "sojasås",
+      "english": "soy sauce",
+      "category": "condiment",
+      "aliases": [
+        "soya",
+        "japansk soja"
+      ]
+    },
+    {
+      "swedish": "fisksås",
+      "english": "fish sauce",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "ostronsås",
+      "english": "oyster sauce",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "chilisås",
+      "english": "chili sauce",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "sambal oelek",
+      "english": "sambal oelek",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "sriracha",
+      "english": "sriracha",
+      "category": "condiment",
+      "aliases": []
+    },
+    {
+      "swedish": "vitvinsvinäger",
+      "english": "white wine vinegar",
+      "category": "acid",
+      "aliases": []
+    },
+    {
+      "swedish": "rödvinsvinäger",
+      "english": "red wine vinegar",
+      "category": "acid",
+      "aliases": []
+    },
+    {
+      "swedish": "äppelcidervinäger",
+      "english": "apple cider vinegar",
+      "category": "acid",
+      "aliases": [
+        "cidervinäger"
+      ]
+    },
+    {
+      "swedish": "balsamvinäger",
+      "english": "balsamic vinegar",
+      "category": "acid",
+      "aliases": []
+    },
+    {
+      "swedish": "citronjuice",
+      "english": "lemon juice",
+      "category": "acid",
+      "aliases": [
+        "citronsaft"
+      ]
+    },
+    {
+      "swedish": "limejuice",
+      "english": "lime juice",
+      "category": "acid",
+      "aliases": [
+        "limesaft"
+      ]
+    },
+    {
+      "swedish": "spad",
+      "english": "brine / liquid from jar or cooking liquid",
+      "category": "contextual",
+      "aliases": [
+        "lag",
+        "inläggningsspad"
+      ],
+      "guard_rule": "Translate by ingredient context: pickle brine, caper brine, chickpea liquid, pasta water, or cooking liquid. Do not normalize to relish itself."
+    },
+    {
+      "swedish": "pickle-spad",
+      "english": "pickle brine",
+      "category": "contextual",
+      "aliases": []
+    },
+    {
+      "swedish": "majonnäsbaserad sås",
+      "english": "mayonnaise-based sauce",
+      "category": "dish",
+      "aliases": []
+    },
+    {
+      "swedish": "salt",
+      "english": "salt",
+      "category": "seasoning",
+      "aliases": [
+        "havssalt",
+        "flingsalt",
+        "bordssalt"
+      ]
+    },
+    {
+      "swedish": "svartpeppar",
+      "english": "black pepper",
+      "category": "seasoning",
+      "aliases": [
+        "malen svartpeppar"
+      ]
+    },
+    {
+      "swedish": "vitpeppar",
+      "english": "white pepper",
+      "category": "seasoning",
+      "aliases": []
+    },
+    {
+      "swedish": "paprikapulver",
+      "english": "paprika powder",
+      "category": "spice",
+      "aliases": [
+        "paprika"
+      ]
+    },
+    {
+      "swedish": "rökt paprikapulver",
+      "english": "smoked paprika powder",
+      "category": "spice",
+      "aliases": [
+        "rökt paprika"
+      ]
+    },
+    {
+      "swedish": "chiliflakes",
+      "english": "chili flakes",
+      "category": "spice",
+      "aliases": [
+        "chiliflingor"
+      ]
+    },
+    {
+      "swedish": "spiskummin",
+      "english": "cumin",
+      "category": "spice",
+      "aliases": [
+        "malen spiskummin"
+      ]
+    },
+    {
+      "swedish": "koriander",
+      "english": "coriander",
+      "category": "spice_or_herb",
+      "aliases": [
+        "malen koriander",
+        "färsk koriander"
+      ],
+      "guard_rule": "Distinguish ground coriander from fresh cilantro by preparation or ingredient context."
+    },
+    {
+      "swedish": "oregano",
+      "english": "oregano",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "timjan",
+      "english": "thyme",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "rosmarin",
+      "english": "rosemary",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "basilika",
+      "english": "basil",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "persilja",
+      "english": "parsley",
+      "category": "herb",
+      "aliases": [
+        "bladpersilja",
+        "kruspersilja"
+      ]
+    },
+    {
+      "swedish": "dill",
+      "english": "dill",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "gräslök",
+      "english": "chives",
+      "category": "herb",
+      "aliases": []
+    },
+    {
+      "swedish": "lagerblad",
+      "english": "bay leaf",
+      "category": "herb",
+      "aliases": [
+        "lagerblad"
+      ]
+    },
+    {
+      "swedish": "vitlökspulver",
+      "english": "garlic powder",
+      "category": "seasoning",
+      "aliases": []
+    },
+    {
+      "swedish": "lökpulver",
+      "english": "onion powder",
+      "category": "seasoning",
+      "aliases": []
+    },
+    {
+      "swedish": "vitlök",
+      "english": "garlic",
+      "category": "aromatic",
+      "aliases": [
+        "vitlöksklyfta",
+        "vitlöksklyftor"
+      ]
+    },
+    {
+      "swedish": "gul lök",
+      "english": "yellow onion",
+      "category": "aromatic",
+      "aliases": [
+        "lök"
+      ]
+    },
+    {
+      "swedish": "rödlök",
+      "english": "red onion",
+      "category": "aromatic",
+      "aliases": []
+    },
+    {
+      "swedish": "schalottenlök",
+      "english": "shallot",
+      "category": "aromatic",
+      "aliases": []
+    },
+    {
+      "swedish": "salladslök",
+      "english": "spring onion",
+      "category": "aromatic",
+      "aliases": [
+        "vårlök"
+      ]
+    },
+    {
+      "swedish": "purjolök",
+      "english": "leek",
+      "category": "aromatic",
+      "aliases": []
+    },
+    {
+      "swedish": "ingefära",
+      "english": "ginger",
+      "category": "aromatic",
+      "aliases": [
+        "färsk ingefära"
+      ]
+    },
+    {
+      "swedish": "selleri",
+      "english": "celery",
+      "category": "vegetable",
+      "aliases": [
+        "blekselleri"
+      ]
+    },
+    {
+      "swedish": "morot",
+      "english": "carrot",
+      "category": "vegetable",
+      "aliases": [
+        "morötter"
+      ]
+    },
+    {
+      "swedish": "potatis",
+      "english": "potato",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "sötpotatis",
+      "english": "sweet potato",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "paprika",
+      "english": "bell pepper",
+      "category": "vegetable",
+      "aliases": [
+        "röd paprika",
+        "gul paprika",
+        "grön paprika"
+      ]
+    },
+    {
+      "swedish": "tomat",
+      "english": "tomato",
+      "category": "vegetable",
+      "aliases": [
+        "tomater"
+      ]
+    },
+    {
+      "swedish": "körsbärstomat",
+      "english": "cherry tomato",
+      "category": "vegetable",
+      "aliases": [
+        "cocktailtomat"
+      ]
+    },
+    {
+      "swedish": "gurka",
+      "english": "cucumber",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "avokado",
+      "english": "avocado",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "spenat",
+      "english": "spinach",
+      "category": "leafy_green",
+      "aliases": [
+        "babyspenat"
+      ]
+    },
+    {
+      "swedish": "grönkål",
+      "english": "kale",
+      "category": "leafy_green",
+      "aliases": []
+    },
+    {
+      "swedish": "ruccola",
+      "english": "arugula",
+      "category": "leafy_green",
+      "aliases": [
+        "rucola"
+      ]
+    },
+    {
+      "swedish": "isbergssallad",
+      "english": "iceberg lettuce",
+      "category": "leafy_green",
+      "aliases": []
+    },
+    {
+      "swedish": "svamp",
+      "english": "mushroom",
+      "category": "fungi",
+      "aliases": [
+        "champinjon",
+        "champinjoner"
+      ]
+    },
+    {
+      "swedish": "kantarell",
+      "english": "chanterelle",
+      "category": "fungi",
+      "aliases": [
+        "kantareller"
+      ]
+    },
+    {
+      "swedish": "broccoli",
+      "english": "broccoli",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "blomkål",
+      "english": "cauliflower",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "zucchini",
+      "english": "zucchini",
+      "category": "vegetable",
+      "aliases": [
+        "courgette"
+      ]
+    },
+    {
+      "swedish": "aubergine",
+      "english": "eggplant",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "ärtor",
+      "english": "peas",
+      "category": "vegetable",
+      "aliases": [
+        "gröna ärtor"
+      ]
+    },
+    {
+      "swedish": "majs",
+      "english": "corn",
+      "category": "vegetable",
+      "aliases": []
+    },
+    {
+      "swedish": "ris",
+      "english": "rice",
+      "category": "grain",
+      "aliases": [
+        "jasminris",
+        "basmatiris"
+      ]
+    },
+    {
+      "swedish": "pasta",
+      "english": "pasta",
+      "category": "grain",
+      "aliases": [
+        "spaghetti",
+        "penne",
+        "fusilli",
+        "tagliatelle"
+      ]
+    },
+    {
+      "swedish": "bröd",
+      "english": "bread",
+      "category": "grain",
+      "aliases": [
+        "surdegsbröd",
+        "franskbröd"
+      ]
+    },
+    {
+      "swedish": "ströbröd",
+      "english": "breadcrumbs",
+      "category": "grain",
+      "aliases": []
+    },
+    {
+      "swedish": "vetemjöl",
+      "english": "wheat flour",
+      "category": "baking",
+      "aliases": [
+        "mjöl"
+      ]
+    },
+    {
+      "swedish": "rågmjöl",
+      "english": "rye flour",
+      "category": "baking",
+      "aliases": []
+    },
+    {
+      "swedish": "majsstärkelse",
+      "english": "cornstarch",
+      "category": "baking",
+      "aliases": [
+        "maizena"
+      ]
+    },
+    {
+      "swedish": "bakpulver",
+      "english": "baking powder",
+      "category": "baking",
+      "aliases": []
+    },
+    {
+      "swedish": "bikarbonat",
+      "english": "baking soda",
+      "category": "baking",
+      "aliases": []
+    },
+    {
+      "swedish": "jäst",
+      "english": "yeast",
+      "category": "baking",
+      "aliases": [
+        "torrjäst",
+        "färsk jäst"
+      ]
+    },
+    {
+      "swedish": "socker",
+      "english": "sugar",
+      "category": "sweetener",
+      "aliases": [
+        "strösocker"
+      ]
+    },
+    {
+      "swedish": "farinsocker",
+      "english": "brown sugar",
+      "category": "sweetener",
+      "aliases": []
+    },
+    {
+      "swedish": "florsocker",
+      "english": "powdered sugar",
+      "category": "sweetener",
+      "aliases": []
+    },
+    {
+      "swedish": "honung",
+      "english": "honey",
+      "category": "sweetener",
+      "aliases": []
+    },
+    {
+      "swedish": "sirap",
+      "english": "syrup",
+      "category": "sweetener",
+      "aliases": [
+        "ljus sirap",
+        "mörk sirap"
+      ]
+    },
+    {
+      "swedish": "smör",
+      "english": "butter",
+      "category": "fat",
+      "aliases": []
+    },
+    {
+      "swedish": "olivolja",
+      "english": "olive oil",
+      "category": "fat",
+      "aliases": []
+    },
+    {
+      "swedish": "rapsolja",
+      "english": "canola oil",
+      "category": "fat",
+      "aliases": [
+        "rypsolja"
+      ]
+    },
+    {
+      "swedish": "solrosolja",
+      "english": "sunflower oil",
+      "category": "fat",
+      "aliases": []
+    },
+    {
+      "swedish": "sesamolja",
+      "english": "sesame oil",
+      "category": "fat",
+      "aliases": []
+    },
+    {
+      "swedish": "grädde",
+      "english": "cream",
+      "category": "dairy",
+      "aliases": [
+        "vispgrädde",
+        "matlagningsgrädde"
+      ],
+      "guard_rule": "Preserve subtype when specified: whipping cream, cooking cream, sour cream."
+    },
+    {
+      "swedish": "crème fraiche",
+      "english": "creme fraiche",
+      "category": "dairy",
+      "aliases": []
+    },
+    {
+      "swedish": "gräddfil",
+      "english": "sour cream",
+      "category": "dairy",
+      "aliases": []
+    },
+    {
+      "swedish": "mjölk",
+      "english": "milk",
+      "category": "dairy",
+      "aliases": []
+    },
+    {
+      "swedish": "filmjölk",
+      "english": "cultured milk",
+      "category": "dairy",
+      "aliases": [
+        "fil"
+      ]
+    },
+    {
+      "swedish": "yoghurt",
+      "english": "yogurt",
+      "category": "dairy",
+      "aliases": [
+        "grekisk yoghurt",
+        "turkisk yoghurt"
+      ]
+    },
+    {
+      "swedish": "färskost",
+      "english": "cream cheese / fresh cheese",
+      "category": "dairy",
+      "aliases": [],
+      "guard_rule": "Translate by product context if a named cheese is not given."
+    },
+    {
+      "swedish": "parmesan",
+      "english": "Parmesan",
+      "category": "cheese",
+      "aliases": [
+        "parmesanost"
+      ]
+    },
+    {
+      "swedish": "mozzarella",
+      "english": "mozzarella",
+      "category": "cheese",
+      "aliases": []
+    },
+    {
+      "swedish": "fetaost",
+      "english": "feta cheese",
+      "category": "cheese",
+      "aliases": [
+        "feta"
+      ]
+    },
+    {
+      "swedish": "cheddar",
+      "english": "cheddar",
+      "category": "cheese",
+      "aliases": []
+    },
+    {
+      "swedish": "ägg",
+      "english": "egg",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "kycklingfilé",
+      "english": "chicken breast",
+      "category": "protein",
+      "aliases": [
+        "kyckling"
+      ]
+    },
+    {
+      "swedish": "kycklinglår",
+      "english": "chicken thigh",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "nötfärs",
+      "english": "ground beef",
+      "category": "protein",
+      "aliases": [
+        "köttfärs"
+      ]
+    },
+    {
+      "swedish": "fläskfärs",
+      "english": "ground pork",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "blandfärs",
+      "english": "mixed ground meat",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "entrecôte",
+      "english": "ribeye",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "oxfilé",
+      "english": "beef tenderloin",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "fläskkarré",
+      "english": "pork shoulder / pork neck",
+      "category": "protein",
+      "aliases": [
+        "karré"
+      ]
+    },
+    {
+      "swedish": "bacon",
+      "english": "bacon",
+      "category": "protein",
+      "aliases": []
+    },
+    {
+      "swedish": "korv",
+      "english": "sausage",
+      "category": "protein",
+      "aliases": [
+        "chorizo"
+      ]
+    },
+    {
+      "swedish": "lax",
+      "english": "salmon",
+      "category": "seafood",
+      "aliases": []
+    },
+    {
+      "swedish": "torsk",
+      "english": "cod",
+      "category": "seafood",
+      "aliases": []
+    },
+    {
+      "swedish": "räkor",
+      "english": "shrimp",
+      "category": "seafood",
+      "aliases": [
+        "räka"
+      ]
+    },
+    {
+      "swedish": "musslor",
+      "english": "mussels",
+      "category": "seafood",
+      "aliases": [
+        "mussla"
+      ]
+    },
+    {
+      "swedish": "tonfisk",
+      "english": "tuna",
+      "category": "seafood",
+      "aliases": []
+    },
+    {
+      "swedish": "kikärtor",
+      "english": "chickpeas",
+      "category": "legume",
+      "aliases": [
+        "kikärta"
+      ]
+    },
+    {
+      "swedish": "linser",
+      "english": "lentils",
+      "category": "legume",
+      "aliases": [
+        "röda linser",
+        "gröna linser"
+      ]
+    },
+    {
+      "swedish": "svarta bönor",
+      "english": "black beans",
+      "category": "legume",
+      "aliases": []
+    },
+    {
+      "swedish": "vita bönor",
+      "english": "white beans",
+      "category": "legume",
+      "aliases": []
+    },
+    {
+      "swedish": "buljong",
+      "english": "stock / broth",
+      "category": "liquid",
+      "aliases": [
+        "fond"
+      ],
+      "guard_rule": "Distinguish stock/broth from concentrated fond by product context."
+    },
+    {
+      "swedish": "vatten",
+      "english": "water",
+      "category": "liquid",
+      "aliases": []
+    },
+    {
+      "swedish": "vin",
+      "english": "wine",
+      "category": "liquid",
+      "aliases": [
+        "rödvin",
+        "vitt vin",
+        "vitvin"
+      ]
+    }
+  ],
+  "contextual_guard_terms": [
+    {
+      "swedish": "spad från relish eller pickles",
+      "preferred_english": "pickle brine / juice from relish or pickles",
+      "must_preserve": [
+        "quantity",
+        "spoon unit"
+      ],
+      "must_not_become": [
+        "relish itself",
+        "chopped pickles",
+        "three-times larger spoon unit"
+      ]
+    },
+    {
+      "swedish": "vitlökspulver",
+      "preferred_english": "garlic powder",
+      "must_not_become": [
+        "onion powder",
+        "white onion powder"
+      ]
+    },
+    {
+      "swedish": "lökpulver",
+      "preferred_english": "onion powder",
+      "must_not_become": [
+        "garlic powder",
+        "white onion powder unless the source explicitly says white onion"
+      ]
+    },
+    {
+      "swedish": "rörs kall",
+      "preferred_english": "mixed cold / stirred cold",
+      "must_preserve": [
+        "no heat used"
+      ],
+      "normalization_hint": "Likely maps to a cold assemble/mix technique rather than a heated cooking method."
+    },
+    {
+      "swedish": "10 min + vila",
+      "preferred_english": "10 min + rest",
+      "must_preserve": [
+        "active prep time",
+        "separate rest/chill requirement"
+      ]
+    }
+  ],
+  "false_friend_risks": [
+    {
+      "term": "lag",
+      "risk": "Can mean pickling liquid / brine, not legal framework or layer."
+    },
+    {
+      "term": "fond",
+      "risk": "Can mean stock concentrate or stock base, not abstract foundation."
+    },
+    {
+      "term": "fil",
+      "risk": "Usually cultured milk in food context, not file."
+    },
+    {
+      "term": "lever",
+      "risk": "Can be liver as ingredient, not the verb lives."
+    },
+    {
+      "term": "glass",
+      "risk": "In Swedish often means ice cream, not drinking glass."
+    },
+    {
+      "term": "pepparrot",
+      "risk": "Horseradish, not pepper root."
+    },
+    {
+      "term": "ättika",
+      "risk": "Spirit vinegar / acetic vinegar, not generic household vinegar."
+    }
+  ]
+}

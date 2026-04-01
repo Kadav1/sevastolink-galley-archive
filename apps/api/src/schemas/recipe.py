@@ -229,6 +229,7 @@ class RecipeSummaryOut(BaseModel):
     rating: int | None = None
     created_at: str
     updated_at: str
+    ingredient_count: int = 0
     cover_media_asset_id: str | None = None
     last_cooked_at: str | None = None
 
@@ -247,6 +248,7 @@ class RecipeSummaryOut(BaseModel):
         data["total_time_minutes"] = (
             (recipe.prep_time_minutes or 0) + (recipe.cook_time_minutes or 0)
         ) or None
+        data["ingredient_count"] = len(recipe.ingredients)
         return cls.model_validate(data)
 
 

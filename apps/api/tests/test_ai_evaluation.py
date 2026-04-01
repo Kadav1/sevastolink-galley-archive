@@ -62,7 +62,7 @@ async def test_evaluate_returns_503_when_ai_disabled(client):
         job_id = await _create_job_with_candidate(ac)
         r = await ac.post(f"/api/v1/intake-jobs/{job_id}/evaluate")
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_disabled"
+    assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
@@ -85,7 +85,7 @@ async def test_evaluate_returns_503_when_lm_studio_unreachable(client):
             job_id = await _create_job_with_candidate(ac)
             r = await ac.post(f"/api/v1/intake-jobs/{job_id}/evaluate")
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_unavailable"
+    assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio

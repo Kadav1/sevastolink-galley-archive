@@ -1,7 +1,8 @@
 .PHONY: help up up-detach up-proxy down restart logs logs-api logs-web logs-nginx ps build rebuild \
         shell-api shell-web \
-        init-data test-api test-api-v \
+        init-data test-api test-api-v test-api-q test-api-k \
         backup backup-db backup-list restore backup-prune \
+        dev-check seed-dev \
         clean tree
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -40,7 +41,14 @@ help:
 	@echo "  make restore BACKUP=<path>  Restore from a backup directory"
 	@echo ""
 	@echo "Tests:"
-	@echo "  make test-api        Run API tests"
+	@echo "  make test-api        Run API tests (standard output)"
+	@echo "  make test-api-v      Run API tests (verbose)"
+	@echo "  make test-api-q      Run API tests (quiet: dots only)"
+	@echo "  make test-api-k K=x  Run tests matching keyword x"
+	@echo ""
+	@echo "Dev:"
+	@echo "  make dev-check       Verify dev environment prerequisites"
+	@echo "  make seed-dev        Insert fixture recipes into dev database"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean           Remove containers, images (does NOT touch data/)"
@@ -143,8 +151,26 @@ test-api:
 test-api-v:
 	cd apps/api && python -m pytest -v
 
+# Quiet: dots only, no captured output
+test-api-q:
+	cd apps/api && python -m pytest -q
+
+# Run tests matching a keyword: make test-api-k K=intake
+test-api-k:
+	cd apps/api && python -m pytest -k "$(K)" -v
+
 # ── Cleanup ───────────────────────────────────────────────────────────────────
 # Removes containers and images only. Data in data/ is NOT touched.
+
+# ── Dev helpers ───────────────────────────────────────────────────────────────
+
+# Verify prerequisites (Python, Node, .env, data dirs, optional Docker)
+dev-check:
+	@bash scripts/dev/check.sh
+
+# Insert dev fixture recipes (idempotent — skips existing slugs)
+seed-dev:
+	cd apps/api && python ../../scripts/seed/seed_dev.py
 
 clean:
 	docker compose down --volumes --remove-orphans

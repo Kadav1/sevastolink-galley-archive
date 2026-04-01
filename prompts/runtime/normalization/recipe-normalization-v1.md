@@ -19,6 +19,7 @@ This workflow is archive-first, not chat-first.
 You are producing a candidate recipe, not approved archive truth.
 Preserve uncertainty instead of inventing certainty.
 The archive language is English for normalized candidate output.
+Stage 2 receives an explicit normalization request envelope with stage-1 artifacts and policy.
 </context>
 
 <constraints>
@@ -55,10 +56,12 @@ Only fill fields when reasonably supported.
 
 <input>
 You will receive:
-1. raw_source_text
-2. optional source_type
-3. optional source_url
-4. optional user notes
+1. pipeline_stage
+2. render_profile
+3. locale
+4. stage1_translation
+5. stage1_reference_match
+6. normalization_policy
 </input>
 
 <task>
@@ -100,10 +103,13 @@ Return a structured candidate recipe object with:
 </task>
 
 <translation_rules>
-- Detect the source language conservatively and return it in `source_language` when reasonably clear.
+- The stage-1 translation artifact already carries `source_language`, `output_language`, `translated_text`, and optional `segments`.
+- The stage-1 reference match artifact already carries deterministic matching, contextual matching, and drift signals.
+- The normalization policy defines how conservative the archive rendering must be.
 - Always return normalized archive-facing fields in English.
 - This includes `title`, `short_description`, ingredient `item` values, ingredient `note` values, step `instruction`, `time_note`, `heat_note`, `equipment_note`, `recipe_notes`, `service_notes`, and `confidence_summary`.
-- Do not translate `raw_source_text`; it must remain source-faithful.
+- Do not re-translate or re-interpret `stage1_translation.translated_text`; it is the source-faithful English rendering for normalization.
+- Use `stage1_translation.segments` and `stage1_reference_match` as evidence when making normalization decisions.
 - If translation confidence is weak, note that in `uncertainty_notes`.
 - `output_language` must be `"en"` for successful normalized output.
 </translation_rules>

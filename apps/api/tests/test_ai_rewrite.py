@@ -63,7 +63,7 @@ async def test_rewrite_returns_503_when_ai_disabled(client):
         slug = await _create_recipe(ac)
         r = await ac.post(f"/api/v1/recipes/{slug}/rewrite")
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_disabled"
+    assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
@@ -86,7 +86,7 @@ async def test_rewrite_returns_503_when_lm_studio_unreachable(client):
             slug = await _create_recipe(ac)
             r = await ac.post(f"/api/v1/recipes/{slug}/rewrite")
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_unavailable"
+    assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio

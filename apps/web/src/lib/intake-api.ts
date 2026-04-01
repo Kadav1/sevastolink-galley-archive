@@ -150,3 +150,20 @@ export async function approveIntakeJob(
     body: JSON.stringify(data),
   });
 }
+
+// ── Evaluate ──────────────────────────────────────────────────────────────────
+
+export interface EvaluationOut {
+  fidelity_assessment: string;
+  missing_information: string[];
+  likely_inventions_or_overreaches: string[];
+  ingredient_issues: string[];
+  step_issues: string[];
+  metadata_confidence: string | null;
+  review_recommendation: "safe_for_human_review" | "review_with_caution" | "needs_major_correction";
+  reviewer_notes: string[];
+}
+
+export async function evaluateCandidate(jobId: string): Promise<{ data: EvaluationOut }> {
+  return apiFetch(`/intake-jobs/${jobId}/evaluate`, { method: "POST" });
+}

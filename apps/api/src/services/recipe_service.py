@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from src.models.recipe import Recipe, RecipeIngredient, RecipeNote, RecipeSource, RecipeStep
 from src.schemas.recipe import RecipeCreate, RecipeUpdate, VerificationState
@@ -208,6 +208,9 @@ def list_recipes(
     technique_family: str | None = None,
     complexity: str | None = None,
     time_class: str | None = None,
+    sector: str | None = None,
+    operational_class: str | None = None,
+    heat_window: str | None = None,
     sort: str = "updated_at_desc",
     limit: int = 50,
     offset: int = 0,
@@ -230,6 +233,9 @@ def list_recipes(
     else:
         query = db.query(Recipe)
 
+    # Eager-load ingredients so ingredient_count is available without N+1 queries
+    query = query.options(selectinload(Recipe.ingredients))
+
     # Exclude archived by default
     if not archived:
         query = query.filter(Recipe.archived == 0)
@@ -249,6 +255,12 @@ def list_recipes(
         query = query.filter(Recipe.complexity == complexity)
     if time_class:
         query = query.filter(Recipe.time_class == time_class)
+    if sector:
+        query = query.filter(Recipe.sector == sector)
+    if operational_class:
+        query = query.filter(Recipe.operational_class == operational_class)
+    if heat_window:
+        query = query.filter(Recipe.heat_window == heat_window)
 
     total = query.count()
 
@@ -257,6 +269,7 @@ def list_recipes(
         "updated_at_desc": Recipe.updated_at.desc(),
         "created_at_desc": Recipe.created_at.desc(),
         "title_asc": Recipe.title.asc(),
+        "title_desc": Recipe.title.desc(),
         "last_cooked_at_desc": Recipe.last_cooked_at.desc(),
     }
     order_col = sort_map.get(sort, Recipe.updated_at.desc())

@@ -127,19 +127,29 @@ export const TRANSITION = {
   NORMAL: "--transition-normal",
 } as const;
 
+// ── Breakpoints ───────────────────────────────────────────────────────────────
+// These are JS pixel values, not CSS custom properties — CSS custom properties
+// cannot be used inside media query expressions.
+
+export const BREAKPOINTS = {
+  /** Below this width the shell collapses to top-bar + overlay-nav layout. */
+  DESKTOP: 1024,
+} as const;
+
 // ── Namespaced convenience export ─────────────────────────────────────────────
 
 export const TOKEN = {
-  bg:         BG,
-  text:       TEXT,
-  textSize:   TEXT_SIZE,
-  border:     BORDER,
-  state:      STATE,
-  font:       FONT,
-  leading:    LEADING,
-  tracking:   TRACKING,
-  space:      SPACE,
-  radius:     RADIUS,
-  layout:     LAYOUT,
-  transition: TRANSITION,
+  bg:          BG,
+  text:        TEXT,
+  textSize:    TEXT_SIZE,
+  border:      BORDER,
+  state:       STATE,
+  font:        FONT,
+  leading:     LEADING,
+  tracking:    TRACKING,
+  space:       SPACE,
+  radius:      RADIUS,
+  layout:      LAYOUT,
+  transition:  TRANSITION,
+  breakpoints: BREAKPOINTS,
 } as const;

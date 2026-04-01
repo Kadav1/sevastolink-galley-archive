@@ -16,6 +16,7 @@ class IntakeJob(Base):
     review_status: Mapped[str] = mapped_column(String, default="not_started")
     raw_source_text: Mapped[str | None] = mapped_column(Text)
     source_url: Mapped[str | None] = mapped_column(String)
+    source_notes: Mapped[str | None] = mapped_column(Text)
     source_media_asset_id: Mapped[str | None] = mapped_column(
         ForeignKey("media_assets.id", ondelete="SET NULL")
     )

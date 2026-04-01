@@ -61,6 +61,7 @@ def create_intake_job(db: Session, data: IntakeJobCreate) -> IntakeJob:
         review_status="not_started",
         raw_source_text=data.raw_source_text,
         source_url=data.source_url,
+        source_notes=data.source_notes,
         created_at=_now(),
         updated_at=_now(),
     )

@@ -13,6 +13,7 @@ from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from src.config.settings import settings
+from src.schemas.common import error_detail
 from src.models.intake import IntakeJob
 from src.models.media import MediaAsset
 from src.models.recipe import Recipe
@@ -51,12 +52,12 @@ def _save_file(file: UploadFile, subdirectory: str) -> tuple[str, str, str, int]
     if mime not in ALLOWED_MIME_TYPES:
         raise HTTPException(
             status_code=422,
-            detail=f"Unsupported file type '{mime}'. Allowed: image/jpeg, image/png, image/webp, application/pdf.",
+            detail=error_detail("unsupported_media_type", f"Unsupported file type '{mime}'. Allowed: image/jpeg, image/png, image/webp, application/pdf."),
         )
 
     data = file.file.read()
     if len(data) > MAX_BYTES:
-        raise HTTPException(status_code=422, detail="File exceeds the 20 MB limit.")
+        raise HTTPException(status_code=422, detail=error_detail("file_too_large", "File exceeds the 20 MB limit."))
 
     asset_id = str(uuid.uuid4())
     ext = _MIME_EXT[mime]
@@ -89,7 +90,7 @@ def attach_to_intake_job(db: Session, job_id: str, file: UploadFile) -> MediaAss
     """Save an uploaded file, create a MediaAsset record, and link it to the job."""
     job = db.get(IntakeJob, job_id)
     if job is None:
-        raise HTTPException(status_code=404, detail="Intake job not found")
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
     asset = _create_asset(db, file, "intake")
     job.source_media_asset_id = asset.id
     db.commit()

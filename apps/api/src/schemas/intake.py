@@ -28,10 +28,16 @@ class IntakeJobOut(BaseModel):
     review_status: str
     raw_source_text: str | None
     source_url: str | None
+    source_notes: str | None
+    source_snapshot_path: str | None
+    source_media_asset_id: str | None
+    error_code: str | None
+    error_message: str | None
     resulting_recipe_id: str | None
     candidate_id: str | None
     created_at: str
     updated_at: str
+    completed_at: str | None
 
     @classmethod
     def from_orm(cls, job) -> "IntakeJobOut":
@@ -45,10 +51,16 @@ class IntakeJobOut(BaseModel):
             review_status=job.review_status,
             raw_source_text=job.raw_source_text,
             source_url=job.source_url,
+            source_notes=job.source_notes,
+            source_snapshot_path=job.source_snapshot_path,
+            source_media_asset_id=job.source_media_asset_id,
+            error_code=job.error_code,
+            error_message=job.error_message,
             resulting_recipe_id=job.resulting_recipe_id,
             candidate_id=candidate_id,
             created_at=job.created_at,
             updated_at=job.updated_at,
+            completed_at=job.completed_at,
         )
 
 

@@ -32,14 +32,16 @@ The current backend mounts:
 * `/api/v1/pantry`
 * `/api/v1/settings`
 
-Media attach is available as a sub-resource of intake jobs:
+Media endpoints are also mounted in the current backend:
 
 * `POST /api/v1/intake-jobs/{job_id}/media`
+* `POST /api/v1/recipes/{id_or_slug}/media`
+* `GET  /api/v1/media-assets/{asset_id}`
+* `GET  /api/v1/media-assets/{asset_id}/file`
 
 The backend does not currently mount standalone route groups for:
 
 * `/search`
-* `/media-assets`
 * `/ai-jobs`
 * `/backups`
 * `/system`
@@ -89,9 +91,7 @@ List responses use:
 
 ### Error shape
 
-The implemented API is not fully uniform yet.
-
-Some endpoints return:
+All error responses use a single uniform shape:
 
 ```json
 {
@@ -102,9 +102,7 @@ Some endpoints return:
 }
 ```
 
-Some FastAPI exceptions currently return the same structure nested under `detail`.
-
-Frontend consumers in this repository already handle this inconsistency in a lightweight way. New backend work should converge toward one consistent error envelope.
+The FastAPI `detail` wrapper is never present. A custom exception handler in `main.py` normalizes all `HTTPException` and `RequestValidationError` responses to this envelope. See §10 for the full list of error codes.
 
 ---
 
@@ -149,13 +147,17 @@ Supported query parameters:
 | `technique_family` | string | Exact-match filter |
 | `complexity` | string | Exact-match filter |
 | `time_class` | string | Exact-match filter |
-| `sort` | string | Defaults to `updated_at_desc` |
+| `sector` | string | Exact-match filter |
+| `operational_class` | string | Exact-match filter |
+| `heat_window` | string | Exact-match filter |
+| `sort` | string | `updated_at_desc` (default), `created_at_desc`, `title_asc`, `title_desc`, `last_cooked_at_desc` |
 | `limit` | integer | Default `50`, max `200` |
 | `offset` | integer | Default `0` |
 
 Response:
 
 * list envelope with `meta.total`, `meta.limit`, and `meta.offset`
+* each item in `data` includes `ingredient_count` (integer count of the recipe's ingredients)
 
 Current implementation note:
 
@@ -327,6 +329,29 @@ GET /api/v1/intake-jobs/{job_id}
 Purpose:
 
 * retrieve current intake job metadata and status
+
+Response fields:
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | string | ULID |
+| `intake_type` | string | `manual` or `paste_text` |
+| `status` | string | `captured`, `in_review`, `approved` |
+| `parse_status` | string | `not_started`, `in_progress`, etc. |
+| `ai_status` | string | `not_requested`, `pending`, `completed`, `failed` |
+| `review_status` | string | `not_started`, `in_progress`, `saved_partial`, `completed` |
+| `raw_source_text` | string\|null | Original source text (write-once) |
+| `source_url` | string\|null | Source URL if provided |
+| `source_notes` | string\|null | Free-text context notes captured at intake |
+| `source_snapshot_path` | string\|null | Path to stored snapshot file |
+| `source_media_asset_id` | string\|null | Attached media asset ID |
+| `error_code` | string\|null | Set on failure |
+| `error_message` | string\|null | Set on failure |
+| `resulting_recipe_id` | string\|null | Set after approval |
+| `candidate_id` | string\|null | Linked structured candidate ID |
+| `created_at` | string | ISO 8601 |
+| `updated_at` | string | ISO 8601 |
+| `completed_at` | string\|null | Set after approval |
 
 ### 6.3 Update candidate
 
@@ -512,34 +537,63 @@ Response:
 }
 ```
 
-Current scope:
+### 9.2 Attach cover image to recipe
 
-* this endpoint is the first real media domain surface
-* it covers intake source files only — recipe image workflows are not yet implemented
-* there is no standalone `/media-assets` resource group yet
+```http
+POST /api/v1/recipes/{id_or_slug}/media
+```
+
+Same multipart/form-data contract as intake job attachment.
+Sets `recipes.cover_media_asset_id`. Accepts id or slug.
+
+### 9.3 Get media asset metadata
+
+```http
+GET /api/v1/media-assets/{asset_id}
+```
+
+Returns `MediaAssetOut` for the given asset id.
+
+### 9.4 Serve media asset file
+
+```http
+GET /api/v1/media-assets/{asset_id}/file
+```
+
+Streams the raw file bytes with the original MIME type.
+Use this as the `src` attribute for `<img>` or PDF embed elements.
 
 ---
 
 ## 10. Current error behavior
 
+### Error envelope
+
+All error responses use a single uniform shape:
+
+```json
+{
+  "error": {
+    "code": "not_found",
+    "message": "Recipe not found."
+  }
+}
+```
+
+The FastAPI `detail` wrapper is never present on error responses. A custom exception handler in `main.py` normalizes all `HTTPException` and `RequestValidationError` responses to this top-level `{"error": {...}}` shape.
+
 ### Common codes in current use
 
-The implemented routes currently use these error codes in practice:
-
-* `validation_error`
-* `not_found`
-* `candidate_incomplete`
-* `conflict`
-* `internal_error`
-* `ai_disabled`
-* `ai_unavailable`
-* `no_source_text`
-
-### Current caveat
-
-The broader API spec defines a larger standardized error vocabulary. The implemented code has not adopted all of it yet.
-
-This is a documentation and consistency gap, not a hidden feature.
+* `validation_error` — request body or query parameter failed validation
+* `not_found` — resource does not exist
+* `candidate_incomplete` — intake candidate missing required fields before approval
+* `conflict` — attempted action conflicts with current state (e.g. double-approve)
+* `internal_error` — unexpected server-side failure
+* `ai_disabled` — AI endpoint called with `LM_STUDIO_ENABLED=false`
+* `ai_unavailable` — AI endpoint called but LM Studio did not respond
+* `no_source_text` — AI operation requires raw source text but none is present
+* `unsupported_media_type` — uploaded file MIME type not accepted
+* `file_too_large` — uploaded file exceeds the 20 MB limit
 
 ---
 
@@ -551,7 +605,6 @@ Notable differences:
 
 * the resource list in `api-spec.md` is wider than the currently mounted routers
 * not all target-state endpoint families exist yet
-* the current error envelope is not fully uniform
 * the current health route lives outside `/api/v1`
 * search is implemented through recipe listing rather than a standalone `/search` resource
 * AI-assisted capabilities exist, but they are exposed through focused task endpoints rather than a first-class `/ai-jobs` resource

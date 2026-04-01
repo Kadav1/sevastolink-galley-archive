@@ -8,7 +8,7 @@ from src.ai.similarity_engine import SimilarityErrorKind, find_similar_recipes
 from src.config.settings import settings
 from src.db.database import get_db
 from src.schemas.ai_outputs import ArchiveRewriteOut, MetadataSuggestionOut, SimilarityIn, SimilarRecipesOut
-from src.schemas.common import ApiResponse, ListMeta, ListResponse
+from src.schemas.common import ApiResponse, ListMeta, ListResponse, error_detail
 from src.schemas.recipe import (
     RecipeArchiveResult,
     RecipeCreate,
@@ -43,6 +43,9 @@ async def list_recipes(
     technique_family: str | None = Query(None),
     complexity: str | None = Query(None),
     time_class: str | None = Query(None),
+    sector: str | None = Query(None),
+    operational_class: str | None = Query(None),
+    heat_window: str | None = Query(None),
     sort: str = Query("updated_at_desc"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -59,6 +62,9 @@ async def list_recipes(
         technique_family=technique_family,
         complexity=complexity,
         time_class=time_class,
+        sector=sector,
+        operational_class=operational_class,
+        heat_window=heat_window,
         sort=sort,
         limit=limit,
         offset=offset,
@@ -164,11 +170,11 @@ async def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI metadata suggestion is not enabled. Set LM_STUDIO_ENABLED=true."}},
+            detail=error_detail("ai_disabled", "AI metadata suggestion is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if not recipe:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 
     recipe_dict = _detail(recipe).model_dump()
     client = LMStudioClient(settings.lm_studio_base_url)
@@ -178,11 +184,11 @@ async def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)
         if err.kind == MetadataErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     return ApiResponse(data=MetadataSuggestionOut.model_validate(result.payload))
@@ -202,11 +208,11 @@ async def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI rewrite is not enabled. Set LM_STUDIO_ENABLED=true."}},
+            detail=error_detail("ai_disabled", "AI rewrite is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if not recipe:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 
     recipe_dict = _detail(recipe).model_dump()
     client = LMStudioClient(settings.lm_studio_base_url)
@@ -216,11 +222,11 @@ async def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)
         if err.kind == RewriteErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     return ApiResponse(data=ArchiveRewriteOut.model_validate(result.payload))
@@ -241,11 +247,11 @@ async def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Dep
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI similarity is not enabled. Set LM_STUDIO_ENABLED=true."}},
+            detail=error_detail("ai_disabled", "AI similarity is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if not recipe:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Recipe not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 
     candidates_orm, _ = recipe_service.list_recipes(
         db, archived=False, limit=21, offset=0, sort="updated_at_desc"
@@ -268,11 +274,11 @@ async def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Dep
         if err.kind == SimilarityErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     return ApiResponse(data=SimilarRecipesOut.model_validate(result.payload))

@@ -98,15 +98,56 @@ python3 scripts/import/normalize_recipes.py \
   --model "Qwen/Qwen2.5-7B-Instruct"
 ```
 
+Multiple explicit files are also supported by repeating `--file`:
+
+```bash
+python3 scripts/import/normalize_recipes.py \
+  --file 'data/imports/raw/recipes/Burgarsås.md' \
+  --file 'data/imports/raw/recipes/Gyllenpenne.md' \
+  data/imports/parsed/recipes-candidates \
+  --model "Qwen/Qwen2.5-7B-Instruct"
+```
+
+Current pipeline:
+
+* stage 1 translation/preprocessing returns a `TranslationArtifact` with required `translated_text` and optional `segments`
+* stage 1.5 deterministically matches the translation against the active Swedish reference files
+* stage 2 assembles the normalization request with `render_profile`, `locale`, `stage1_translation`, `stage1_reference_match`, and `normalization_policy`
+* weak stage-1 quality assessment can escalate into `warnings` and `review_flags` before candidate emission
+* saved `.preprocessed.txt` artifacts are still supported through `--preprocess-only` and `--use-preprocessed-dir` for one-model-at-a-time LM Studio workflows
+
 Current expectations:
 
 * LM Studio must be reachable at the chosen base URL
 * the runtime prompt and schema files must exist
 * output is written as candidate bundle JSON, not directly into the database
+* one JSON run report is written under `data/reports/`
 
 Current note:
 
-* the normalization script also supports optional translation-model configuration, but the simplest current workflow remains single-model normalization unless a separate translation pass is intentionally being used
+* the normalization script can optionally emit saved `.preprocessed.txt` artifacts before normalization
+* normalization can then reuse those saved preprocessing artifacts with `--use-preprocessed-dir`, which supports one-model-at-a-time LM Studio workflows
+* if a matching saved `.preprocessed.txt` artifact is missing, the importer currently falls back to inline preprocessing rather than failing immediately
+* Swedish import guardrails now use `data/reference/swedish_recipe_units.json` and `data/reference/swedish_recipe_terms.json` as the active canonical inputs for stage-1.5 matching
+* weak stage-1 assessments can preserve the run while carrying `warnings` and `review_flags` into the candidate bundle
+* candidate bundles remain backward-compatible with `scripts/import/review_candidates.py`
+* the importer continues through per-file failures and records them in the run report rather than aborting the full run on the first failed file
+
+Sequential preprocessing and normalization example:
+
+```bash
+python3 scripts/import/normalize_recipes.py \
+  --preprocess-only \
+  --file 'data/imports/raw/recipes/Burgarsås.md' \
+  data/imports/preprocessed/recipes \
+  --model "translategemma-4b-it"
+
+python3 scripts/import/normalize_recipes.py \
+  --use-preprocessed-dir data/imports/preprocessed/recipes \
+  --file 'data/imports/raw/recipes/Burgarsås.md' \
+  data/imports/parsed/recipes-candidates \
+  --model "Qwen/Qwen2.5-7B-Instruct"
+```
 
 ### 4.3 Stage 3: Review candidate bundles
 
@@ -131,6 +172,8 @@ Review should focus on:
 * preserved provenance
 * suspicious AI guesses
 * taxonomy values that look too broad, too narrow, or invented
+* stage-1 translation fidelity as reflected in `preprocessing_payload_json`, `normalized_input_text`, and the emitted preprocessing `warnings` / `review_flags`
+* preprocessing drift warnings around Swedish measurements, contextual terms, and false-friend-sensitive words
 
 ### 4.4 Stage 4: Patch candidate bundles when needed
 
@@ -209,9 +252,25 @@ A candidate bundle includes:
 * source metadata
 * normalized candidate update fields
 * optional candidate extras
+* warnings and review flags carried forward from preprocessing guardrails as well as normalization cleanup
 * warning list
 * review flag list
 * prompt and schema provenance
+
+### Run reports
+
+Each normalization run also writes one JSON report document under:
+
+`data/reports/`
+
+The report captures:
+
+* selected source files
+* per-file success or failure status
+* failing stage when a file does not complete
+* emitted candidate output paths
+* warning and review-flag counts
+* aggregate summary totals
 
 ### Patch file shape
 

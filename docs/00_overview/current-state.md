@@ -50,14 +50,15 @@ The backend currently exposes:
 * health endpoint under `/api/health`
 * recipe endpoints under `/api/v1/recipes`
 * intake endpoints under `/api/v1/intake-jobs`
+* pantry suggestion endpoint under `/api/v1/pantry`
+* settings endpoint under `/api/v1/settings`
+* media attach and asset retrieval endpoints under `/api/v1/`
 * automatic schema initialization on startup through the SQL migration runner
 
 The backend does not currently expose separate implemented routers for:
 
 * search
-* media assets
 * AI job history
-* settings persistence
 * backup management through HTTP
 * system status endpoints beyond health
 
@@ -87,7 +88,7 @@ The repository currently includes working local scripts for:
 
 * backup and restore
 * raw recipe normalization into candidate bundles
-* optional recipe translation before normalization in the CLI importer
+* saved preprocessing artifacts for sequential one-model-at-a-time import runs
 * candidate review, patching, ingest, and approval
 
 These workflows are part of the working archive toolset even though they are not all surfaced in the web UI yet.
@@ -103,7 +104,7 @@ These workflows are part of the working archive toolset even though they are not
 | Recipe list/detail API | Implemented | CRUD plus favorite/archive actions |
 | Intake job API | Implemented | create, get, update candidate, normalize, approve |
 | LM Studio normalization | Implemented | Optional; degrades cleanly when disabled or unavailable |
-| CLI translation prompt flow | Implemented | Used only by importer, not by the API or web UI |
+| CLI preprocessing prompt flow | Implemented | The importer can emit saved `.preprocessed.txt` artifacts and later normalize from them |
 | Library UI | Implemented | Main default route |
 | Recipe detail UI | Implemented | Route-backed by slug |
 | Kitchen mode UI | Implemented | Full-screen route |
@@ -113,9 +114,9 @@ These workflows are part of the working archive toolset even though they are not
 | URL import | Deferred | Mentioned in specs and intake UI as later work |
 | File / image intake | Deferred | Mentioned in specs and intake UI as later work |
 | Standalone AI tools area | Deferred | Not currently routed |
-| HTTP settings API | Deferred | Spec-only at present |
+| HTTP settings API | Implemented | Settings persistence exists in the backend API, but the web settings page is still a placeholder |
 | HTTP backup API | Deferred | Backup exists as shell workflow, not API resource |
-| Runtime metadata / rewrite / pantry / similarity / evaluation prompt flows | Deferred | Prompt assets exist, but no implemented route or UI uses them |
+| Runtime metadata / rewrite / pantry / similarity / evaluation prompt flows | Partially Implemented | Several AI-backed endpoints exist in the backend API, but they are not yet broadly surfaced as routed web product workflows |
 
 ---
 
@@ -145,11 +146,21 @@ The current backend route model is:
 * `/api/v1/recipes/:id_or_slug/unarchive`
 * `/api/v1/recipes/:id_or_slug/favorite`
 * `/api/v1/recipes/:id_or_slug/unfavorite`
+* `/api/v1/recipes/:id_or_slug/suggest-metadata`
+* `/api/v1/recipes/:id_or_slug/rewrite`
+* `/api/v1/recipes/:id_or_slug/similar`
+* `/api/v1/recipes/:id_or_slug/media`
 * `/api/v1/intake-jobs`
 * `/api/v1/intake-jobs/:job_id`
 * `/api/v1/intake-jobs/:job_id/candidate`
 * `/api/v1/intake-jobs/:job_id/normalize`
+* `/api/v1/intake-jobs/:job_id/evaluate`
 * `/api/v1/intake-jobs/:job_id/approve`
+* `/api/v1/intake-jobs/:job_id/media`
+* `/api/v1/pantry/suggest`
+* `/api/v1/settings`
+* `/api/v1/media-assets/:asset_id`
+* `/api/v1/media-assets/:asset_id/file`
 
 ---
 
@@ -242,8 +253,8 @@ The following areas are clearly deferred in the current repository snapshot:
 * standalone AI tools pages
 * URL intake
 * file and image intake
-* backend search, media, and import domains beyond the current intake flow
-* broader AI prompt families beyond normalization in the API and translation in the CLI importer
+* standalone backend search and AI-job domains beyond the current mounted routes
+* broader routed AI product surfaces beyond the currently implemented backend endpoints and intake normalization flow
 
 ---
 
@@ -266,7 +277,8 @@ The following backend directories currently exist as reserved structure but do n
 Current interpretation:
 
 * these map to target-state domains described elsewhere in the docs
-* they are not currently mounted as routers or active service areas in the running API
+* the empty scaffold directories themselves are not the active implementation location
+* media functionality is implemented today through mounted routes and services elsewhere in `apps/api/src/`
 
 ### 10.3 Frontend scaffold directories
 
@@ -399,10 +411,10 @@ The repository does implement AI-assisted normalization and approval through the
 However:
 
 * the practical review flow is still centered on paste-text intake and CLI candidate review
-* there is no broader dedicated AI review surface keyed around evaluation or job-history workflows
-* runtime prompt families for evaluation, metadata, rewrite, pantry, and similarity remain prompt assets rather than implemented product features
+* there is no broader dedicated routed AI review surface keyed around evaluation or job-history workflows
+* runtime prompt families for evaluation, metadata, rewrite, pantry, and similarity are implemented in the backend API, but not yet broadly productized in the routed web UI
 
-Normalization is implemented, but the wider AI workflow implied by the prompt inventory has not fully materialized.
+Normalization is implemented, and several adjacent AI endpoints now exist, but the wider routed AI workflow implied by the prompt inventory has not fully materialized.
 
 ### 12.3 Dev, test, and operator scaffolding remain thin
 
@@ -420,7 +432,7 @@ This means the application is usable, but the surrounding ergonomics and higher-
 
 The frontend exposes `/settings`, but the current settings page remains a placeholder surface rather than an implemented management workflow.
 
-This also means there is no matching implemented HTTP settings API in the backend today.
+There is now a matching implemented HTTP settings API in the backend, but the routed web settings management workflow has not yet been built out.
 
 ### 12.5 New session prompts created from the audit
 

@@ -1,0 +1,683 @@
+{
+  "version": "2026-03-28",
+  "language": "sv-SE",
+  "purpose": "Deterministic Swedish recipe measurement normalization for import preprocessing, validation, and drift checks.",
+  "verification_scope": {
+    "externally_verified": [
+      "core Swedish kitchen volume units and spoon measures",
+      "metric weight relationships",
+      "lexical existence of matsked, tesked, and related Swedish measurement terms"
+    ],
+    "repo_derived_or_modeled": [
+      "guard rules",
+      "package-unit handling policy",
+      "ambiguous-token handling policy",
+      "US customary fallback support included for mixed-source recipe imports"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Svenska Akademiens ordböcker: matsked",
+      "url": "https://svenska.se/so/?id=150407",
+      "used_for": [
+        "msk lexical definition",
+        "15 ml recipe-measure reference"
+      ]
+    },
+    {
+      "label": "Svenska Akademiens ordböcker: tesked",
+      "url": "https://svenska.se/so/?id=183988&pz=5",
+      "used_for": [
+        "tsk lexical definition",
+        "5 ml recipe-measure reference"
+      ]
+    },
+    {
+      "label": "Recepten.se: Mått, vikt och enheter",
+      "url": "https://www.recepten.se/artiklar/maatt_enheter.html",
+      "used_for": [
+        "1 krm = 1 ml",
+        "1 tsk = 5 ml",
+        "1 msk = 15 ml",
+        "1 dl = 100 ml",
+        "1 l = 1000 ml",
+        "1 hg = 100 g",
+        "1 kg = 1000 g"
+      ]
+    }
+  ],
+  "notes": [
+    "This file is intended to be stricter than a freeform translation glossary. It preserves Swedish kitchen measurement semantics and flags ambiguous or culturally mixed units.",
+    "For Swedish-native recipe notation, use Swedish kitchen standards where they exist: 1 krm = 1 ml, 1 tsk = 5 ml, 1 msk = 15 ml, 1 dl = 100 ml, 1 l = 1000 ml.",
+    "Imperial and US customary units are included because imported Swedish recipes may still contain cup, oz, or lb from translated or internet-sourced material.",
+    "Count, package, and size descriptors are separated from exact convertible units. They should not be silently converted to grams or milliliters without product-specific density assumptions.",
+    "Ambiguous tokens should be flagged, not normalized blindly.",
+    "Only the core Swedish measurement standards are externally verified here. Guard rules and importer policies are repository-level modeling choices."
+  ],
+  "verification_buckets": {
+    "verified_units": [
+      "krm",
+      "ml",
+      "cl",
+      "dl",
+      "l",
+      "tsk",
+      "msk",
+      "g",
+      "hg",
+      "kg"
+    ],
+    "modeled_units": [
+      "mg",
+      "fl oz",
+      "cup",
+      "pint",
+      "quart",
+      "oz",
+      "lb",
+      "st",
+      "bit",
+      "klyfta",
+      "nypa",
+      "näve"
+    ],
+    "requires_review": [
+      "US customary units mixed into Swedish-native notation",
+      "count units that depend on ingredient density or size",
+      "ambiguous household package sizes",
+      "tokens that could be either quantity words or preparation words"
+    ]
+  },
+  "volume_units": [
+    {
+      "canonical": "krm",
+      "english": "saltspoon / spice measure",
+      "swedish": "kryddmått",
+      "aliases": [
+        "krm",
+        "kryddmått",
+        "kryddmatt"
+      ],
+      "metric_equivalent_ml": 1.0,
+      "standard": "Swedish kitchen standard"
+    },
+    {
+      "canonical": "ml",
+      "english": "milliliter",
+      "swedish": "milliliter",
+      "aliases": [
+        "ml",
+        "milliliter",
+        "milliliters",
+        "millilitre",
+        "millilitres"
+      ],
+      "metric_equivalent_ml": 1.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "cl",
+      "english": "centiliter",
+      "swedish": "centiliter",
+      "aliases": [
+        "cl",
+        "centiliter",
+        "centiliter",
+        "centiliters",
+        "centilitres"
+      ],
+      "metric_equivalent_ml": 10.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "dl",
+      "english": "deciliter",
+      "swedish": "deciliter",
+      "aliases": [
+        "dl",
+        "deciliter",
+        "deciliters",
+        "decilitre",
+        "decilitres"
+      ],
+      "metric_equivalent_ml": 100.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "l",
+      "english": "liter",
+      "swedish": "liter",
+      "aliases": [
+        "l",
+        "liter",
+        "liter",
+        "liters",
+        "litre",
+        "litres"
+      ],
+      "metric_equivalent_ml": 1000.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "tsk",
+      "english": "teaspoon",
+      "swedish": "tesked",
+      "aliases": [
+        "tsk",
+        "tesked",
+        "teskedar",
+        "tsp",
+        "teaspoon",
+        "teaspoons"
+      ],
+      "metric_equivalent_ml": 5.0,
+      "standard": "Swedish kitchen standard",
+      "guard_rule": "Do not silently rewrite to tablespoon or 15 ml."
+    },
+    {
+      "canonical": "msk",
+      "english": "tablespoon",
+      "swedish": "matsked",
+      "aliases": [
+        "msk",
+        "matsked",
+        "matskedar",
+        "mck",
+        "tbsp",
+        "tablespoon",
+        "tablespoons"
+      ],
+      "metric_equivalent_ml": 15.0,
+      "standard": "Swedish kitchen standard",
+      "guard_rule": "Do not silently rewrite to teaspoon or 5 ml."
+    },
+    {
+      "canonical": "fl oz",
+      "english": "fluid ounce",
+      "swedish": "fluid ounce",
+      "aliases": [
+        "fl oz",
+        "fluid ounce",
+        "fluid ounces"
+      ],
+      "metric_equivalent_ml": 29.5735,
+      "standard": "US customary"
+    },
+    {
+      "canonical": "cup",
+      "english": "cup",
+      "swedish": "cup",
+      "aliases": [
+        "cup",
+        "cups"
+      ],
+      "metric_equivalent_ml": 236.588,
+      "standard": "US customary",
+      "guard_rule": "Cup is not a native Swedish metric unit; preserve source context and flag if mixed with Swedish-native notation."
+    },
+    {
+      "canonical": "pint",
+      "english": "pint",
+      "swedish": "pint",
+      "aliases": [
+        "pint",
+        "pints"
+      ],
+      "metric_equivalent_ml": 473.176,
+      "standard": "US customary"
+    },
+    {
+      "canonical": "quart",
+      "english": "quart",
+      "swedish": "quart",
+      "aliases": [
+        "quart",
+        "quarts"
+      ],
+      "metric_equivalent_ml": 946.353,
+      "standard": "US customary"
+    }
+  ],
+  "weight_units": [
+    {
+      "canonical": "mg",
+      "english": "milligram",
+      "swedish": "milligram",
+      "aliases": [
+        "mg",
+        "milligram",
+        "milligrams"
+      ],
+      "metric_equivalent_g": 0.001,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "g",
+      "english": "gram",
+      "swedish": "gram",
+      "aliases": [
+        "g",
+        "gram",
+        "gram",
+        "grams"
+      ],
+      "metric_equivalent_g": 1.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "hg",
+      "english": "hectogram",
+      "swedish": "hektogram",
+      "aliases": [
+        "hg",
+        "hektogram",
+        "hektogram",
+        "hecto",
+        "hekto"
+      ],
+      "metric_equivalent_g": 100.0,
+      "standard": "Metric",
+      "guard_rule": "Very common in Swedish grocery and recipe notation; should not be discarded or mistranslated."
+    },
+    {
+      "canonical": "kg",
+      "english": "kilogram",
+      "swedish": "kilogram",
+      "aliases": [
+        "kg",
+        "kilogram",
+        "kilograms"
+      ],
+      "metric_equivalent_g": 1000.0,
+      "standard": "Metric"
+    },
+    {
+      "canonical": "oz",
+      "english": "ounce",
+      "swedish": "ounce",
+      "aliases": [
+        "oz",
+        "ounce",
+        "ounces"
+      ],
+      "metric_equivalent_g": 28.3495,
+      "standard": "Avoirdupois"
+    },
+    {
+      "canonical": "lb",
+      "english": "pound",
+      "swedish": "pound",
+      "aliases": [
+        "lb",
+        "lbs",
+        "pound",
+        "pounds"
+      ],
+      "metric_equivalent_g": 453.592,
+      "standard": "Avoirdupois"
+    }
+  ],
+  "count_units": [
+    {
+      "canonical": "st",
+      "english": "piece / item",
+      "swedish": "styck",
+      "aliases": [
+        "st",
+        "styck",
+        "stycken"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "bit",
+      "english": "piece / chunk",
+      "swedish": "bit",
+      "aliases": [
+        "bit",
+        "bitar"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "klyfta",
+      "english": "clove / wedge / segment",
+      "swedish": "klyfta",
+      "aliases": [
+        "klyfta",
+        "klyftor"
+      ],
+      "exact_conversion": null,
+      "guard_rule": "Meaning depends on ingredient context: garlic clove, citrus segment, or potato wedge."
+    },
+    {
+      "canonical": "nypa",
+      "english": "pinch",
+      "swedish": "nypa",
+      "aliases": [
+        "nypa",
+        "nypor",
+        "pinch"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "näve",
+      "english": "handful",
+      "swedish": "näve",
+      "aliases": [
+        "näve",
+        "nävar",
+        "handfull",
+        "handful"
+      ],
+      "exact_conversion": null
+    }
+  ],
+  "package_units": [
+    {
+      "canonical": "burk",
+      "english": "jar / can",
+      "swedish": "burk",
+      "aliases": [
+        "burk",
+        "burkar"
+      ],
+      "exact_conversion": null,
+      "guard_rule": "Requires product context and package size; do not convert blindly."
+    },
+    {
+      "canonical": "paket",
+      "english": "package / packet",
+      "swedish": "paket",
+      "aliases": [
+        "paket",
+        "pkt",
+        "package",
+        "packet"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "påse",
+      "english": "bag",
+      "swedish": "påse",
+      "aliases": [
+        "påse",
+        "påsar"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "tetra",
+      "english": "carton",
+      "swedish": "tetra",
+      "aliases": [
+        "tetra",
+        "tetrapak",
+        "tetra pak",
+        "kartong"
+      ],
+      "exact_conversion": null
+    },
+    {
+      "canonical": "förpackning",
+      "english": "package / pack",
+      "swedish": "förpackning",
+      "aliases": [
+        "förpackning",
+        "förp",
+        "pack"
+      ],
+      "exact_conversion": null
+    }
+  ],
+  "temperature_units": [
+    {
+      "canonical": "C",
+      "english": "Celsius",
+      "swedish": "grader Celsius",
+      "aliases": [
+        "c",
+        "°c",
+        "grader",
+        "grader c",
+        "grader celsius"
+      ]
+    },
+    {
+      "canonical": "F",
+      "english": "Fahrenheit",
+      "swedish": "grader Fahrenheit",
+      "aliases": [
+        "f",
+        "°f",
+        "grader f",
+        "grader fahrenheit"
+      ]
+    }
+  ],
+  "time_units": [
+    {
+      "canonical": "sek",
+      "english": "second",
+      "swedish": "sekund",
+      "aliases": [
+        "s",
+        "sek",
+        "sekund",
+        "sekunder",
+        "second",
+        "seconds"
+      ]
+    },
+    {
+      "canonical": "min",
+      "english": "minute",
+      "swedish": "minut",
+      "aliases": [
+        "min",
+        "minut",
+        "minuter",
+        "minute",
+        "minutes"
+      ]
+    },
+    {
+      "canonical": "tim",
+      "english": "hour",
+      "swedish": "timme",
+      "aliases": [
+        "h",
+        "tim",
+        "timme",
+        "timmar",
+        "hour",
+        "hours",
+        "hr"
+      ]
+    },
+    {
+      "canonical": "dygn",
+      "english": "24-hour period / day",
+      "swedish": "dygn",
+      "aliases": [
+        "dygn"
+      ]
+    },
+    {
+      "canonical": "natt",
+      "english": "overnight",
+      "swedish": "över natten",
+      "aliases": [
+        "över natten",
+        "overnight"
+      ]
+    }
+  ],
+  "size_descriptors": [
+    {
+      "canonical": "liten",
+      "english": "small",
+      "aliases": [
+        "liten",
+        "litet",
+        "små",
+        "small"
+      ]
+    },
+    {
+      "canonical": "mellan",
+      "english": "medium",
+      "aliases": [
+        "mellan",
+        "medelstor",
+        "medelstora",
+        "medium"
+      ]
+    },
+    {
+      "canonical": "stor",
+      "english": "large",
+      "aliases": [
+        "stor",
+        "stort",
+        "stora",
+        "large"
+      ]
+    }
+  ],
+  "ambiguous_tokens": [
+    {
+      "token": "kopp",
+      "risk": "Could mean literal cup, coffee cup, or informal serving amount rather than standardized cup.",
+      "recommended_action": "Flag for review; preserve source token if source context is unclear."
+    },
+    {
+      "token": "glas",
+      "risk": "May mean tumbler volume rather than a standardized measurement.",
+      "recommended_action": "Flag for review."
+    },
+    {
+      "token": "skvätt",
+      "risk": "Splash is intentionally imprecise.",
+      "recommended_action": "Preserve as descriptive quantity; do not convert."
+    },
+    {
+      "token": "lagom",
+      "risk": "Contextual amount, not deterministic.",
+      "recommended_action": "Preserve as freeform note or review flag."
+    }
+  ],
+  "normalization_aliases": {
+    "kryddmatt": "kryddmått",
+    "kryddmått": "krm",
+    "nypa": "pinch",
+    "matsked": "msk",
+    "matskedar": "msk",
+    "tesked": "tsk",
+    "teskedar": "tsk",
+    "tablespoon": "tbsp",
+    "tablespoons": "tbsp",
+    "teaspoon": "tsp",
+    "teaspoons": "tsp",
+    "pieces": "piece",
+    "ounce": "oz",
+    "ounces": "oz",
+    "pound": "lb",
+    "pounds": "lb"
+  },
+  "canonical_units": {
+    "krm": {
+      "aliases": [
+        "krm",
+        "kryddmått",
+        "kryddmatt"
+      ],
+      "category": "volume_spoon",
+      "protected": true,
+      "allow_naturalized_render": false,
+      "ambiguity_policy": "review_on_change"
+    },
+    "dl": {
+      "aliases": [
+        "dl",
+        "deciliter",
+        "deciliters",
+        "decilitre",
+        "decilitres"
+      ],
+      "category": "volume_metric",
+      "protected": true,
+      "allow_naturalized_render": false,
+      "ambiguity_policy": "preserve_structured"
+    },
+    "tsk": {
+      "aliases": [
+        "tsk",
+        "tesked",
+        "teskedar",
+        "tsp",
+        "teaspoon",
+        "teaspoons"
+      ],
+      "category": "volume_spoon",
+      "protected": true,
+      "allow_naturalized_render": false,
+      "ambiguity_policy": "review_on_change"
+    },
+    "msk": {
+      "aliases": [
+        "msk",
+        "matsked",
+        "matskedar",
+        "mck",
+        "tbsp",
+        "tablespoon",
+        "tablespoons"
+      ],
+      "category": "volume_spoon",
+      "protected": true,
+      "allow_naturalized_render": false,
+      "ambiguity_policy": "review_on_change"
+    },
+    "nypa": {
+      "aliases": [
+        "nypa",
+        "nypor",
+        "pinch"
+      ],
+      "category": "count_quantity",
+      "protected": true,
+      "allow_naturalized_render": false,
+      "ambiguity_policy": "review_on_change"
+    }
+  },
+  "guard_rules": [
+    {
+      "name": "swedish_spoon_guard",
+      "description": "Swedish tsk and msk must retain their spoon identity throughout preprocessing and normalization.",
+      "fail_on": [
+        "tsk -> tbsp",
+        "msk -> tsp"
+      ]
+    },
+    {
+      "name": "metric_notation_guard",
+      "description": "Do not drop explicit dl, ml, cl, g, hg, kg values into preparation text when they can remain structured.",
+      "fail_on": [
+        "1 dl -> freeform note only",
+        "a pinch -> freeform note only when count-like quantity is supported"
+      ]
+    },
+    {
+      "name": "package_unit_guard",
+      "description": "Package nouns are not equivalent to grams or milliliters without explicit size data.",
+      "fail_on": [
+        "burk -> guessed grams",
+        "paket -> guessed grams",
+        "påse -> guessed grams"
+      ]
+    }
+  ]
+}

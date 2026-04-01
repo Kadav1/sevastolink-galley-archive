@@ -11,7 +11,7 @@ from src.ai.pantry_suggester import PantryErrorKind, suggest_pantry
 from src.config.settings import settings
 from src.db.database import get_db
 from src.schemas.ai_outputs import PantryQueryIn, PantrySuggestionOut
-from src.schemas.common import ApiResponse
+from src.schemas.common import ApiResponse, error_detail
 from src.services import recipe_service
 
 router = APIRouter(prefix="/pantry", tags=["pantry"])
@@ -29,13 +29,13 @@ async def pantry_suggest(body: PantryQueryIn, db: Session = Depends(get_db)):
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI pantry suggestion is not enabled. Set LM_STUDIO_ENABLED=true."}},
+            detail=error_detail("ai_disabled", "AI pantry suggestion is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
 
     if not body.available_ingredients:
         raise HTTPException(
             status_code=422,
-            detail={"error": {"code": "validation_error", "message": "available_ingredients must not be empty."}},
+            detail=error_detail("validation_error", "available_ingredients must not be empty."),
         )
 
     archive_recipes_orm, _ = recipe_service.list_recipes(
@@ -68,11 +68,11 @@ async def pantry_suggest(body: PantryQueryIn, db: Session = Depends(get_db)):
         if err.kind == PantryErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     return ApiResponse(data=PantrySuggestionOut.model_validate(result.payload))

@@ -1,0 +1,611 @@
+2026-04-01T03:46:06Z INFO  galley.request GET /api/health 200 0ms
+2026-04-01T03:46:06Z INFO  galley.request GET /api/health 200 0ms
+2026-04-01T03:46:06Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:46:06Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:46:06Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:46:10Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:11Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:11Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:11Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:11Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:11Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:11Z INFO  galley.request POST /api/v1/intake-jobs 201 99ms
+2026-04-01T03:46:11Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JC5M6TNVSRMK5M2HJ3B47/candidate 200 40ms
+2026-04-01T03:46:11Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JC5M6TNVSRMK5M2HJ3B47/evaluate 503 0ms
+2026-04-01T03:46:12Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:13Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:13Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:13Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:13Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:13Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:13Z INFO  galley.request POST /api/v1/intake-jobs/DOESNOTEXIST/evaluate 404 2ms
+2026-04-01T03:46:13Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:14Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:14Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:14Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:14Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:14Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:14Z INFO  galley.request POST /api/v1/intake-jobs 201 105ms
+2026-04-01T03:46:15Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JC8NTTHG9FYCR50N75ST4/candidate 200 53ms
+2026-04-01T03:46:15Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JC8NTTHG9FYCR50N75ST4/evaluate 503 1ms
+2026-04-01T03:46:15Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:16Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:16Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:16Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:16Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:17Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:17Z INFO  galley.request POST /api/v1/intake-jobs 201 104ms
+2026-04-01T03:46:17Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JCAXCFX26WNN0E2655WHE/candidate 200 56ms
+2026-04-01T03:46:17Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JCAXCFX26WNN0E2655WHE/evaluate 200 1ms
+2026-04-01T03:46:17Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:18Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:18Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:19Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:19Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:19Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:19Z INFO  galley.request POST /api/v1/recipes 201 124ms
+2026-04-01T03:46:19Z INFO  galley.request POST /api/v1/recipes/shakshuka/suggest-metadata 503 0ms
+2026-04-01T03:46:19Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:20Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:20Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:20Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:20Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:20Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:20Z INFO  galley.request POST /api/v1/recipes/does-not-exist/suggest-metadata 404 3ms
+2026-04-01T03:46:21Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:22Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:22Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:23Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:23Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:23Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:23Z INFO  galley.request POST /api/v1/recipes 201 120ms
+2026-04-01T03:46:23Z INFO  galley.request POST /api/v1/recipes/shakshuka/suggest-metadata 503 69ms
+2026-04-01T03:46:23Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:24Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:24Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:24Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:24Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:24Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:25Z INFO  galley.request POST /api/v1/recipes 201 74ms
+2026-04-01T03:46:25Z INFO  galley.request POST /api/v1/recipes/shakshuka/suggest-metadata 200 38ms
+2026-04-01T03:46:25Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:26Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:26Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:26Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:26Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:26Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:26Z INFO  galley.request POST /api/v1/pantry/suggest 503 1ms
+2026-04-01T03:46:26Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:28Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:28Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:28Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:28Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:28Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:28Z INFO  galley.request POST /api/v1/pantry/suggest 422 0ms
+2026-04-01T03:46:28Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:30Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:30Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:30Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:30Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:30Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:30Z INFO  galley.request POST /api/v1/pantry/suggest 503 8ms
+2026-04-01T03:46:30Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:31Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:31Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:31Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:31Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:31Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:32Z INFO  galley.request POST /api/v1/pantry/suggest 200 8ms
+2026-04-01T03:46:32Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:33Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:33Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:33Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:33Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:33Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:33Z INFO  galley.request POST /api/v1/recipes 201 74ms
+2026-04-01T03:46:33Z INFO  galley.request POST /api/v1/recipes/pasta-bolognese/rewrite 503 0ms
+2026-04-01T03:46:33Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:34Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:34Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:34Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:34Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:34Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:34Z INFO  galley.request POST /api/v1/recipes/does-not-exist/rewrite 404 3ms
+2026-04-01T03:46:35Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:36Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:36Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:36Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:36Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:36Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:36Z INFO  galley.request POST /api/v1/recipes 201 106ms
+2026-04-01T03:46:36Z INFO  galley.request POST /api/v1/recipes/pasta-bolognese/rewrite 503 53ms
+2026-04-01T03:46:36Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:38Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:38Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:38Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:38Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:38Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:39Z INFO  galley.request POST /api/v1/recipes 201 108ms
+2026-04-01T03:46:39Z INFO  galley.request POST /api/v1/recipes/pasta-bolognese/rewrite 200 50ms
+2026-04-01T03:46:39Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:40Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:40Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:40Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:40Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:40Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:40Z INFO  galley.request POST /api/v1/recipes 201 91ms
+2026-04-01T03:46:40Z INFO  galley.request POST /api/v1/recipes/pasta-carbonara/similar 503 1ms
+2026-04-01T03:46:41Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:42Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:42Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:42Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:42Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:42Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:42Z INFO  galley.request POST /api/v1/recipes/does-not-exist/similar 404 4ms
+2026-04-01T03:46:42Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:44Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:44Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:44Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:44Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:44Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:44Z INFO  galley.request POST /api/v1/recipes 201 106ms
+2026-04-01T03:46:44Z INFO  galley.request POST /api/v1/recipes/pasta-carbonara/similar 503 51ms
+2026-04-01T03:46:45Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:46Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:46Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:46Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:46Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:46Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:46Z INFO  galley.request POST /api/v1/recipes 201 114ms
+2026-04-01T03:46:46Z INFO  galley.request POST /api/v1/recipes 201 57ms
+2026-04-01T03:46:46Z INFO  galley.request POST /api/v1/recipes/pasta-carbonara/similar 200 65ms
+2026-04-01T03:46:47Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:48Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:48Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:48Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:48Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:48Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:48Z INFO  galley.request GET /api/v1/recipes/does-not-exist 404 5ms
+2026-04-01T03:46:48Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:50Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:50Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:50Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:50Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:50Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:50Z INFO  galley.request GET /api/v1/intake-jobs/does-not-exist 404 2ms
+2026-04-01T03:46:50Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:52Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:52Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:52Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:52Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:52Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:52Z INFO  galley.request GET /api/v1/media-assets/does-not-exist 404 3ms
+2026-04-01T03:46:52Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:53Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:53Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:54Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:54Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:54Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:54Z INFO  galley.request POST /api/v1/intake-jobs 422 0ms
+2026-04-01T03:46:54Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:56Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:56Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:56Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:56Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:56Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:56Z INFO  galley.request POST /api/v1/intake-jobs 422 0ms
+2026-04-01T03:46:56Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:57Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:57Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:57Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:57Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:57Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:58Z INFO  galley.request POST /api/v1/intake-jobs 201 103ms
+2026-04-01T03:46:58Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JDJSTZFCQ642281FPW86V/normalize 503 0ms
+2026-04-01T03:46:58Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:46:59Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:46:59Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:46:59Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:46:59Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:46:59Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:46:59Z INFO  galley.request POST /api/v1/pantry/suggest 503 0ms
+2026-04-01T03:47:00Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:01Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:01Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:01Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:01Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:01Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:01Z INFO  galley.request GET /api/v1/recipes/nonexistent 404 5ms
+2026-04-01T03:47:02Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:03Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:03Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:03Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:03Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:03Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:03Z INFO  galley.request POST /api/v1/intake-jobs 422 0ms
+2026-04-01T03:47:03Z INFO  galley.request GET /api/health 200 0ms
+2026-04-01T03:47:03Z INFO  galley.request GET /api/health 200 0ms
+2026-04-01T03:47:03Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:47:03Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:47:03Z INFO  galley.request GET /api/v1/health/ai 200 0ms
+2026-04-01T03:47:03Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:04Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:04Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:04Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:04Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:04Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:04Z INFO  galley.request POST /api/v1/intake-jobs 201 72ms
+2026-04-01T03:47:04Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:05Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:05Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:05Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:05Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:06Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:06Z INFO  galley.request POST /api/v1/intake-jobs 422 1ms
+2026-04-01T03:47:06Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:07Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:07Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:07Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:07Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:08Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:08Z INFO  galley.request POST /api/v1/intake-jobs 201 104ms
+2026-04-01T03:47:08Z INFO  galley.request GET /api/v1/intake-jobs/01KN3JDWMZ4A6KSK15XJZEM79J 200 1ms
+2026-04-01T03:47:08Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:09Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:09Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:09Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:09Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:09Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:10Z INFO  galley.request GET /api/v1/intake-jobs/DOESNOTEXIST 404 2ms
+2026-04-01T03:47:10Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:11Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:11Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:11Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:11Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:11Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:11Z INFO  galley.request POST /api/v1/intake-jobs 201 83ms
+2026-04-01T03:47:11Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JDZTWFSD84MS58CW1J423/candidate 200 49ms
+2026-04-01T03:47:11Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:13Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:13Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:13Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:13Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:13Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:13Z INFO  galley.request POST /api/v1/intake-jobs 201 104ms
+2026-04-01T03:47:13Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JE1QETRRWRZMX0XAZF96D/candidate 200 55ms
+2026-04-01T03:47:13Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JE1QETRRWRZMX0XAZF96D/approve 201 63ms
+2026-04-01T03:47:13Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:15Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:15Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:15Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:15Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:15Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:15Z INFO  galley.request POST /api/v1/intake-jobs 201 121ms
+2026-04-01T03:47:15Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JE3S5GT0GX194TM8D078B/approve 422 1ms
+2026-04-01T03:47:15Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:16Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:16Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:17Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:17Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:17Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:17Z INFO  galley.request POST /api/v1/intake-jobs 201 108ms
+2026-04-01T03:47:17Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JE5HMHMG2Z457QPYEPT43/candidate 200 55ms
+2026-04-01T03:47:17Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JE5HMHMG2Z457QPYEPT43/approve 201 64ms
+2026-04-01T03:47:17Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JE5HMHMG2Z457QPYEPT43/approve 409 1ms
+2026-04-01T03:47:17Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:19Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:19Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:19Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:19Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:19Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:19Z INFO  galley.request POST /api/v1/intake-jobs 201 88ms
+2026-04-01T03:47:19Z INFO  galley.request PATCH /api/v1/intake-jobs/01KN3JE7HF95F80C6G79DSCX8H/candidate 200 48ms
+2026-04-01T03:47:19Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JE7HF95F80C6G79DSCX8H/approve 201 54ms
+2026-04-01T03:47:19Z INFO  galley.request GET /api/v1/recipes 200 61ms
+2026-04-01T03:47:19Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:20Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:20Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:20Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:20Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:21Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:21Z INFO  galley.request POST /api/v1/intake-jobs 201 103ms
+2026-04-01T03:47:21Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:22Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:22Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:22Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:22Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:23Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:23Z INFO  galley.request POST /api/v1/intake-jobs 201 124ms
+2026-04-01T03:47:23Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEBB9107KZG6TCKAM5A0F/normalize 503 0ms
+2026-04-01T03:47:23Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:25Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:25Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:25Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:25Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:25Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:25Z INFO  galley.request POST /api/v1/intake-jobs 201 103ms
+2026-04-01T03:47:25Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEDEFAZ4FT8W434VVP7AJ/normalize 503 1ms
+2026-04-01T03:47:25Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:26Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:26Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:26Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:26Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:27Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:27Z INFO  galley.request POST /api/v1/intake-jobs 201 106ms
+2026-04-01T03:47:27Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEF8VTV92ETAQNXR6K5YS/normalize 200 52ms
+2026-04-01T03:47:27Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:28Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:28Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:29Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:29Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:29Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:29Z INFO  galley.request POST /api/v1/intake-jobs 201 107ms
+2026-04-01T03:47:29Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEHA11MXXGBVXQJYNN03M/media 200 54ms
+2026-04-01T03:47:29Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:31Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:31Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:31Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:31Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:31Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:31Z INFO  galley.request POST /api/v1/intake-jobs 201 88ms
+2026-04-01T03:47:31Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEKKGC09FAMMBKH9T2TAS/media 200 47ms
+2026-04-01T03:47:31Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:33Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:33Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:33Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:33Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:33Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:33Z INFO  galley.request POST /api/v1/intake-jobs 201 72ms
+2026-04-01T03:47:33Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEN9KZQMBCNEB3H7403WW/media 200 39ms
+2026-04-01T03:47:33Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:34Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:34Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:34Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:34Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:34Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:34Z INFO  galley.request POST /api/v1/intake-jobs 201 89ms
+2026-04-01T03:47:34Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JEPR8EHQ714NZTQ1VK0H2/media 422 4ms
+2026-04-01T03:47:35Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:36Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:36Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:36Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:36Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:36Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:36Z INFO  galley.request POST /api/v1/intake-jobs/does-not-exist/media 404 3ms
+2026-04-01T03:47:37Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:38Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:38Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:38Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:38Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:38Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:38Z INFO  galley.request POST /api/v1/recipes 201 89ms
+2026-04-01T03:47:39Z INFO  galley.request POST /api/v1/recipes/test-recipe/media 200 86ms
+2026-04-01T03:47:39Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:40Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:40Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:40Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:40Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:40Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:40Z INFO  galley.request POST /api/v1/recipes 201 105ms
+2026-04-01T03:47:40Z INFO  galley.request POST /api/v1/recipes/covered-recipe/media 200 100ms
+2026-04-01T03:47:41Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:42Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:42Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:43Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:43Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:43Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:43Z INFO  galley.request POST /api/v1/recipes/no-such-recipe/media 404 6ms
+2026-04-01T03:47:43Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:44Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:44Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:44Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:44Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:44Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:44Z INFO  galley.request POST /api/v1/intake-jobs 201 104ms
+2026-04-01T03:47:44Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JF0J7EVPD6YKJX50YF5GV/media 200 54ms
+2026-04-01T03:47:45Z INFO  galley.request GET /api/v1/media-assets/53981367-8f0a-40f5-a3e6-410f5268d9c6 200 0ms
+2026-04-01T03:47:45Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:46Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:46Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:46Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:46Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:46Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:46Z INFO  galley.request GET /api/v1/media-assets/does-not-exist 404 2ms
+2026-04-01T03:47:47Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:48Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:48Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:48Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:48Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:48Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:48Z INFO  galley.request POST /api/v1/intake-jobs 201 121ms
+2026-04-01T03:47:49Z INFO  galley.request POST /api/v1/intake-jobs/01KN3JF4GEB4W2P5ZW20397GZ7/media 200 54ms
+2026-04-01T03:47:49Z INFO  galley.request GET /api/v1/media-assets/89f375a9-6c60-4fb4-b9ae-d8a38df29104/file 200 1ms
+2026-04-01T03:47:49Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:50Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:50Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:50Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:50Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:50Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:50Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:47:51Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:52Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:52Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:52Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:52Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:52Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:52Z INFO  galley.request POST /api/v1/recipes 201 120ms
+2026-04-01T03:47:52Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:54Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:54Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:54Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:54Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:54Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:54Z INFO  galley.request POST /api/v1/recipes 201 101ms
+2026-04-01T03:47:54Z INFO  galley.request GET /api/v1/recipes/shakshuka 200 50ms
+2026-04-01T03:47:55Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:56Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:56Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:56Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:56Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:56Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:56Z INFO  galley.request POST /api/v1/recipes 201 108ms
+2026-04-01T03:47:56Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:47:56Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:47:58Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:47:58Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:47:58Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:47:58Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:47:58Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:47:58Z INFO  galley.request POST /api/v1/recipes 201 121ms
+2026-04-01T03:47:58Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:47:58Z INFO  galley.request GET /api/v1/recipes 200 0ms
+2026-04-01T03:47:58Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:00Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:00Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:00Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:00Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:00Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:01Z INFO  galley.request POST /api/v1/recipes 201 122ms
+2026-04-01T03:48:01Z INFO  galley.request GET /api/v1/recipes 200 6ms
+2026-04-01T03:48:01Z INFO  galley.request GET /api/v1/recipes 200 1ms
+2026-04-01T03:48:01Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:02Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:02Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:02Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:02Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:02Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:02Z INFO  galley.request POST /api/v1/recipes 201 95ms
+2026-04-01T03:48:02Z INFO  galley.request GET /api/v1/recipes 200 4ms
+2026-04-01T03:48:02Z INFO  galley.request GET /api/v1/recipes 200 5ms
+2026-04-01T03:48:03Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:04Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:04Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:04Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:04Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:04Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:04Z INFO  galley.request POST /api/v1/recipes 201 122ms
+2026-04-01T03:48:04Z INFO  galley.request PATCH /api/v1/recipes/shakshuka 200 116ms
+2026-04-01T03:48:05Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:06Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:06Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:06Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:06Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:07Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:07Z INFO  galley.request POST /api/v1/recipes 201 106ms
+2026-04-01T03:48:07Z INFO  galley.request POST /api/v1/recipes/shakshuka/archive 200 99ms
+2026-04-01T03:48:07Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:08Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:08Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:09Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:09Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:09Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:09Z INFO  galley.request POST /api/v1/recipes 201 94ms
+2026-04-01T03:48:09Z INFO  galley.request POST /api/v1/recipes/shakshuka/archive 200 83ms
+2026-04-01T03:48:09Z INFO  galley.request GET /api/v1/recipes 200 5ms
+2026-04-01T03:48:09Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:48:09Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:10Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:10Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:10Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:10Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:10Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:11Z INFO  galley.request POST /api/v1/recipes 201 92ms
+2026-04-01T03:48:11Z INFO  galley.request DELETE /api/v1/recipes/shakshuka 204 85ms
+2026-04-01T03:48:11Z INFO  galley.request GET /api/v1/recipes/shakshuka 404 1ms
+2026-04-01T03:48:11Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:12Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:12Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:12Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:12Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:13Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:13Z INFO  galley.request GET /api/v1/recipes/nonexistent-recipe 404 3ms
+2026-04-01T03:48:13Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:14Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:14Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:14Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:14Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:14Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:15Z INFO  galley.request POST /api/v1/recipes 201 106ms
+2026-04-01T03:48:15Z INFO  galley.request POST /api/v1/recipes 201 57ms
+2026-04-01T03:48:15Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:16Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:16Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:16Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:16Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:17Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:17Z INFO  galley.request POST /api/v1/recipes 201 90ms
+2026-04-01T03:48:17Z INFO  galley.request GET /api/v1/recipes 200 6ms
+2026-04-01T03:48:17Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:18Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:18Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:18Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:18Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:18Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:19Z INFO  galley.request POST /api/v1/recipes 201 90ms
+2026-04-01T03:48:19Z INFO  galley.request POST /api/v1/recipes 201 49ms
+2026-04-01T03:48:19Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:48:19Z INFO  galley.request GET /api/v1/recipes 200 1ms
+2026-04-01T03:48:19Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:20Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:20Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:20Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:20Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:20Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:20Z INFO  galley.request POST /api/v1/recipes 201 113ms
+2026-04-01T03:48:20Z INFO  galley.request GET /api/v1/recipes 200 6ms
+2026-04-01T03:48:20Z INFO  galley.request GET /api/v1/recipes 200 1ms
+2026-04-01T03:48:21Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:22Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:22Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:22Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:22Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:22Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:22Z INFO  galley.request POST /api/v1/recipes 201 106ms
+2026-04-01T03:48:22Z INFO  galley.request GET /api/v1/recipes 200 7ms
+2026-04-01T03:48:22Z INFO  galley.request GET /api/v1/recipes 200 1ms
+2026-04-01T03:48:23Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:24Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:24Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:25Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:25Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:25Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:25Z INFO  galley.request POST /api/v1/recipes 201 168ms
+2026-04-01T03:48:25Z INFO  galley.request POST /api/v1/recipes 201 46ms
+2026-04-01T03:48:25Z INFO  galley.request GET /api/v1/recipes 200 5ms
+2026-04-01T03:48:25Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:26Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:26Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:26Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:26Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:26Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:27Z INFO  galley.request GET /api/v1/settings 200 2ms
+2026-04-01T03:48:27Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:28Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:28Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:28Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:28Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:28Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:28Z INFO  galley.request PATCH /api/v1/settings 200 88ms
+2026-04-01T03:48:29Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:30Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:30Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:30Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:30Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:30Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:31Z INFO  galley.request PATCH /api/v1/settings 200 104ms
+2026-04-01T03:48:31Z INFO  galley.request GET /api/v1/settings 200 1ms
+2026-04-01T03:48:31Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:32Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:32Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:32Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:32Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:32Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:32Z INFO  galley.request PATCH /api/v1/settings 422 0ms
+2026-04-01T03:48:32Z INFO  src.db.init_db Applying migration 001 (001_initial_schema.sql)
+2026-04-01T03:48:34Z INFO  src.db.init_db Migration 001 applied
+2026-04-01T03:48:34Z INFO  src.db.init_db Applying migration 002 (002_add_recipe_cover_media.sql)
+2026-04-01T03:48:34Z INFO  src.db.init_db Migration 002 applied
+2026-04-01T03:48:34Z INFO  src.db.init_db Applying migration 003 (003_intake_jobs_source_notes.sql)
+2026-04-01T03:48:34Z INFO  src.db.init_db Migration 003 applied
+2026-04-01T03:48:34Z INFO  galley.request PATCH /api/v1/settings 200 3ms
+2026-04-01T03:48:43Z INFO  test logging config smoke test

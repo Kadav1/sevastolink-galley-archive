@@ -10,44 +10,11 @@
  */
 
 import type { RecipeDetail } from "../../types/recipe";
+import { MetaItem } from "../ui/MetaItem";
 import { StatusBadge } from "../ui/StatusBadge";
 
 interface Props {
   recipe: RecipeDetail;
-}
-
-// ── Internal sub-components ───────────────────────────────────────────────────
-
-function PrimaryItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  if (!value) return null;
-  return (
-    <div style={styles.primaryItem}>
-      <span style={styles.itemLabel}>{label}</span>
-      <span style={styles.primaryValue}>{value}</span>
-    </div>
-  );
-}
-
-function SecondaryItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  if (!value) return null;
-  return (
-    <div style={styles.secondaryItem}>
-      <span style={styles.itemLabel}>{label}</span>
-      <span style={styles.secondaryValue}>{value}</span>
-    </div>
-  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -81,7 +48,7 @@ export function MetadataStrip({ recipe }: Props) {
     return (
       <div style={styles.strip} aria-label="Recipe metadata">
         <div style={styles.statusGroup}>
-          <span style={styles.itemLabel}>Trust</span>
+          <span style={labelStyle}>Trust</span>
           <StatusBadge state={recipe.verification_state} />
         </div>
       </div>
@@ -93,25 +60,25 @@ export function MetadataStrip({ recipe }: Props) {
       {/* Primary group */}
       {hasPrimary && (
         <div style={styles.primaryGroup}>
-          <PrimaryItem label="Serves" value={recipe.servings} />
-          <PrimaryItem label="Time" value={timeDisplay} />
-          <PrimaryItem label="Heat" value={recipe.heat_window} />
+          <MetaItem label="Serves" value={recipe.servings} size="base" style={styles.primaryItem} />
+          <MetaItem label="Time" value={timeDisplay} size="base" style={styles.primaryItem} />
+          <MetaItem label="Heat" value={recipe.heat_window} size="base" style={styles.primaryItem} />
         </div>
       )}
 
       {/* Secondary group */}
       {hasSecondary && (
         <div style={styles.secondaryGroup}>
-          <SecondaryItem label="Role" value={recipe.dish_role} />
-          <SecondaryItem label="Cuisine" value={recipe.primary_cuisine} />
-          <SecondaryItem label="Technique" value={recipe.technique_family} />
-          <SecondaryItem label="Complexity" value={recipe.complexity} />
+          <MetaItem label="Role" value={recipe.dish_role} size="sm" style={styles.secondaryItem} />
+          <MetaItem label="Cuisine" value={recipe.primary_cuisine} size="sm" style={styles.secondaryItem} />
+          <MetaItem label="Technique" value={recipe.technique_family} size="sm" style={styles.secondaryItem} />
+          <MetaItem label="Complexity" value={recipe.complexity} size="sm" style={styles.secondaryItem} />
         </div>
       )}
 
       {/* Status */}
       <div style={styles.statusGroup}>
-        <span style={styles.itemLabel}>Trust</span>
+        <span style={labelStyle}>Trust</span>
         <StatusBadge state={recipe.verification_state} />
       </div>
     </div>
@@ -135,18 +102,10 @@ const styles = {
     flexWrap: "wrap" as const,
     borderRight: "1px solid var(--border-subtle)",
   },
+  // Item padding + border — passed as style override to MetaItem
   primaryItem: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
     padding: "var(--space-3) var(--space-5)",
     borderRight: "1px solid var(--border-subtle)",
-  },
-  primaryValue: {
-    fontSize: "var(--text-base)",
-    color: "var(--text-primary)",
-    fontWeight: 400,
-    lineHeight: "var(--leading-snug)",
   },
   // Secondary: classification fields — smaller, quieter
   secondaryGroup: {
@@ -155,17 +114,8 @@ const styles = {
     borderRight: "1px solid var(--border-subtle)",
   },
   secondaryItem: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
     padding: "var(--space-3) var(--space-4)",
     borderRight: "1px solid var(--border-subtle)",
-  },
-  secondaryValue: {
-    fontSize: "var(--text-sm)",
-    color: "var(--text-secondary)",
-    fontWeight: 400,
-    lineHeight: "var(--leading-snug)",
   },
   // Status group — trust badge
   statusGroup: {
@@ -175,12 +125,13 @@ const styles = {
     padding: "var(--space-3) var(--space-4)",
     justifyContent: "center",
   },
-  // Shared label style
-  itemLabel: {
-    fontSize: "var(--text-xs)",
-    color: "var(--text-tertiary)",
-    letterSpacing: "var(--tracking-wide)",
-    textTransform: "uppercase" as const,
-    fontWeight: 500,
-  },
+} as const;
+
+// Shared label style — matches MetaItem's internal labelStyle
+const labelStyle = {
+  fontSize: "var(--text-xs)",
+  color: "var(--text-tertiary)",
+  letterSpacing: "var(--tracking-wide)",
+  textTransform: "uppercase" as const,
+  fontWeight: 500,
 } as const;

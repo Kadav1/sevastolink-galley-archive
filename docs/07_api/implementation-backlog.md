@@ -45,39 +45,31 @@ Still missing:
 
 | Priority | Area | Current state | Target state |
 |---|---|---|---|
-| P1 | Error-envelope consistency | Mixed `detail` vs nested `error` shapes | One stable API error contract |
+| P1 | Error-envelope consistency | **Done** — unified `{"error": {...}}` envelope, custom exception handler in `main.py` | One stable API error contract |
+| P1 | Schema/API alignment | **Done** — `IntakeJobOut` expanded, `ingredient_count` in `RecipeSummaryOut`, 3 new list filters, `title_desc` sort | ORM, schema, and spec in sync |
 | P1 | Search resource decision | Search exists only through `/recipes` list behavior | Either dedicated `/search` resource or explicit decision not to create one |
 | P1 | Settings API | **Done** — `GET/PATCH /api/v1/settings` mounted | Functional settings routes |
-| P2 | Media assets API | First endpoint implemented: `POST /intake-jobs/{job_id}/media` | Standalone `/media-assets` resource group if needed |
+| P2 | Media assets API | Source attach, recipe cover attach, metadata GET, file serve — all implemented | No outstanding P2 media items |
 | P2 | AI jobs API | AI capability exists, `ai_jobs` table exists, API absent | First-class AI job visibility if needed |
 | P2 | Backup/system API decision | Shell workflows exist, API absent | Explicit surfaced operator resources or documented operator-only choice |
-| P3 | Full target-state search facets | Current filters cover only main subset | Broader taxonomy and ingredient-family filters if still desired |
+| P3 | Full target-state search facets | Current filters cover main taxonomy dimensions | Ingredient-family and multi-value filters if still desired |
 
 ---
 
 ## 4. Backlog detail
 
-### 4.1 P1: Error-envelope consistency
+### 4.1 P1: Error-envelope consistency (implemented)
 
 Current state:
 
-* success envelopes are consistent
-* error responses vary between direct `detail` payloads and nested `error` objects
-
-Missing target-state items:
-
-* one stable error response contract across all routes
-
-Likely implementation work:
-
-* standardize `HTTPException` payloads
-* add or update shared error helpers
-* align docs and frontend assumptions with the final envelope shape
+* all error responses use `{"error": {"code": "...", "message": "..."}}` at the top level
+* custom `HTTPException` and `RequestValidationError` handlers in `main.py` normalize all shapes
+* `error_detail()` helper in `schemas/common.py` is used consistently across all routes and services
+* no `detail` wrapper on any error response
 
 Primary source:
 
-* `api-spec.md` §3
-* `api-spec.md` §5
+* `docs/07_api/implemented-api.md §10`
 
 ### 4.2 P1: Search resource decision
 

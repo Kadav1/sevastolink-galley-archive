@@ -5,17 +5,37 @@ type NavItem = {
   to: string;
 };
 
+type SideNavProps = {
+  /** True when rendered as a fixed overlay (mobile / tablet). */
+  overlay?: boolean;
+  /** Called when the user requests to close the nav (overlay mode only). */
+  onClose?: () => void;
+};
+
 const NAV_ITEMS: NavItem[] = [
   { label: "Library", to: "/library" },
+  { label: "Pantry", to: "/pantry" },
   { label: "Intake", to: "/intake" },
   { label: "Settings", to: "/settings" },
 ];
 
-export function SideNav() {
+export function SideNav({ overlay = false, onClose }: SideNavProps) {
   return (
-    <nav style={styles.nav} aria-label="Primary navigation">
+    <nav
+      style={{ ...styles.nav, ...(overlay ? styles.navOverlay : {}) }}
+      aria-label="Primary navigation"
+    >
       <div style={styles.brand}>
         <span style={styles.brandText}>Galley</span>
+        {overlay && onClose && (
+          <button
+            style={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close navigation"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       <ul style={styles.list}>
@@ -23,6 +43,7 @@ export function SideNav() {
           <li key={item.to}>
             <NavLink
               to={item.to}
+              onClick={overlay ? onClose : undefined}
               style={({ isActive }) => ({
                 ...styles.link,
                 ...(isActive ? styles.linkActive : {}),
@@ -50,10 +71,21 @@ const styles = {
     position: "sticky" as const,
     top: 0,
   },
+  // Overlay variant — fixed, full-height, above backdrop
+  navOverlay: {
+    position: "fixed" as const,
+    top: 0,
+    left: 0,
+    height: "100dvh",
+    zIndex: 30,
+  },
   brand: {
     padding: "0 var(--space-6) var(--space-8)",
     borderBottom: "1px solid var(--border-subtle)",
     marginBottom: "var(--space-6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   brandText: {
     fontFamily: "var(--font-display)",
@@ -62,6 +94,15 @@ const styles = {
     letterSpacing: "var(--tracking-wider)",
     textTransform: "uppercase" as const,
     color: "var(--text-secondary)",
+  },
+  closeBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "var(--text-tertiary)",
+    fontSize: "var(--text-base)",
+    padding: "var(--space-1)",
+    lineHeight: 1,
   },
   list: {
     display: "flex",

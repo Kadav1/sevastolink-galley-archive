@@ -12,6 +12,58 @@
     "translated_text": {
       "type": "string",
       "minLength": 1
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "segment_id",
+          "segment_type",
+          "source_text",
+          "translated_text",
+          "uncertainty_flags"
+        ],
+        "properties": {
+          "segment_id": {
+            "type": "string",
+            "pattern": "^seg_[0-9]{4,}$"
+          },
+          "segment_type": {
+            "type": "string",
+            "enum": [
+              "title",
+              "ingredient_line",
+              "instruction_line",
+              "note",
+              "other"
+            ]
+          },
+          "source_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "translated_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uncertainty_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "unknown_token",
+                "ambiguous_ingredient",
+                "ambiguous_modifier",
+                "unresolved_unit",
+                "ocr_noise"
+              ]
+            },
+            "uniqueItems": true
+          }
+        }
+      }
     }
   },
   "required": [

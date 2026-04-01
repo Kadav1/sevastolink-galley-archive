@@ -6,7 +6,7 @@ from src.ai.lm_studio_client import LMStudioClient
 from src.ai.normalizer import NormalizationErrorKind, normalize_recipe
 from src.config.settings import settings
 from src.db.database import get_db
-from src.schemas.common import ApiResponse
+from src.schemas.common import ApiResponse, error_detail
 from src.schemas.ai_outputs import EvaluationOut
 from src.schemas.intake import (
     ApproveIntakeIn,
@@ -76,8 +76,8 @@ def _candidate_out(candidate) -> CandidateOut:
 async def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)):
     if body.intake_type == "paste_text" and not body.raw_source_text:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"error": {"code": "validation_error", "message": "raw_source_text is required for paste_text intake."}},
+            status_code=422,
+            detail=error_detail("validation_error", "raw_source_text is required for paste_text intake."),
         )
     job = intake_service.create_intake_job(db, body)
     db.commit()
@@ -91,7 +91,7 @@ async def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)
 async def get_intake_job(job_id: str, db: Session = Depends(get_db)):
     job = intake_service.get_intake_job(db, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
     return ApiResponse(data=IntakeJobOut.from_orm(job))
 
 
@@ -101,7 +101,7 @@ async def get_intake_job(job_id: str, db: Session = Depends(get_db)):
 async def update_candidate(job_id: str, body: CandidateUpdate, db: Session = Depends(get_db)):
     candidate = intake_service.update_candidate(db, job_id, body)
     if candidate is None:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
     db.commit()
     db.refresh(candidate)
     return ApiResponse(data=_candidate_out(candidate))
@@ -121,17 +121,17 @@ async def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI normalization is not enabled. Set LM_STUDIO_ENABLED=true to use this feature."}},
+            detail=error_detail("ai_disabled", "AI normalization is not enabled. Set LM_STUDIO_ENABLED=true to use this feature."),
         )
 
     job = intake_service.get_intake_job(db, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
 
     if not job.raw_source_text:
         raise HTTPException(
             status_code=422,
-            detail={"error": {"code": "no_source_text", "message": "Intake job has no raw source text to normalize."}},
+            detail=error_detail("no_source_text", "Intake job has no raw source text to normalize."),
         )
 
     client = LMStudioClient(settings.lm_studio_base_url)
@@ -147,17 +147,17 @@ async def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
         if err.kind == NormalizationErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable. You can continue manually."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable. You can continue manually."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     # Apply the AI-suggested fields to the candidate
     candidate = intake_service.update_candidate(db, job_id, result.candidate_update)
     if candidate is None:
-        raise HTTPException(status_code=500, detail={"error": {"code": "internal_error", "message": "Failed to apply normalization result."}})
+        raise HTTPException(status_code=500, detail=error_detail("internal_error", "Failed to apply normalization result."))
 
     db.commit()
     db.refresh(candidate)
@@ -170,21 +170,21 @@ async def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
 async def approve_intake_job(job_id: str, body: ApproveIntakeIn, db: Session = Depends(get_db)):
     job = intake_service.get_intake_job(db, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
     if job.status == "approved":
         raise HTTPException(
             status_code=409,
-            detail={"error": {"code": "conflict", "message": "Intake job has already been approved."}},
+            detail=error_detail("conflict", "Intake job has already been approved."),
         )
     if not job.candidate or not job.candidate.title:
         raise HTTPException(
             status_code=422,
-            detail={"error": {"code": "candidate_incomplete", "message": "Candidate must have a title before approval."}},
+            detail=error_detail("candidate_incomplete", "Candidate must have a title before approval."),
         )
 
     recipe = intake_service.approve_intake_job(db, job_id, body)
     if not recipe:
-        raise HTTPException(status_code=500, detail={"error": {"code": "internal_error", "message": "Approval failed."}})
+        raise HTTPException(status_code=500, detail=error_detail("internal_error", "Approval failed."))
 
     db.commit()
     db.refresh(recipe)
@@ -208,24 +208,24 @@ async def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
     if not settings.lm_studio_enabled:
         raise HTTPException(
             status_code=503,
-            detail={"error": {"code": "ai_disabled", "message": "AI evaluation is not enabled. Set LM_STUDIO_ENABLED=true."}},
+            detail=error_detail("ai_disabled", "AI evaluation is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
 
     job = intake_service.get_intake_job(db, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Intake job not found."}})
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
 
     if not job.raw_source_text:
         raise HTTPException(
             status_code=422,
-            detail={"error": {"code": "no_source_text", "message": "Intake job has no raw source text to evaluate against."}},
+            detail=error_detail("no_source_text", "Intake job has no raw source text to evaluate against."),
         )
 
     candidate = job.candidate
     if not candidate:
         raise HTTPException(
             status_code=422,
-            detail={"error": {"code": "no_candidate", "message": "Intake job has no structured candidate to evaluate."}},
+            detail=error_detail("no_candidate", "Intake job has no structured candidate to evaluate."),
         )
 
     candidate_dict = _candidate_out(candidate).model_dump()
@@ -242,11 +242,11 @@ async def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
         if err.kind == EvaluationErrorKind.transport_failure:
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "ai_unavailable", "message": "AI service is unavailable."}},
+                detail=error_detail("ai_unavailable", "AI service is unavailable."),
             )
         raise HTTPException(
             status_code=502,
-            detail={"error": {"code": f"ai_{err.kind.value}", "message": err.message}},
+            detail=error_detail(f"ai_{err.kind.value}", err.message),
         )
 
     return ApiResponse(data=EvaluationOut(

@@ -81,3 +81,13 @@ export async function toggleFavorite(
     method: "POST",
   });
 }
+
+export async function patchRecipe(
+  idOrSlug: string,
+  patch: Record<string, unknown>,
+): Promise<ApiResponse<RecipeDetail>> {
+  return apiFetch<ApiResponse<RecipeDetail>>(`/recipes/${idOrSlug}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}

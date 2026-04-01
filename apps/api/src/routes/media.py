@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from src.config.settings import settings
 from src.db.database import get_db
-from src.schemas.common import ApiResponse
+from src.schemas.common import ApiResponse, error_detail
 from src.schemas.media_schema import MediaAssetOut
 from src.services import media_service, recipe_service
 
@@ -55,7 +55,7 @@ async def attach_recipe_media(
     """
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
     asset = media_service.attach_to_recipe(db, recipe, file)
     return ApiResponse(data=MediaAssetOut.model_validate(asset))
 
@@ -71,7 +71,7 @@ async def get_media_asset(
     """Retrieve metadata for a media asset by id."""
     asset = media_service.get_by_id(db, asset_id)
     if asset is None:
-        raise HTTPException(status_code=404, detail="Media asset not found")
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Media asset not found."))
     return ApiResponse(data=MediaAssetOut.model_validate(asset))
 
 
@@ -87,10 +87,10 @@ async def serve_media_file(
     """
     asset = media_service.get_by_id(db, asset_id)
     if asset is None:
-        raise HTTPException(status_code=404, detail="Media asset not found")
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Media asset not found."))
     file_path: Path = settings.media_dir / asset.relative_path
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="Asset file not found on disk")
+        raise HTTPException(status_code=404, detail=error_detail("not_found", "Asset file not found on disk."))
     return FileResponse(
         path=str(file_path),
         media_type=asset.mime_type or "application/octet-stream",

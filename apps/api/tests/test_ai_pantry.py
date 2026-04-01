@@ -52,7 +52,7 @@ async def test_pantry_returns_503_when_ai_disabled(client):
             "available_ingredients": ["eggs", "onion", "tomatoes"],
         })
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_disabled"
+    assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
@@ -78,7 +78,7 @@ async def test_pantry_returns_503_when_lm_studio_unreachable(client):
                 "available_ingredients": ["eggs", "onion"],
             })
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_unavailable"
+    assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio

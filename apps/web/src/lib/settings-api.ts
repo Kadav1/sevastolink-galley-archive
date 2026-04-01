@@ -28,3 +28,14 @@ export async function updateSettings(
     body: JSON.stringify(update),
   });
 }
+
+export interface AiHealth {
+  ai_enabled: boolean;
+  reachable: boolean | null;
+  model: string | null;
+  error: string | null;
+}
+
+export async function getAiHealth(): Promise<ApiResponse<AiHealth>> {
+  return apiFetch<ApiResponse<AiHealth>>("/health/ai");
+}

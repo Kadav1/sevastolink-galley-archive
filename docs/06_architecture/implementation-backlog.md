@@ -45,7 +45,7 @@ Still missing:
 | P1 | Search domain completion | Search exists inside recipe service | Dedicated search domain and cleaner boundary |
 | P1 | Settings domain completion | **Done** — settings API and UI implemented | Settings API and UI are functional |
 | P1 | Dev/migrate/seed ergonomics | Startup migration works, helper dirs are empty | Real operator/developer command layer |
-| P2 | Media domain completion | First endpoint implemented: `POST /intake-jobs/{job_id}/media` | Broader media workflows if still needed |
+| P2 | Media domain completion | **Done** — source attach, recipe cover attach, metadata GET, file serve all implemented | No outstanding P2 media items |
 | P2 | Data-access separation | Services perform DB orchestration directly | Clearer service/repository split where useful |
 | P2 | Backup/system domain surfacing | Shell workflows exist only outside API | Better surfaced operational architecture |
 | P3 | AI domain productization | AI backend capabilities exist unevenly across UX | Cleaner product-facing AI domain surfaces |

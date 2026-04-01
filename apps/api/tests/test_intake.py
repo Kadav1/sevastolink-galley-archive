@@ -239,7 +239,7 @@ async def test_normalize_returns_503_when_ai_disabled(client):
         job_id = create.json()["data"]["id"]
         r = await ac.post(f"/api/v1/intake-jobs/{job_id}/normalize")
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_disabled"
+    assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
@@ -262,7 +262,7 @@ async def test_normalize_returns_503_when_lm_studio_unreachable(client):
             r = await ac.post(f"/api/v1/intake-jobs/{job_id}/normalize")
 
     assert r.status_code == 503
-    assert r.json()["detail"]["error"]["code"] == "ai_unavailable"
+    assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio

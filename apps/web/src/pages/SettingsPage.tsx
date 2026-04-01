@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
-import type { Settings } from "../lib/settings-api";
+import type { AiHealth, Settings } from "../lib/settings-api";
+import { getAiHealth } from "../lib/settings-api";
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
@@ -100,6 +102,21 @@ const VERIFICATION_OPTIONS: {
 export function SettingsPage() {
   const { data: settings, isLoading, isError } = useSettings();
   const { mutate: saveSettings, isPending: isSaving } = useUpdateSettings();
+  const [aiHealth, setAiHealth] = useState<AiHealth | null>(null);
+  const [checkingAi, setCheckingAi] = useState(false);
+
+  async function handleCheckAi() {
+    setCheckingAi(true);
+    setAiHealth(null);
+    try {
+      const res = await getAiHealth();
+      setAiHealth(res.data);
+    } catch {
+      setAiHealth({ ai_enabled: true, reachable: false, model: null, error: "Network error — API unreachable" });
+    } finally {
+      setCheckingAi(false);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -173,6 +190,37 @@ export function SettingsPage() {
             {settings.ai_enabled ? "Enabled" : "Disabled"}
           </span>
         </SettingRow>
+
+        {settings.ai_enabled && (
+          <SettingRow
+            label="LM Studio connection"
+            description="Test whether the configured LM Studio instance is reachable."
+          >
+            <div style={pageStyles.aiCheckArea}>
+              <button
+                type="button"
+                style={pageStyles.checkBtn}
+                onClick={handleCheckAi}
+                disabled={checkingAi}
+              >
+                {checkingAi ? "Checking…" : "Check connection"}
+              </button>
+              {aiHealth !== null && (
+                <span
+                  style={
+                    aiHealth.reachable
+                      ? pageStyles.aiStatusOk
+                      : pageStyles.aiStatusFail
+                  }
+                >
+                  {aiHealth.reachable
+                    ? `Connected${aiHealth.model ? ` — ${aiHealth.model}` : ""}`
+                    : `Unreachable${aiHealth.error ? `: ${aiHealth.error}` : ""}`}
+                </span>
+              )}
+            </div>
+          </SettingRow>
+        )}
       </section>
 
       {isSaving && <p style={pageStyles.notice}>Saving…</p>}
@@ -207,5 +255,29 @@ const pageStyles = {
     borderRadius: "var(--radius-sm)",
     background: "var(--surface-muted, #f0f0f0)",
     color: "var(--text-tertiary)",
+  },
+  aiCheckArea: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "var(--space-2)",
+    alignItems: "flex-end",
+  },
+  checkBtn: {
+    background: "var(--bg-panel)",
+    border: "1px solid var(--border-subtle)",
+    borderRadius: "var(--radius-sm)",
+    color: "var(--text-secondary)",
+    cursor: "pointer",
+    fontSize: "var(--text-sm)",
+    padding: "var(--space-2) var(--space-4)",
+  } as React.CSSProperties,
+  aiStatusOk: {
+    fontSize: "var(--text-xs)",
+    color: "var(--state-verified)",
+  },
+  aiStatusFail: {
+    fontSize: "var(--text-xs)",
+    color: "var(--state-advisory)",
+    maxWidth: 280,
   },
 } as const;
