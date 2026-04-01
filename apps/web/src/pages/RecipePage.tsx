@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { IngredientList } from "../components/recipe/IngredientList";
 import { MetadataStrip } from "../components/recipe/MetadataStrip";
 import { NoteBlock } from "../components/recipe/NoteBlock";
 import { SourcePanel } from "../components/recipe/SourcePanel";
 import { StepList } from "../components/recipe/StepList";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { DEFAULT_SCALE, SCALE_OPTIONS, scaleServings } from "../lib/scaling";
 import type { ScaleFactor } from "../lib/scaling";
 import { useRecipe } from "../hooks/useRecipe";
 import { useFavorite } from "../hooks/useFavorite";
-import { ApiError, patchRecipe } from "../lib/api";
+import { ApiError, archiveRecipe, unarchiveRecipe, patchRecipe } from "../lib/api";
 import { suggestMetadata, rewriteRecipe, findSimilarRecipes } from "../lib/recipe-ai-api";
 import type { MetadataSuggestionOut, ArchiveRewriteOut, SimilarRecipesOut, SimilarityMatchOut } from "../lib/recipe-ai-api";
 
@@ -365,9 +366,12 @@ const simStyles = {
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useRecipe(slug ?? "");
   const [scale, setScale] = useState<ScaleFactor>(DEFAULT_SCALE);
   const favMutation = useFavorite();
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [archivePending, setArchivePending] = useState(false);
 
   // AI enrichment state
   const [metadata, setMetadata] = useState<MetadataSuggestionOut | null>(null);
@@ -447,6 +451,27 @@ export function RecipePage() {
     }
   }
 
+  async function handleArchiveConfirm() {
+    setArchivePending(true);
+    try {
+      if (recipe.archived) {
+        await unarchiveRecipe(recipe.slug);
+        await queryClient.invalidateQueries({ queryKey: ["recipe", recipe.slug] });
+        await queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      } else {
+        await archiveRecipe(recipe.slug);
+        // After archiving, navigate back to library since recipe is no longer visible
+        await queryClient.invalidateQueries({ queryKey: ["recipes"] });
+        navigate("/library");
+      }
+    } catch {
+      // silent
+    } finally {
+      setArchivePending(false);
+      setShowArchiveConfirm(false);
+    }
+  }
+
   async function handleFindSimilar() {
     setSimilarLoading(true);
     setSimilarError(null);
@@ -470,6 +495,20 @@ export function RecipePage() {
 
   return (
     <div style={styles.page}>
+      <ConfirmDialog
+        open={showArchiveConfirm}
+        title={recipe.archived ? "Unarchive recipe" : "Archive recipe"}
+        message={
+          recipe.archived
+            ? "This recipe will be restored to the library."
+            : "This recipe will be hidden from the library. You can unarchive it later."
+        }
+        confirmLabel={recipe.archived ? "Unarchive" : "Archive"}
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setShowArchiveConfirm(false)}
+        destructive={!recipe.archived}
+      />
+
       {/* Back nav */}
       <Link to="/library" style={styles.backLink} aria-label="Back to library">
         ← Library
@@ -496,6 +535,15 @@ export function RecipePage() {
               aria-pressed={recipe.favorite}
             >
               {recipe.favorite ? "★" : "☆"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowArchiveConfirm(true)}
+              disabled={archivePending}
+              style={styles.archiveBtn}
+              aria-label={recipe.archived ? "Unarchive recipe" : "Archive recipe"}
+            >
+              {recipe.archived ? "Unarchive" : "Archive"}
             </button>
           </div>
         </div>
@@ -653,6 +701,18 @@ const styles = {
     padding: 0,
     lineHeight: 1,
     transition: "color var(--transition-fast)",
+  } as React.CSSProperties,
+  archiveBtn: {
+    background: "none",
+    border: "1px solid var(--border-subtle)",
+    borderRadius: "var(--radius-sm)",
+    color: "var(--text-tertiary)",
+    cursor: "pointer",
+    fontSize: "var(--text-xs)",
+    letterSpacing: "var(--tracking-wide)",
+    padding: "2px var(--space-2)",
+    textTransform: "uppercase" as const,
+    transition: "var(--transition-fast)",
   } as React.CSSProperties,
   description: {
     fontSize: "var(--text-base)",

@@ -197,6 +197,26 @@ def get_recipe(db: Session, id_or_slug: str) -> Recipe | None:
     return recipe
 
 
+def ingredient_family_counts(db: Session) -> list[dict]:
+    """Return ingredient families with recipe counts, sorted by count desc.
+
+    Uses json_each() to expand the ingredient_families JSON array on each recipe.
+    Only counts non-archived recipes.
+    """
+    rows = db.execute(
+        text(
+            "SELECT jf.value AS family, COUNT(*) AS count "
+            "FROM recipes, json_each(recipes.ingredient_families) AS jf "
+            "WHERE recipes.archived = 0 "
+            "  AND recipes.ingredient_families IS NOT NULL "
+            "  AND recipes.ingredient_families != 'null' "
+            "GROUP BY jf.value "
+            "ORDER BY count DESC, jf.value ASC"
+        )
+    ).fetchall()
+    return [{"family": row[0], "count": row[1]} for row in rows]
+
+
 def list_recipes(
     db: Session,
     q: str | None = None,
@@ -211,6 +231,7 @@ def list_recipes(
     sector: str | None = None,
     operational_class: str | None = None,
     heat_window: str | None = None,
+    ingredient_family: str | None = None,
     sort: str = "updated_at_desc",
     limit: int = 50,
     offset: int = 0,
@@ -261,6 +282,18 @@ def list_recipes(
         query = query.filter(Recipe.operational_class == operational_class)
     if heat_window:
         query = query.filter(Recipe.heat_window == heat_window)
+    if ingredient_family:
+        query = query.filter(
+            Recipe.id.in_(
+                db.execute(
+                    text(
+                        "SELECT recipe_id FROM recipes, json_each(recipes.ingredient_families) AS jf "
+                        "WHERE jf.value = :fam"
+                    ),
+                    {"fam": ingredient_family},
+                ).scalars().all()
+            )
+        )
 
     total = query.count()
 

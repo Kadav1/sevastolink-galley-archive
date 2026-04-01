@@ -99,6 +99,7 @@ export interface RecipeListParams {
   technique_family?: string;
   complexity?: string;
   time_class?: string;
+  ingredient_family?: string;
   sort?: string;
   limit?: number;
   offset?: number;

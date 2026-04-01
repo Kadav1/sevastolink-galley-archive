@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  DISH_ROLE_FILTER_OPTIONS,
+  CUISINE_FILTER_OPTIONS,
+  TECHNIQUE_FILTER_OPTIONS,
+} from "@galley/shared-taxonomy";
 import { apiFetch } from "../lib/api";
 import { useSettings } from "../hooks/useSettings";
 import type { VerificationState } from "../types/recipe";
@@ -223,22 +228,9 @@ const addBtnStyle: React.CSSProperties = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-const DISH_ROLE_OPTIONS = [
-  "", "Breakfast", "Lunch", "Dinner", "Side", "Starter", "Dessert",
-  "Snack", "Pantry Staple", "Sauce / Condiment", "Bread", "Drink",
-];
-
-const CUISINE_OPTIONS = [
-  "", "British", "French", "Italian", "Spanish", "Greek", "Turkish",
-  "Levantine", "North African", "West African", "South Asian",
-  "East Asian", "South-East Asian", "Japanese", "Chinese", "Korean",
-  "Mexican", "American", "Middle Eastern", "Global / Mixed",
-];
-
-const TECHNIQUE_OPTIONS = [
-  "", "Roast", "Braise", "Simmer", "Fry", "Grill", "Bake",
-  "Steam", "Cure / Preserve", "Raw / No-Cook", "Ferment",
-];
+const DISH_ROLE_OPTIONS = ["", ...DISH_ROLE_FILTER_OPTIONS];
+const CUISINE_OPTIONS = ["", ...CUISINE_FILTER_OPTIONS];
+const TECHNIQUE_OPTIONS = ["", ...TECHNIQUE_FILTER_OPTIONS];
 
 const SOURCE_TYPE_OPTIONS = [
   { value: "Manual", label: "Manual" },

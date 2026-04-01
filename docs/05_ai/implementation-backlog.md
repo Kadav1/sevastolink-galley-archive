@@ -50,7 +50,7 @@ Still missing:
 | P1 | Intake review and evaluation UX | Normalize exists in web flow, evaluation is API-only | Review-centered intake AI surface |
 | P1 | Archive enrichment UX | Metadata and rewrite exist as endpoints | Real enrichment flow on recipe pages or AI tools area |
 | P1 | Dedicated AI tools area | AI is embedded, not routed as its own area | Honest optional AI route group |
-| P2 | AI job visibility decision | `ai_jobs` table exists, no surfaced resource | Explicit job history API/UI or explicit non-goal |
+| P2 | AI job visibility decision | **Done** — decided internal infrastructure, not a surfaced resource (see `implemented-ai.md §4.4`) | Explicit architectural decision recorded |
 | P2 | LM Studio diagnostics and degraded-mode visibility | Errors surface inline, ops visibility is thin | Clearer local AI health and troubleshooting flow |
 | P3 | Retrieval-assistance productization | Similarity and pantry endpoints exist | Stronger user-facing retrieval assistance if still worthwhile |
 

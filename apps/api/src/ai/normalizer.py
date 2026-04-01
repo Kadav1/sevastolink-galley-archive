@@ -31,20 +31,49 @@ from src.schemas.recipe import IngredientIn, StepIn
 # ── Taxonomy vocabulary ────────────────────────────────────────────────────────
 
 DISH_ROLES = [
-    "Breakfast", "Lunch", "Dinner", "Side", "Starter", "Dessert",
-    "Snack", "Pantry Staple", "Sauce / Condiment", "Bread", "Drink",
+    "Breakfast", "Brunch", "Snack", "Starter", "Soup", "Salad", "Side", "Main",
+    "Shared Plate", "Dessert", "Bread", "Dough", "Sauce", "Condiment", "Drink",
+    "Preserve", "Pantry Staple", "Component", "Confectionery", "Street Food",
 ]
 
 PRIMARY_CUISINES = [
-    "British", "French", "Italian", "Spanish", "Greek", "Turkish",
-    "Levantine", "North African", "West African", "South Asian",
-    "East Asian", "South-East Asian", "Japanese", "Chinese", "Korean",
-    "Mexican", "American", "Middle Eastern", "Global / Mixed",
+    # Europe
+    "Italian", "French", "Spanish", "Catalan", "Portuguese", "Greek", "Turkish",
+    "British", "Irish", "Scottish", "Nordic", "Swedish", "Norwegian", "Danish",
+    "Finnish", "German", "Austrian", "Swiss", "Dutch", "Belgian",
+    "Eastern European", "Polish", "Hungarian", "Czech", "Romanian", "Russian",
+    "Georgian", "Armenian", "Ukrainian",
+    # Middle East & North Africa
+    "Levantine", "Lebanese", "Syrian", "Palestinian", "Israeli", "Egyptian",
+    "Moroccan", "Tunisian", "Algerian", "Libyan", "Persian", "Iraqi", "Yemeni",
+    # Sub-Saharan Africa
+    "Ethiopian", "Eritrean", "West African", "Nigerian", "Ghanaian",
+    "Senegalese", "East African", "Kenyan", "South African", "Zimbabwean",
+    # South Asia
+    "Indian", "North Indian", "South Indian", "Pakistani", "Bangladeshi",
+    "Sri Lankan", "Nepali",
+    # Southeast Asia
+    "Thai", "Vietnamese", "Cambodian", "Laotian", "Filipino", "Indonesian",
+    "Malaysian", "Singaporean", "Burmese",
+    # East Asia
+    "Chinese", "Cantonese", "Sichuan", "Shanghainese", "Taiwanese",
+    "Japanese", "Korean", "Mongolian",
+    # Central Asia & Caucasus
+    "Uzbek", "Kazakh", "Azerbaijani", "Caucasian",
+    # Americas
+    "Mexican", "Tex-Mex", "Oaxacan", "Central American", "Guatemalan",
+    "Peruvian", "Colombian", "Venezuelan", "Brazilian", "Argentinian",
+    "Chilean", "American", "American Southern", "American Midwest",
+    "Cajun / Creole", "Caribbean", "Jamaican", "Cuban",
+    # Cross-cultural
+    "Fusion", "Global / Mixed",
 ]
 
 TECHNIQUE_FAMILIES = [
-    "Roast", "Braise", "Simmer", "Fry", "Grill", "Bake",
-    "Steam", "Cure / Preserve", "Raw / No-Cook", "Ferment",
+    "Raw", "Assemble", "Marinate", "Cure", "Ferment", "Pickle", "Smoke",
+    "Confit", "Poach", "Steam", "Boil", "Simmer", "Braise", "Stew",
+    "Slow Cook", "Pressure Cook", "Sear", "Fry", "Stir-Fry", "Deep Fry",
+    "Roast", "Bake", "Grill", "Emulsify", "Blend", "Dehydrate", "Multi-Stage",
 ]
 
 # ── Contract constants ─────────────────────────────────────────────────────────

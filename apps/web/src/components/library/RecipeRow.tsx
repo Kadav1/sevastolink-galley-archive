@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { RecipeSummary } from "../../types/recipe";
 import { useFavorite } from "../../hooks/useFavorite";
+import { Badge } from "../ui/Badge";
 import { StatusBadge } from "../ui/StatusBadge";
 
 interface Props {
@@ -80,6 +81,9 @@ export function RecipeRow({ recipe }: Props) {
         {rightMeta.map((m) => (
           <span key={m} style={styles.time}>{m}</span>
         ))}
+        {recipe.complexity && (
+          <Badge variant="muted">{recipe.complexity}</Badge>
+        )}
         <StatusBadge state={recipe.verification_state} />
       </div>
     </li>

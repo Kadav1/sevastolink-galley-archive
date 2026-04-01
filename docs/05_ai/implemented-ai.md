@@ -198,6 +198,24 @@ Implemented today:
   * pantry
   * similarity
 
+### 4.4 AI jobs table — internal infrastructure decision
+
+**Decision (Session 42):** `ai_jobs` is internal infrastructure. It will not be surfaced as a first-class API or UI resource.
+
+Rationale:
+
+* This is a single-user personal archive. There is no stakeholder who needs to monitor or audit a job-history feed.
+* Every AI operation is user-initiated and shows its result inline in the originating workflow (intake, recipe detail, pantry). The result is immediately visible; a separate history surface adds no product value.
+* Exposing `ai_jobs` as a resource would create surface area to maintain without improving any real user workflow.
+
+Current state:
+
+* `ai_jobs` rows are written as audit records whenever an AI endpoint runs.
+* No API route reads them. No UI surface exposes them.
+* This is correct and intentional.
+
+If this product ever becomes multi-user or a background AI enrichment queue is added, revisiting this decision is appropriate. For the current single-user local-archive model, the decision is to keep `ai_jobs` internal.
+
 ### 4.2 LM Studio integration
 
 Implemented today:
@@ -228,7 +246,7 @@ The broader AI docs describe more AI-facing product behavior than the current ro
 Current gaps include:
 
 * no dedicated AI tools route group
-* no surfaced `ai_jobs` resource even though the table exists
+* `ai_jobs` is intentionally internal infrastructure (see §4.4)
 * no standalone routed surfaces dedicated solely to rewrite, metadata suggestion, or similarity beyond the Recipe Detail AI Tools section
 * no AI-backed retrieval assistant beyond direct endpoint capability
 

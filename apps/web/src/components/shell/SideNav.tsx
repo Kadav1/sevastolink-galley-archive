@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
+import { Icon, type IconName } from "../ui/Icon";
 
 type NavItem = {
   label: string;
   to: string;
+  icon: IconName;
 };
 
 type SideNavProps = {
@@ -13,10 +15,10 @@ type SideNavProps = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Library", to: "/library" },
-  { label: "Pantry", to: "/pantry" },
-  { label: "Intake", to: "/intake" },
-  { label: "Settings", to: "/settings" },
+  { label: "Library", to: "/library", icon: "library" },
+  { label: "Pantry", to: "/pantry", icon: "pantry" },
+  { label: "Intake", to: "/intake", icon: "intake" },
+  { label: "Settings", to: "/settings", icon: "settings" },
 ];
 
 export function SideNav({ overlay = false, onClose }: SideNavProps) {
@@ -33,7 +35,7 @@ export function SideNav({ overlay = false, onClose }: SideNavProps) {
             onClick={onClose}
             aria-label="Close navigation"
           >
-            ✕
+            <Icon name="close" size={16} />
           </button>
         )}
       </div>
@@ -49,6 +51,7 @@ export function SideNav({ overlay = false, onClose }: SideNavProps) {
                 ...(isActive ? styles.linkActive : {}),
               })}
             >
+              <Icon name={item.icon} size={15} />
               {item.label}
             </NavLink>
           </li>
@@ -111,7 +114,9 @@ const styles = {
     padding: "0 var(--space-3)",
   },
   link: {
-    display: "block",
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--space-2)",
     padding: "var(--space-2) var(--space-3)",
     borderRadius: "var(--radius-sm)",
     fontSize: "var(--text-sm)",

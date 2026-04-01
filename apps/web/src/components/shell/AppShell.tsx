@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { SideNav } from "./SideNav";
 import { useIsDesktop } from "../../hooks/useBreakpoint";
+import { Icon } from "../ui/Icon";
 
 /** Height of the fixed mobile top bar in px. */
 const TOPBAR_HEIGHT = 52;
@@ -26,9 +27,7 @@ export function AppShell() {
             aria-label="Open navigation"
             aria-expanded={navOpen}
           >
-            <span style={styles.hLine} />
-            <span style={styles.hLine} />
-            <span style={styles.hLine} />
+            <Icon name="menu" size={20} />
           </button>
         </header>
       )}
@@ -103,21 +102,14 @@ const styles = {
   },
   hamburger: {
     display: "flex",
-    flexDirection: "column" as const,
+    alignItems: "center",
     justifyContent: "center",
-    gap: 5,
     background: "none",
     border: "none",
     cursor: "pointer",
+    color: "var(--text-secondary)",
     padding: "var(--space-2)",
     borderRadius: "var(--radius-sm)",
-  },
-  hLine: {
-    display: "block",
-    width: 20,
-    height: 2,
-    background: "var(--text-secondary)",
-    borderRadius: 1,
   },
 
   // ── Backdrop ──────────────────────────────────────────────────────────────

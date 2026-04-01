@@ -9,6 +9,7 @@ from src.config.settings import settings
 from src.db.database import get_db
 from src.schemas.ai_outputs import ArchiveRewriteOut, MetadataSuggestionOut, SimilarityIn, SimilarRecipesOut
 from src.schemas.common import ApiResponse, ListMeta, ListResponse, error_detail
+from src.schemas.ingredient_families import IngredientFamilyCount, IngredientFamiliesOut
 from src.schemas.recipe import (
     RecipeArchiveResult,
     RecipeCreate,
@@ -32,6 +33,18 @@ def _summary(recipe) -> RecipeSummaryOut:
 
 # ── List ──────────────────────────────────────────────────────────────────────
 
+@router.get("/ingredient-families", response_model=ApiResponse[IngredientFamiliesOut])
+async def list_ingredient_families(db: Session = Depends(get_db)):
+    """Return ingredient family facet counts across the non-archived archive."""
+    rows = recipe_service.ingredient_family_counts(db)
+    return ApiResponse(
+        data=IngredientFamiliesOut(
+            families=[IngredientFamilyCount(**r) for r in rows],
+            total=len(rows),
+        )
+    )
+
+
 @router.get("", response_model=ListResponse[RecipeSummaryOut])
 async def list_recipes(
     q: str | None = Query(None),
@@ -46,6 +59,7 @@ async def list_recipes(
     sector: str | None = Query(None),
     operational_class: str | None = Query(None),
     heat_window: str | None = Query(None),
+    ingredient_family: str | None = Query(None),
     sort: str = Query("updated_at_desc"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -65,6 +79,7 @@ async def list_recipes(
         sector=sector,
         operational_class=operational_class,
         heat_window=heat_window,
+        ingredient_family=ingredient_family,
         sort=sort,
         limit=limit,
         offset=offset,

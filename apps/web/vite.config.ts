@@ -9,6 +9,9 @@ export default defineConfig({
       "@galley/shared-ui-tokens": fileURLToPath(
         new URL("../../packages/shared-ui-tokens/src/index.ts", import.meta.url)
       ),
+      "@galley/shared-taxonomy": fileURLToPath(
+        new URL("../../packages/shared-taxonomy/src/index.ts", import.meta.url)
+      ),
     },
   },
   server: {

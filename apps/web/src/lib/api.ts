@@ -91,3 +91,19 @@ export async function patchRecipe(
     body: JSON.stringify(patch),
   });
 }
+
+export async function archiveRecipe(
+  idOrSlug: string,
+): Promise<ApiResponse<{ archived: boolean }>> {
+  return apiFetch<ApiResponse<{ archived: boolean }>>(`/recipes/${idOrSlug}/archive`, {
+    method: "POST",
+  });
+}
+
+export async function unarchiveRecipe(
+  idOrSlug: string,
+): Promise<ApiResponse<{ archived: boolean }>> {
+  return apiFetch<ApiResponse<{ archived: boolean }>>(`/recipes/${idOrSlug}/unarchive`, {
+    method: "POST",
+  });
+}

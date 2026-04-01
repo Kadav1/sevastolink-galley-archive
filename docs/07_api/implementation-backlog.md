@@ -50,7 +50,7 @@ Still missing:
 | P1 | Search resource decision | Search exists only through `/recipes` list behavior | Either dedicated `/search` resource or explicit decision not to create one |
 | P1 | Settings API | **Done** — `GET/PATCH /api/v1/settings` mounted | Functional settings routes |
 | P2 | Media assets API | Source attach, recipe cover attach, metadata GET, file serve — all implemented | No outstanding P2 media items |
-| P2 | AI jobs API | AI capability exists, `ai_jobs` table exists, API absent | First-class AI job visibility if needed |
+| P2 | AI jobs API | **Done** — decided internal infrastructure, no API surface (see `docs/05_ai/implemented-ai.md §4.4`) | Explicit architectural decision recorded |
 | P2 | Backup/system API decision | Shell workflows exist, API absent | Explicit surfaced operator resources or documented operator-only choice |
 | P3 | Full target-state search facets | Current filters cover main taxonomy dimensions | Ingredient-family and multi-value filters if still desired |
 

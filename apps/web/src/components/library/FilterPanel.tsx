@@ -1,6 +1,14 @@
+import {
+  DISH_ROLE_FILTER_OPTIONS,
+  CUISINE_FILTER_OPTIONS,
+  TECHNIQUE_FILTER_OPTIONS,
+  COMPLEXITY_OPTIONS,
+  TIME_CLASS_OPTIONS,
+  INGREDIENT_FAMILY_FILTER_OPTIONS,
+} from "@galley/shared-taxonomy";
 import type { VerificationState } from "../../types/recipe";
 
-type FilterKey = "verification_state" | "dish_role" | "primary_cuisine" | "technique_family" | "complexity" | "time_class" | "favorite";
+type FilterKey = "verification_state" | "dish_role" | "primary_cuisine" | "technique_family" | "complexity" | "time_class" | "ingredient_family" | "favorite";
 
 export interface ActiveFilters {
   verification_state?: VerificationState;
@@ -9,6 +17,7 @@ export interface ActiveFilters {
   technique_family?: string;
   complexity?: string;
   time_class?: string;
+  ingredient_family?: string;
   favorite?: boolean;
 }
 
@@ -19,37 +28,9 @@ interface Props {
 
 const VERIFICATION_OPTIONS: VerificationState[] = ["Verified", "Unverified", "Draft", "Archived"];
 
-// These are static option lists for v1 — populated from known taxonomy values.
-// In a later version, these could be derived from facet counts from the API.
-const DISH_ROLE_OPTIONS = [
-  "Breakfast", "Lunch", "Dinner", "Side", "Starter", "Dessert",
-  "Snack", "Pantry Staple", "Sauce / Condiment", "Bread", "Drink",
-];
-
-const CUISINE_OPTIONS = [
-  "British", "French", "Italian", "Spanish", "Greek", "Turkish",
-  "Levantine", "North African", "West African", "South Asian",
-  "East Asian", "South-East Asian", "Japanese", "Chinese", "Korean",
-  "Mexican", "American", "Middle Eastern", "Global / Mixed",
-];
-
-const TECHNIQUE_OPTIONS = [
-  "Roast", "Braise", "Simmer", "Fry", "Grill", "Bake",
-  "Steam", "Cure / Preserve", "Raw / No-Cook", "Ferment",
-];
-
-// content-taxonomy-spec §3.1
-const COMPLEXITY_OPTIONS = ["Basic", "Intermediate", "Advanced", "Project"];
-
-// content-taxonomy-spec §3.2
-const TIME_CLASS_OPTIONS = [
-  "Under 15 min", "15–30 min", "30–60 min",
-  "1–2 hr", "2–4 hr", "Half Day+", "Multi-Day",
-];
-
 interface FilterGroupProps {
   label: string;
-  options: string[];
+  options: readonly string[];
   value?: string;
   onSelect: (v: string | undefined) => void;
 }
@@ -122,19 +103,19 @@ export function FilterPanel({ filters, onChange }: Props) {
       />
       <FilterGroup
         label="Dish Role"
-        options={DISH_ROLE_OPTIONS}
+        options={DISH_ROLE_FILTER_OPTIONS}
         value={filters.dish_role}
         onSelect={(v) => set("dish_role", v)}
       />
       <FilterGroup
         label="Cuisine"
-        options={CUISINE_OPTIONS}
+        options={CUISINE_FILTER_OPTIONS}
         value={filters.primary_cuisine}
         onSelect={(v) => set("primary_cuisine", v)}
       />
       <FilterGroup
         label="Technique"
-        options={TECHNIQUE_OPTIONS}
+        options={TECHNIQUE_FILTER_OPTIONS}
         value={filters.technique_family}
         onSelect={(v) => set("technique_family", v)}
       />
@@ -149,6 +130,12 @@ export function FilterPanel({ filters, onChange }: Props) {
         options={TIME_CLASS_OPTIONS}
         value={filters.time_class}
         onSelect={(v) => set("time_class", v)}
+      />
+      <FilterGroup
+        label="Ingredient"
+        options={INGREDIENT_FAMILY_FILTER_OPTIONS}
+        value={filters.ingredient_family}
+        onSelect={(v) => set("ingredient_family", v)}
       />
     </aside>
   );

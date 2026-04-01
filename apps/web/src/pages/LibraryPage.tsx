@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { FilterPanel, type ActiveFilters } from "../components/library/FilterPanel";
 import { RecipeRow } from "../components/library/RecipeRow";
 import { SearchBar } from "../components/library/SearchBar";
+import { Chip } from "../components/ui/Chip";
+import { useIsDesktop } from "../hooks/useBreakpoint";
 import { useRecipes } from "../hooks/useRecipes";
 import { useSettings } from "../hooks/useSettings";
 import type { RecipeListParams, VerificationState } from "../types/recipe";
@@ -18,6 +20,7 @@ function buildParams(q: string, filters: ActiveFilters, offset: number, sort: st
   if (filters.technique_family) params.technique_family = filters.technique_family;
   if (filters.complexity) params.complexity = filters.complexity;
   if (filters.time_class) params.time_class = filters.time_class;
+  if (filters.ingredient_family) params.ingredient_family = filters.ingredient_family;
   if (filters.favorite) params.favorite = true;
   return params;
 }
@@ -30,13 +33,31 @@ function filtersFromSearch(params: URLSearchParams): ActiveFilters {
     technique_family: params.get("technique_family") ?? undefined,
     complexity: params.get("complexity") ?? undefined,
     time_class: params.get("time_class") ?? undefined,
+    ingredient_family: params.get("ingredient_family") ?? undefined,
     favorite: params.get("favorite") === "true" ? true : undefined,
   };
+}
+
+/** Returns the active filters as a flat list of { label, key } for chip display. */
+function activeChipList(filters: ActiveFilters): { label: string; key: keyof ActiveFilters }[] {
+  const chips: { label: string; key: keyof ActiveFilters }[] = [];
+  if (filters.favorite)             chips.push({ label: "★ Favourites", key: "favorite" });
+  if (filters.verification_state)   chips.push({ label: filters.verification_state, key: "verification_state" });
+  if (filters.dish_role)            chips.push({ label: filters.dish_role, key: "dish_role" });
+  if (filters.primary_cuisine)      chips.push({ label: filters.primary_cuisine, key: "primary_cuisine" });
+  if (filters.technique_family)     chips.push({ label: filters.technique_family, key: "technique_family" });
+  if (filters.complexity)           chips.push({ label: filters.complexity, key: "complexity" });
+  if (filters.time_class)           chips.push({ label: filters.time_class, key: "time_class" });
+  if (filters.ingredient_family)    chips.push({ label: filters.ingredient_family, key: "ingredient_family" });
+  return chips;
 }
 
 export function LibraryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const isDesktop = useIsDesktop();
+
   const filters = filtersFromSearch(searchParams);
   const offset = Math.max(0, parseInt(searchParams.get("offset") ?? "0", 10) || 0);
 
@@ -52,7 +73,7 @@ export function LibraryPage() {
       const next = new URLSearchParams(prev);
       if (value) next.set("q", value);
       else next.delete("q");
-      next.delete("offset"); // reset page on new search
+      next.delete("offset");
       return next;
     }, { replace: true });
   }, [setSearchParams]);
@@ -62,14 +83,14 @@ export function LibraryPage() {
       const p = new URLSearchParams(prev);
       const keys: (keyof ActiveFilters)[] = [
         "verification_state", "dish_role", "primary_cuisine", "technique_family",
-        "complexity", "time_class", "favorite",
+        "complexity", "time_class", "ingredient_family", "favorite",
       ];
       for (const key of keys) {
         const val = next[key];
         if (val !== undefined && val !== false) p.set(key, String(val));
         else p.delete(key);
       }
-      p.delete("offset"); // reset page on filter change
+      p.delete("offset");
       return p;
     }, { replace: true });
   }, [setSearchParams]);
@@ -83,15 +104,21 @@ export function LibraryPage() {
     }, { replace: true });
   }, [setSearchParams]);
 
+  function removeFilter(key: keyof ActiveFilters) {
+    handleFilters({ ...filters, [key]: undefined });
+  }
+
   const recipes = data?.data ?? [];
   const total = data?.meta.total ?? 0;
   const hasPrev = offset > 0;
   const hasNext = offset + PAGE_LIMIT < total;
   const page = Math.floor(offset / PAGE_LIMIT) + 1;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+  const activeChips = activeChipList(filters);
 
   return (
     <div style={styles.page}>
+      {/* ── Header ── */}
       <header style={styles.header}>
         <h1 style={styles.title}>Library</h1>
         {!isLoading && (
@@ -101,12 +128,52 @@ export function LibraryPage() {
         )}
       </header>
 
+      {/* ── Search ── */}
       <div style={styles.searchRow}>
         <SearchBar value={q} onChange={handleSearch} />
       </div>
 
-      <div style={styles.body}>
-        <FilterPanel filters={filters} onChange={handleFilters} />
+      {/* ── Active filter chips + mobile filter toggle ── */}
+      {(activeChips.length > 0 || !isDesktop) && (
+        <div style={styles.filterMeta}>
+          {!isDesktop && (
+            <button
+              type="button"
+              style={{
+                ...styles.filterToggleBtn,
+                ...(filtersExpanded ? styles.filterToggleBtnActive : {}),
+              }}
+              onClick={() => setFiltersExpanded((v) => !v)}
+            >
+              Filters{activeChips.length > 0 ? ` (${activeChips.length})` : ""}
+            </button>
+          )}
+          {activeChips.length > 0 && (
+            <div style={styles.activeChips}>
+              {activeChips.map(({ label, key }) => (
+                <Chip
+                  key={key}
+                  active
+                  onRemove={() => removeFilter(key)}
+                >
+                  {label}
+                </Chip>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Body: filter sidebar + list column ── */}
+      <div
+        style={{
+          ...styles.body,
+          flexDirection: isDesktop ? "row" : "column",
+        }}
+      >
+        {(isDesktop || filtersExpanded) && (
+          <FilterPanel filters={filters} onChange={handleFilters} />
+        )}
 
         <div style={styles.listColumn}>
           <div style={styles.list} role="list" aria-label="Recipe list">
@@ -118,7 +185,7 @@ export function LibraryPage() {
             )}
             {!isLoading && !isError && recipes.length === 0 && (
               <p style={styles.state}>
-                {q || Object.values(filters).some(Boolean)
+                {q || activeChips.length > 0
                   ? "No recipes match these filters."
                   : "No recipes yet. Use Intake to add the first one."}
               </p>
@@ -185,6 +252,34 @@ const styles = {
   searchRow: {
     width: "100%",
   },
+  filterMeta: {
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--space-3)",
+    flexWrap: "wrap" as const,
+  },
+  filterToggleBtn: {
+    background: "none",
+    border: "1px solid var(--border-subtle)",
+    borderRadius: "var(--radius-sm)",
+    color: "var(--text-secondary)",
+    cursor: "pointer",
+    fontSize: "var(--text-xs)",
+    padding: "var(--space-1) var(--space-3)",
+    letterSpacing: "var(--tracking-wide)",
+    textTransform: "uppercase" as const,
+    fontWeight: 500,
+  } as React.CSSProperties,
+  filterToggleBtnActive: {
+    background: "var(--bg-overlay)",
+    borderColor: "var(--border-primary)",
+    color: "var(--text-primary)",
+  } as React.CSSProperties,
+  activeChips: {
+    display: "flex",
+    flexWrap: "wrap" as const,
+    gap: "var(--space-2)",
+  },
   body: {
     display: "flex",
     gap: "var(--space-8)",
@@ -196,6 +291,7 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     gap: 0,
+    minWidth: 0,
   },
   list: {
     display: "flex",
@@ -234,9 +330,11 @@ const styles = {
   state: {
     color: "var(--text-tertiary)",
     fontSize: "var(--text-sm)",
+    padding: "var(--space-6) var(--space-4)",
   },
   stateError: {
     color: "var(--state-advisory)",
     fontSize: "var(--text-sm)",
+    padding: "var(--space-6) var(--space-4)",
   },
 } as const;

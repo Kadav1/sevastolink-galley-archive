@@ -11,6 +11,9 @@ from src.schemas.ai_outputs import EvaluationOut
 from src.schemas.intake import (
     ApproveIntakeIn,
     ApproveIntakeOut,
+    BatchIntakeIn,
+    BatchIntakeJobError,
+    BatchIntakeOut,
     CandidateIngredientOut,
     CandidateOut,
     CandidateStepOut,
@@ -83,6 +86,41 @@ async def create_intake_job(body: IntakeJobCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(job)
     return ApiResponse(data=IntakeJobOut.from_orm(job))
+
+
+# ── Batch create ──────────────────────────────────────────────────────────────
+
+@router.post("/batch", response_model=ApiResponse[BatchIntakeOut], status_code=status.HTTP_201_CREATED)
+async def batch_create_intake_jobs(body: BatchIntakeIn, db: Session = Depends(get_db)):
+    """Create multiple intake jobs in a single request (max 50).
+
+    Each job is attempted independently. Failures are collected and returned
+    alongside successes — the batch does not abort on a per-item failure.
+    """
+    created: list[IntakeJobOut] = []
+    errors: list[BatchIntakeJobError] = []
+
+    for idx, job_create in enumerate(body.jobs):
+        try:
+            if job_create.intake_type == "paste_text" and not job_create.raw_source_text:
+                raise ValueError("raw_source_text is required for paste_text intake.")
+            job = intake_service.create_intake_job(db, job_create)
+            db.flush()
+            db.refresh(job)
+            created.append(IntakeJobOut.from_orm(job))
+        except Exception as exc:
+            errors.append(BatchIntakeJobError(index=idx, message=str(exc)))
+
+    db.commit()
+
+    result = BatchIntakeOut(
+        created=created,
+        errors=errors,
+        total=len(body.jobs),
+        succeeded=len(created),
+        failed=len(errors),
+    )
+    return ApiResponse(data=result)
 
 
 # ── Get ────────────────────────────────────────────────────────────────────────

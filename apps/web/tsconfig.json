@@ -16,7 +16,8 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@galley/shared-ui-tokens": ["../../packages/shared-ui-tokens/src/index.ts"]
+      "@galley/shared-ui-tokens": ["../../packages/shared-ui-tokens/src/index.ts"],
+      "@galley/shared-taxonomy": ["../../packages/shared-taxonomy/src/index.ts"]
     }
   },
   "include": ["src"]

@@ -1,5 +1,5 @@
-from typing import Literal
-from pydantic import BaseModel
+from typing import Annotated, Literal
+from pydantic import BaseModel, Field
 
 from src.schemas.recipe import (
     IngredientIn,
@@ -137,3 +137,22 @@ class ApproveIntakeIn(BaseModel):
 class ApproveIntakeOut(BaseModel):
     recipe: RecipeSummaryOut
     intake_job_id: str
+
+
+# ── Batch intake ───────────────────────────────────────────────────────────────
+
+class BatchIntakeIn(BaseModel):
+    jobs: Annotated[list[IntakeJobCreate], Field(min_length=1, max_length=50)]
+
+
+class BatchIntakeJobError(BaseModel):
+    index: int
+    message: str
+
+
+class BatchIntakeOut(BaseModel):
+    created: list[IntakeJobOut]
+    errors: list[BatchIntakeJobError]
+    total: int
+    succeeded: int
+    failed: int
