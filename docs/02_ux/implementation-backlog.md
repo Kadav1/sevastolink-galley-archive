@@ -33,6 +33,7 @@ The frontend currently implements:
 * intake hub
 * manual entry flow
 * paste-text intake flow with optional AI normalization
+* first-slice AI retrieval and enrichment surfaces through the pantry workflow and recipe-detail helpers
 * settings placeholder page
 
 The frontend does not yet implement:
@@ -57,6 +58,7 @@ The frontend does not yet implement:
 | P1 | Intake expansion | Manual + paste only | URL import, file intake, review route | `intake-import-ux.md`, `screen-blueprint-pack.md` |
 | P2 | Settings | Placeholder page only | Functional settings landing and sub-pages | `information-architecture.md`, `screen-blueprint-pack.md` |
 | P2 | AI tools area | No routed AI area | Dedicated AI utility surfaces | `information-architecture.md`, `screen-blueprint-pack.md`, `component-inventory.md` |
+| P3 | Storage-guidance surfaces | No first-class storage-guidance product module | Advisory storage-aware retrieval tied to archive and pantry workflows | `information-architecture.md`, `component-inventory.md` |
 | P3 | Shell and navigation refinement | Side nav + main outlet only | Richer shell, context patterns, route hierarchy | `component-inventory.md`, `screen-blueprint-pack.md` |
 | P3 | Component-system completion | Partial real component set | Broader component families from UX docs | `component-inventory.md` |
 
@@ -178,7 +180,7 @@ Primary source docs:
 
 Current state:
 
-* AI exists only as a helper inside paste-text intake
+* AI retrieval and enrichment are already surfaced in a first slice through the pantry workflow and recipe-detail helpers
 * there is no `AI Tools` route or navigation entry
 
 Missing target-state items:
@@ -196,13 +198,46 @@ Likely implementation work:
 * define shared job/result/review UI patterns
 * align route rollout with actually implemented backend prompt consumers
 
+Retrieval note:
+
+* deterministic ingredient-first retrieval and inspiration are already owned by Session 39
+* AI-assisted pantry and similar-recipe surfacing are already implemented in a first slice and should now be treated as refinement work rather than greenfield capability
+
 Primary source docs:
 
 * `docs/02_ux/information-architecture.md`
 * `docs/02_ux/screen-blueprint-pack.md`
 * `docs/02_ux/component-inventory.md`
 
-### 4.6 P3: Shell and navigation refinement
+### 4.6 P3: Storage-guidance surfaces
+
+Current state:
+
+* storage-related metadata exists, but there is no first-class storage-guidance module in the UX
+* archive and pantry flows do not yet surface use-soon or caution modules as a coherent product layer
+
+New target-state proposal:
+
+* storage-guidance surfaces tied to recipe detail and pantry workflows
+* advisory use-soon / caution modules
+* leftovers and preservation-oriented retrieval framing
+
+Likely implementation work:
+
+* define where storage guidance belongs in recipe detail and ingredient-first retrieval
+* extract advisory card and metadata-rail patterns rather than inventing a separate sub-app
+* keep guidance explicitly advisory and archive-connected
+
+Planning note:
+
+* these surfaces are not yet owned by an existing implementation session and should remain proposal-level until a dedicated plan or session exists
+
+Primary source docs:
+
+* `docs/02_ux/information-architecture.md`
+* `docs/02_ux/component-inventory.md`
+
+### 4.7 P3: Shell and navigation refinement
 
 Current state:
 
@@ -229,7 +264,7 @@ Primary source docs:
 * `docs/02_ux/component-inventory.md`
 * `docs/02_ux/screen-blueprint-pack.md`
 
-### 4.7 P3: Component-system completion
+### 4.8 P3: Component-system completion
 
 Current state:
 
