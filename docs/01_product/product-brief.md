@@ -245,6 +245,7 @@ v2 builds on a stable v1. Items here are anticipated but not committed.
 * Recipe-level nutrition reference metadata
 * Dietary and allergen cues on recipe records
 * Retrieval support based on nutrition-related metadata later
+
 ### 6.10 Meal planning (light)
 
 * Planned date field on recipes
