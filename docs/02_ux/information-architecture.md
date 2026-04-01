@@ -168,7 +168,7 @@ Galley Archive
 │   ├── Suggest Metadata
 │   ├── Rewrite Recipe
 │   ├── Compare Similar
-│   └── Cook from Ingredients
+│   └── Ingredient Retrieval Assist
 └── Settings
     ├── Archive Settings
     ├── UI Preferences
@@ -239,7 +239,7 @@ Suggested route model:
 /recipe/:slug/edit      → edit recipe
 /intake                 → intake hub
 /intake/manual          → manual creation
-/intake/text            → paste raw text
+/intake/paste           → paste raw text
 /intake/url             → URL import
 /intake/file            → image/PDF import
 /intake/review/:id      → review normalized intake result
@@ -247,7 +247,7 @@ Suggested route model:
 /ai/normalize           → normalize recipe flow
 /ai/rewrite             → rewrite recipe flow
 /ai/suggest-metadata    → metadata enrichment flow
-/ai/pantry              → cook from ingredients flow
+/ai/pantry              → optional AI-assisted ingredient retrieval entry
 /settings               → settings landing
 /settings/archive       → archive/storage settings
 /settings/ui            → UI preferences
@@ -386,6 +386,7 @@ Primary tools
 	•	pantry suggestion
 
 AI tools should always feel subordinate to the archive.
+Ingredient-driven AI assistance should hand the user back into archive retrieval rather than behaving like a separate pantry product.
 
 ⸻
 
@@ -422,7 +423,7 @@ This is one of the most important flows and must be extremely smooth.
 8.2 Discover something based on ingredients
 
 Flow:
-	1.	Open Library or AI Tools
+	1.	Open Library
 	2.	Search/filter by ingredient families or pantry input
 	3.	Review matching recipes
 	4.	Open candidate recipes
@@ -430,6 +431,7 @@ Flow:
 	6.	Cook or save to favorites
 
 Later semantic/AI support can enrich this, but the structured system should support it already.
+Optional AI-assisted ingredient retrieval may exist as a secondary helper entry, but the archive should remain the primary discovery surface.
 
 The same flow may later include use-soon and leftovers-aware framing, but it should still feel like archive retrieval rather than recommendation-feed behavior.
 
