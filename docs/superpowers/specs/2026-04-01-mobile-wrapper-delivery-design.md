@@ -198,7 +198,103 @@ Deliberately out of scope for this wrapper phase:
 
 ---
 
-## 7. Build And Delivery Workflow
+## 7. Android Design And Quality Guidance
+
+The wrapper is still an Android product surface and should follow Android design and quality guidance rather than behaving like a generic packaged website.
+
+### 7.1 Design philosophy for this wrapper
+
+Google's current Android guidance emphasizes a few principles that are directly relevant here:
+
+* adaptive layouts should be treated as a first-class requirement rather than a later polish pass
+* navigation should feel predictable and aligned with Android back behavior
+* modern Android apps should support edge-to-edge layouts while respecting system insets and gesture areas
+* settings should be limited, well-grouped, and should respect system behavior where possible
+* app quality should be judged across user value, user experience, technical quality, and privacy and security rather than only whether the APK launches
+
+For Galley, that means the wrapper should behave like a high-quality Android surface for an archive and kitchen tool, not just a browser tab inside an app shell.
+
+### 7.2 Adaptive layout requirement
+
+Android now treats adaptive design across phones, tablets, foldables, ChromeOS, and multi-window environments as a core quality concern.
+
+For this wrapper, the target should be:
+
+* `Adaptive ready` minimum for the entire wrapper
+* selective movement toward `Adaptive optimized` for kitchen-critical routes
+
+Practical implications for Galley:
+
+* the wrapper must be tested in portrait and landscape
+* kitchen mode and recipe detail must remain readable on both compact phones and larger tablet surfaces
+* tablet and foldable layouts should use available space intentionally rather than merely scaling up phone layouts
+* multi-window and split-screen should not break core reading and cooking flows
+
+The wrapper should especially respect the product's existing kitchen-tablet use case rather than optimizing only for narrow phone screens.
+
+### 7.3 Navigation and back behavior
+
+Android guidance treats navigation as a consistency and predictability issue, not just a routing problem.
+
+For this wrapper:
+
+* the Android back action must map cleanly to the web app's route history
+* back behavior must not trap the user in modal or shell states unexpectedly
+* route transitions should preserve clear mental models of where the user is going next
+* any custom handling must avoid fighting Android predictive back expectations
+
+This is particularly important because a wrapped web app can easily feel non-native if back navigation is inconsistent.
+
+### 7.4 Edge-to-edge and inset safety
+
+Current Android guidance expects modern apps to support edge-to-edge layouts while keeping critical content clear of system bars, gesture areas, and display cutouts.
+
+For this wrapper:
+
+* backgrounds and scrolling surfaces may extend edge-to-edge
+* tappable controls, step controls, and other critical kitchen actions must remain inset from gesture-conflict areas
+* top-level layout review is required for status bar, navigation bar, and cutout overlap
+* phone and tablet verification should include gesture navigation and three-button navigation where relevant
+
+This matters for Galley because kitchen use involves fast glances and low-friction interaction; controls placed too close to system gesture zones will degrade usability.
+
+### 7.5 Settings discipline
+
+Android settings guidance is relevant even for a wrapper application.
+
+The wrapper should:
+
+* keep app-specific settings limited to behavior the wrapper truly owns
+* avoid duplicating system settings unnecessarily
+* use clear language and manageable grouping
+* keep frequent actions in context rather than burying them in settings
+
+For example, Android shell concerns such as backend endpoint selection for development may belong in debug-only configuration, while normal product settings should remain owned by the Galley application itself.
+
+### 7.6 Material and Android visual alignment
+
+Google's design guidance points to Material 3 and Android UI conventions as the baseline for a modern Android experience.
+
+This design does not require a visual rewrite of Galley into Material components. It does require:
+
+* respecting Android system bars, safe areas, and navigation conventions
+* ensuring launcher assets, splash behavior, and shell-level UI feel coherent with Android norms
+* avoiding obvious "desktop web app in a phone frame" failure modes where Android chrome and Galley chrome fight each other
+
+### 7.7 Quality standard for wrapper acceptance
+
+Google's Android quality model should be used as a review lens for the wrapper:
+
+* `Core value`: the wrapper must improve practical access to the archive, especially in kitchen and mobile contexts
+* `User experience`: the wrapper must feel predictable, readable, and touch-safe on Android devices
+* `Technical quality`: startup, routing, resizing, uploads, and shell integration must be stable across supported devices
+* `Privacy and security`: backend access, transport security, and device permissions must be explicit and defensible
+
+This gives the wrapper a stronger acceptance standard than "the site opens inside an app shell".
+
+---
+
+## 8. Build And Delivery Workflow
 
 The wrapper should be built from a production artifact of this repository's web application rather than from a copied working tree.
 
@@ -211,12 +307,12 @@ Recommended flow:
 
 There are two reasonable ways to supply the web artifact:
 
-### 7.1 Archive-based handoff
+### 8.1 Archive-based handoff
 
 * this repository produces a versioned archive of the web build
 * the mobile repository imports that archive during wrapper release preparation
 
-### 7.2 Git-based handoff
+### 8.2 Git-based handoff
 
 * the mobile repository references this repository at a known commit or tag
 * the mobile repository runs a scripted build and import step against that source
@@ -235,11 +331,11 @@ This traceability is required so that a shipped mobile binary can always be mapp
 
 ---
 
-## 8. Constraints, Risks, And Verification
+## 9. Constraints, Risks, And Verification
 
 This wrapper approach has meaningful benefits, but its boundaries should be stated plainly.
 
-### 8.1 Constraints
+### 9.1 Constraints
 
 Primary constraints:
 
@@ -248,7 +344,7 @@ Primary constraints:
 * mobile UX quality depends on how well the current routes behave on phone and tablet screens
 * Android-native integrations remain shallow unless additional Capacitor plugins are introduced
 
-### 8.2 Repository-specific risks
+### 9.2 Repository-specific risks
 
 Known risks in the current codebase:
 
@@ -256,25 +352,45 @@ Known risks in the current codebase:
 * backend CORS is currently tuned for local browser development origins rather than Android delivery
 * Android file, camera, and upload flows may behave differently than desktop-browser assumptions
 * if the backend is not exposed over stable HTTPS, production Android networking will be fragile and in some cases blocked by platform security defaults
+* if adaptive layouts, insets, and back behavior are not reviewed explicitly, the wrapper will fail Android quality expectations even if the base web app works in a desktop browser
 
-### 8.3 Verification standard
+### 9.3 Verification standard
 
 The wrapper phase should not be considered complete until all of the following are true:
 
 * the production web build succeeds
 * the wrapper loads the embedded app shell correctly on Android
 * core routes work on phone-sized screens
+* tablet and large-screen layouts are reviewed against adaptive-quality expectations for the kitchen and recipe flows
+* Android back navigation behaves predictably across route transitions and shell states
+* system bars, gesture areas, and display cutouts do not obscure critical controls
 * library, recipe detail, kitchen mode, pantry, intake, and settings connect successfully to the backend
 * image and file upload flows are verified on a real Android device
 * each release build is traceable to a specific source commit or web artifact version
 
-### 8.4 Product boundary
+### 9.4 Product boundary
 
 The wrapper is a delivery vehicle for the existing Galley system. It is not, by itself, a commitment to a permanent mobile architecture.
 
 ---
 
-## 9. Recommended Next Documentation Steps
+## 10. Reference Guidance
+
+The Android-specific guidance in this design is informed by current official Android documentation, especially:
+
+* Android Design & Plan
+* Android mobile design guidance
+* Android adaptive and large-screen guidance
+* Android navigation and predictive back guidance
+* Android edge-to-edge design guidance
+* Android settings guidance
+* Android app quality guidance
+
+These references should be revisited when implementation planning starts so the wrapper plan reflects the then-current Android recommendations.
+
+---
+
+## 11. Recommended Next Documentation Steps
 
 Before implementation planning begins, the repository should keep the documentation split clear:
 
