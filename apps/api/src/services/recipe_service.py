@@ -27,6 +27,16 @@ logger = logging.getLogger(__name__)
 _UTC = timezone.utc
 
 
+def _sanitize_fts_query(q: str) -> str:
+    """Quote each token so FTS5 operators in user input are treated as literals.
+
+    Strips embedded double-quotes from tokens before wrapping so that inputs
+    like '"unclosed' don't produce malformed FTS5 syntax.
+    """
+    tokens = (token.replace('"', "") for token in q.strip().split() if token)
+    return " ".join(f'"{t}"' for t in tokens if t)
+
+
 def _now() -> str:
     return datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -182,15 +192,23 @@ def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
     return recipe
 
 
-def get_recipe(db: Session, id_or_slug: str) -> Recipe | None:
+def _get_recipe(db: Session, id_or_slug: str) -> Recipe | None:
+    """Pure read — no side effects. Used internally by all service mutations."""
     from src.utils.ids import is_ulid
     if is_ulid(id_or_slug.upper()):
-        recipe = db.query(Recipe).filter(Recipe.id == id_or_slug.upper()).first()
-    else:
-        recipe = db.query(Recipe).filter(Recipe.slug == id_or_slug).first()
+        return db.query(Recipe).filter(Recipe.id == id_or_slug.upper()).first()
+    return db.query(Recipe).filter(Recipe.slug == id_or_slug).first()
 
+
+def fetch_recipe(db: Session, id_or_slug: str) -> Recipe | None:
+    """Pure read — no side effects. Use from any route that doesn't represent a user view."""
+    return _get_recipe(db, id_or_slug)
+
+
+def get_recipe(db: Session, id_or_slug: str) -> Recipe | None:
+    """Read a recipe and record the view timestamp. Call only from GET route handlers."""
+    recipe = _get_recipe(db, id_or_slug)
     if recipe:
-        # Touch last_viewed_at
         recipe.last_viewed_at = _now()
         db.commit()
         db.refresh(recipe)
@@ -245,7 +263,7 @@ def list_recipes(
                 "WHERE recipe_search_fts MATCH :q "
                 "ORDER BY rank"
             ),
-            {"q": q},
+            {"q": _sanitize_fts_query(q)},
         ).fetchall()
         matching_ids = [row[0] for row in fts_rows]
         if not matching_ids:
@@ -313,7 +331,7 @@ def list_recipes(
 
 
 def update_recipe(db: Session, id_or_slug: str, data: RecipeUpdate) -> Recipe | None:
-    recipe = get_recipe(db, id_or_slug)
+    recipe = _get_recipe(db, id_or_slug)
     if not recipe:
         return None
 
@@ -376,7 +394,7 @@ def update_recipe(db: Session, id_or_slug: str, data: RecipeUpdate) -> Recipe | 
 
 
 def archive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
-    recipe = get_recipe(db, id_or_slug)
+    recipe = _get_recipe(db, id_or_slug)
     if not recipe:
         return None
     recipe.verification_state = VerificationState.archived.value
@@ -388,7 +406,7 @@ def archive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
 
 
 def unarchive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
-    recipe = get_recipe(db, id_or_slug)
+    recipe = _get_recipe(db, id_or_slug)
     if not recipe:
         return None
     recipe.verification_state = VerificationState.unverified.value
@@ -400,7 +418,7 @@ def unarchive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
 
 
 def set_favorite(db: Session, id_or_slug: str, value: bool) -> Recipe | None:
-    recipe = get_recipe(db, id_or_slug)
+    recipe = _get_recipe(db, id_or_slug)
     if not recipe:
         return None
     recipe.favorite = 1 if value else 0
@@ -411,7 +429,7 @@ def set_favorite(db: Session, id_or_slug: str, value: bool) -> Recipe | None:
 
 
 def delete_recipe(db: Session, id_or_slug: str) -> bool:
-    recipe = get_recipe(db, id_or_slug)
+    recipe = _get_recipe(db, id_or_slug)
     if not recipe:
         return False
     db.execute(

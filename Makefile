@@ -1,8 +1,9 @@
 .PHONY: help up up-detach up-proxy down restart logs logs-api logs-web logs-nginx ps build rebuild \
         shell-api shell-web \
         init-data test-api test-api-v test-api-q test-api-k \
+        secrets-scan install-git-hooks \
         backup backup-db backup-list restore backup-prune \
-        dev-check seed-dev \
+        dev-check seed-dev install-api install-web dev-api dev-web build-web \
         clean tree
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -45,10 +46,17 @@ help:
 	@echo "  make test-api-v      Run API tests (verbose)"
 	@echo "  make test-api-q      Run API tests (quiet: dots only)"
 	@echo "  make test-api-k K=x  Run tests matching keyword x"
+	@echo "  make secrets-scan    Scan the repo for high-confidence hardcoded secrets"
 	@echo ""
 	@echo "Dev:"
+	@echo "  make install-api     Install API dependencies into the repo .venv"
+	@echo "  make install-web     Install web dependencies"
+	@echo "  make dev-api         Run the FastAPI app locally from apps/api"
+	@echo "  make dev-web         Run the Vite dev server locally from apps/web"
+	@echo "  make build-web       Build the frontend from apps/web"
 	@echo "  make dev-check       Verify dev environment prerequisites"
 	@echo "  make seed-dev        Insert fixture recipes into dev database"
+	@echo "  make install-git-hooks  Install the local pre-commit secret scan hook"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean           Remove containers, images (does NOT touch data/)"
@@ -158,6 +166,51 @@ test-api-q:
 # Run tests matching a keyword: make test-api-k K=intake
 test-api-k:
 	cd apps/api && python -m pytest -k "$(K)" -v
+
+secrets-scan:
+	bash scripts/dev/scan_secrets.sh
+
+install-git-hooks:
+	bash scripts/dev/install_git_hooks.sh
+
+install-api:
+	@if [ ! -x ".venv/bin/python" ]; then \
+	    echo "Error: .venv/bin/python not found. Create the repo virtualenv first, e.g. python3 -m venv .venv"; \
+	    exit 1; \
+	fi
+	cd apps/api && ../../.venv/bin/python -m pip install -e ".[dev]"
+
+install-web:
+	@if ! command -v npm >/dev/null 2>&1; then \
+	    echo "Error: npm not found. Install Node.js 20+ and npm first."; \
+	    exit 1; \
+	fi
+	cd apps/web && npm install
+
+dev-api:
+	@if [ ! -x ".venv/bin/python" ]; then \
+	    echo "Error: .venv/bin/python not found. Run 'make install-api' after creating the repo virtualenv."; \
+	    exit 1; \
+	fi
+	@if ! .venv/bin/python -c "import uvicorn, fastapi" >/dev/null 2>&1; then \
+	    echo "Error: API dependencies are not installed in .venv. Run 'make install-api' first."; \
+	    exit 1; \
+	fi
+	cd apps/api && ../../.venv/bin/python -m uvicorn src.main:app --reload --port 8000
+
+dev-web:
+	@if [ ! -d "apps/web/node_modules" ]; then \
+	    echo "Error: apps/web/node_modules is missing. Run 'make install-web' first."; \
+	    exit 1; \
+	fi
+	cd apps/web && npm run dev
+
+build-web:
+	@if [ ! -d "apps/web/node_modules" ]; then \
+	    echo "Error: apps/web/node_modules is missing. Run 'make install-web' first."; \
+	    exit 1; \
+	fi
+	cd apps/web && npm run build
 
 # ── Cleanup ───────────────────────────────────────────────────────────────────
 # Removes containers and images only. Data in data/ is NOT touched.

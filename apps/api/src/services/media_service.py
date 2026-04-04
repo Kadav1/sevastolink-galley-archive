@@ -55,9 +55,18 @@ def _save_file(file: UploadFile, subdirectory: str) -> tuple[str, str, str, int]
             detail=error_detail("unsupported_media_type", f"Unsupported file type '{mime}'. Allowed: image/jpeg, image/png, image/webp, application/pdf."),
         )
 
-    data = file.file.read()
-    if len(data) > MAX_BYTES:
-        raise HTTPException(status_code=422, detail=error_detail("file_too_large", "File exceeds the 20 MB limit."))
+    chunks: list[bytes] = []
+    total = 0
+    chunk_size = 64 * 1024  # 64 KB
+    while True:
+        chunk = file.file.read(chunk_size)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > MAX_BYTES:
+            raise HTTPException(status_code=422, detail=error_detail("file_too_large", "File exceeds the 20 MB limit."))
+        chunks.append(chunk)
+    data = b"".join(chunks)
 
     asset_id = str(uuid.uuid4())
     ext = _MIME_EXT[mime]

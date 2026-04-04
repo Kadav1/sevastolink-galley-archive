@@ -26,55 +26,7 @@ from shared_prompts import get_contract, loader as _prompt_loader
 from src.ai.lm_studio_client import LMStudioClient, LMStudioError, LMStudioErrorKind
 from src.schemas.intake import CandidateUpdate
 from src.schemas.recipe import IngredientIn, StepIn
-
-
-# ── Taxonomy vocabulary ────────────────────────────────────────────────────────
-
-DISH_ROLES = [
-    "Breakfast", "Brunch", "Snack", "Starter", "Soup", "Salad", "Side", "Main",
-    "Shared Plate", "Dessert", "Bread", "Dough", "Sauce", "Condiment", "Drink",
-    "Preserve", "Pantry Staple", "Component", "Confectionery", "Street Food",
-]
-
-PRIMARY_CUISINES = [
-    # Europe
-    "Italian", "French", "Spanish", "Catalan", "Portuguese", "Greek", "Turkish",
-    "British", "Irish", "Scottish", "Nordic", "Swedish", "Norwegian", "Danish",
-    "Finnish", "German", "Austrian", "Swiss", "Dutch", "Belgian",
-    "Eastern European", "Polish", "Hungarian", "Czech", "Romanian", "Russian",
-    "Georgian", "Armenian", "Ukrainian",
-    # Middle East & North Africa
-    "Levantine", "Lebanese", "Syrian", "Palestinian", "Israeli", "Egyptian",
-    "Moroccan", "Tunisian", "Algerian", "Libyan", "Persian", "Iraqi", "Yemeni",
-    # Sub-Saharan Africa
-    "Ethiopian", "Eritrean", "West African", "Nigerian", "Ghanaian",
-    "Senegalese", "East African", "Kenyan", "South African", "Zimbabwean",
-    # South Asia
-    "Indian", "North Indian", "South Indian", "Pakistani", "Bangladeshi",
-    "Sri Lankan", "Nepali",
-    # Southeast Asia
-    "Thai", "Vietnamese", "Cambodian", "Laotian", "Filipino", "Indonesian",
-    "Malaysian", "Singaporean", "Burmese",
-    # East Asia
-    "Chinese", "Cantonese", "Sichuan", "Shanghainese", "Taiwanese",
-    "Japanese", "Korean", "Mongolian",
-    # Central Asia & Caucasus
-    "Uzbek", "Kazakh", "Azerbaijani", "Caucasian",
-    # Americas
-    "Mexican", "Tex-Mex", "Oaxacan", "Central American", "Guatemalan",
-    "Peruvian", "Colombian", "Venezuelan", "Brazilian", "Argentinian",
-    "Chilean", "American", "American Southern", "American Midwest",
-    "Cajun / Creole", "Caribbean", "Jamaican", "Cuban",
-    # Cross-cultural
-    "Fusion", "Global / Mixed",
-]
-
-TECHNIQUE_FAMILIES = [
-    "Raw", "Assemble", "Marinate", "Cure", "Ferment", "Pickle", "Smoke",
-    "Confit", "Poach", "Steam", "Boil", "Simmer", "Braise", "Stew",
-    "Slow Cook", "Pressure Cook", "Sear", "Fry", "Stir-Fry", "Deep Fry",
-    "Roast", "Bake", "Grill", "Emulsify", "Blend", "Dehydrate", "Multi-Stage",
-]
+from src.schemas.taxonomy import DISH_ROLES, PRIMARY_CUISINES, TECHNIQUE_FAMILIES
 
 # ── Contract constants ─────────────────────────────────────────────────────────
 
@@ -129,9 +81,9 @@ def build_normalization_prompt(raw_text: str, source_notes: str | None = None) -
         "source_url": None,
         "user_notes": source_notes,
         "allowed_taxonomy": {
-            "dish_role": DISH_ROLES,
-            "primary_cuisine": PRIMARY_CUISINES,
-            "technique_family": TECHNIQUE_FAMILIES,
+            "dish_role": sorted(DISH_ROLES),
+            "primary_cuisine": sorted(PRIMARY_CUISINES),
+            "technique_family": sorted(TECHNIQUE_FAMILIES),
         },
     }
 

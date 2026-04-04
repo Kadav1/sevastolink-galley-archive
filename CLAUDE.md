@@ -173,6 +173,8 @@ Copy `.env.example` to `.env`. Key variables:
 
 **Error envelope** — all errors use `{"error": {"code": "...", "message": "..."}}`. Use `error_detail(code, message)` from `schemas/common.py` as the `HTTPException.detail`. A custom handler in `main.py` wraps it. Never use bare strings or nested `{"error": {...}}` shapes in `detail`.
 
+**Prettier + tokens.css** — `packages/shared-ui-tokens/tokens.css` uses intentional column-aligned comment headers (`/* ── Section ── */`) and value spacing. A global Prettier hook reformats this file on every write. `packages/shared-ui-tokens/` is listed in `.prettierignore` to protect it.
+
 ## What Is Explicitly Out of Scope (v1)
 
 Do not implement: multi-user collaboration, cloud hosting, real-time sync, distributed workers, remote vector databases, background AI enrichment at scale, or microservice decomposition.

@@ -48,7 +48,7 @@ def client(db_session):
 async def _create_recipe(ac: AsyncClient, title: str) -> str:
     r = await ac.post("/api/v1/recipes", json={
         "title": title,
-        "dish_role": "Dinner",
+        "dish_role": "Main",
         "primary_cuisine": "Italian",
         "ingredients": [{"position": 1, "item": "pasta", "quantity": "400g"}],
         "steps": [{"position": 1, "instruction": "Cook pasta."}],

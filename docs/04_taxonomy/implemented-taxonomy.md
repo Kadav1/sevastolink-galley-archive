@@ -1,6 +1,6 @@
 # Sevastolink Galley Archive
 
-## Implemented Taxonomy v1.0
+## Implemented Taxonomy v1.1
 
 ---
 
@@ -23,23 +23,16 @@ This is the implementation-aware taxonomy baseline for contributors.
 
 ### Established facts
 
-The current repository implements taxonomy in three different layers:
+The current repository implements taxonomy in four coordinated layers:
 
 * database columns and API schemas
-* normalization-time vocabulary checks
-* frontend filter and form option lists
-
-The current repository does not yet implement:
-
-* a shared runtime taxonomy package
-* one canonical machine-readable taxonomy source used by backend and frontend together
-* full runtime enforcement for every field described by the broader taxonomy spec
+* a shared canonical vocabulary package (`packages/shared-taxonomy`)
+* backend Pydantic validators rejecting non-canonical values at intake
+* frontend filter panels and forms consuming shared vocabulary constants
 
 ### Current interpretation
 
-The repository supports a real taxonomy model today, but that model is only partially centralized.
-
-Contributors should treat taxonomy as operationally implemented, but still split across docs and code.
+Taxonomy is centralized and enforced. The shared taxonomy package is the single source of truth for all controlled vocabularies. Backend and frontend both import from it — directly in TypeScript, and via a Python mirror for the API.
 
 ---
 
@@ -47,7 +40,7 @@ Contributors should treat taxonomy as operationally implemented, but still split
 
 ### 3.1 First-class taxonomy fields in the data model
 
-The current recipe and candidate models include these primary fields:
+All of these fields exist in the backend models, schemas, and SQLite columns:
 
 * `dish_role`
 * `primary_cuisine`
@@ -66,11 +59,9 @@ The current recipe and candidate models include these primary fields:
 * `operational_class`
 * `heat_window`
 
-These fields exist in the backend models and schemas, even when they are not all surfaced in the web UI today.
-
 ### 3.2 Taxonomy fields actively surfaced in the current frontend
 
-The current web app actively uses only a subset of the available taxonomy:
+The following are used in library filtering, recipe summary metadata, recipe detail metadata strip, or intake forms:
 
 * `verification_state`
 * `dish_role`
@@ -78,23 +69,16 @@ The current web app actively uses only a subset of the available taxonomy:
 * `technique_family`
 * `complexity`
 * `time_class`
-* `heat_window`
-
-These are used for:
-
-* library filtering
-* recipe summary metadata
-* recipe detail metadata strip
-* manual entry and paste-text intake forms
+* `ingredient_families` (library filter panel)
+* `heat_window` (recipe detail metadata)
 
 ### 3.3 Taxonomy fields present in schemas but not meaningfully surfaced in the web UI
 
-The following fields exist in backend and API structures but are not yet major first-class frontend surfaces:
+The following exist in backend and API structures but are not yet major first-class frontend surfaces:
 
 * `secondary_cuisines`
 * `service_format`
 * `season`
-* `ingredient_families`
 * `mood_tags`
 * `storage_profile`
 * `dietary_flags`
@@ -102,72 +86,86 @@ The following fields exist in backend and API structures but are not yet major f
 * `sector`
 * `operational_class`
 
-They may appear in payloads and database rows, but they are not yet central to current routed frontend workflows.
+They appear in payloads and database rows but are not yet central to current routed frontend workflows.
 
 ---
 
 ## 4. Current vocabulary enforcement
 
-### 4.1 Explicitly enforced vocabularies in the normalizer
+### 4.1 Backend validation (API layer)
 
-The AI normalizer currently validates and constrains only these single-select vocabularies:
+All controlled taxonomy fields are validated at the API layer via Pydantic `field_validator` decorators on `RecipeCreate` and `RecipeUpdate`.
 
-* `dish_role`
-* `primary_cuisine`
-* `technique_family`
+The validators live in `apps/api/src/schemas/recipe.py` and import canonical vocabulary sets from `apps/api/src/schemas/taxonomy.py`.
 
-This validation happens in `apps/api/src/ai/normalizer.py`.
+Enforced on `RecipeCreate` and `RecipeUpdate`:
 
-### 4.2 Frontend hardcoded lists
+* `dish_role` — single value against `DISH_ROLES`
+* `primary_cuisine` — single value against `PRIMARY_CUISINES`
+* `secondary_cuisines` — all items against `PRIMARY_CUISINES`
+* `technique_family` — single value against `TECHNIQUE_FAMILIES`
+* `ingredient_families` — all items against `INGREDIENT_FAMILIES`
+* `complexity` — single value against `COMPLEXITY_OPTIONS`
+* `time_class` — single value against `TIME_CLASS_OPTIONS`
+* `service_format` — single value against `SERVICE_FORMATS`
+* `season` — single value against `SEASONS`
+* `mood_tags` — all items against `MOOD_TAGS`
+* `storage_profile` — all items against `STORAGE_PROFILES`
+* `dietary_flags` — all items against `DIETARY_FLAGS`
+* `provision_tags` — all items against `PROVISION_TAGS`
+* `sector` — single value against `SECTORS`
+* `operational_class` — single value against `OPERATIONAL_CLASSES`
+* `heat_window` — single value against `HEAT_WINDOWS`
 
-The frontend currently hardcodes option lists for:
+A request supplying an unknown taxonomy value is rejected with HTTP 422.
 
-* `verification_state`
-* `dish_role`
-* `primary_cuisine`
-* `technique_family`
-* `complexity`
-* `time_class`
+### 4.2 Shared vocabulary package
 
-These lists live in the web components and pages rather than in a shared taxonomy source.
+`packages/shared-taxonomy/src/index.ts` exports all canonical vocabulary arrays `as const` with derived TypeScript types.
 
-### 4.3 Schema-level reality
+The frontend imports these via the `@galley/shared-taxonomy` alias (configured in `apps/web/vite.config.ts` and `apps/web/tsconfig.json`).
 
-Most taxonomy fields in the backend schemas are currently typed as strings or string arrays without strict vocabulary validation.
+Currently consuming `@galley/shared-taxonomy`:
 
-This means:
+* `apps/web/src/components/library/FilterPanel.tsx`
+* `apps/web/src/pages/ManualEntryPage.tsx`
 
-* the fields exist structurally
-* some filtering and display behavior exists
-* full controlled-vocabulary enforcement is not yet universal
+### 4.3 Backend Python mirror
+
+`apps/api/src/schemas/taxonomy.py` mirrors the shared-taxonomy constants as Python `frozenset[str]` values. This is the import source for all API-layer validators.
+
+When updating vocabulary, update both `packages/shared-taxonomy/src/index.ts` and `apps/api/src/schemas/taxonomy.py` together.
+
+### 4.4 AI normalizer vocabulary
+
+The AI normalizer (`apps/api/src/ai/normalizer.py`) embeds canonical vocabulary lists in its prompt-building logic. These are kept in sync with the shared taxonomy package but are formatted as plain strings for LM Studio prompt injection.
+
+### 4.5 Repair script drift map
+
+`scripts/import/repair_candidates.py` applies deterministic fixes to pre-ingested candidate bundles. Its `FIELD_MAPS` dictionary contains case-folded mappings from known stale or invented values to canonical spec values. This covers common AI drift patterns (gerund forms, compound values, broad-bucket cuisines) and is extended whenever new drift patterns are identified.
 
 ---
 
-## 5. Current source-of-truth split
+## 5. Current source-of-truth
 
-Taxonomy truth currently lives across:
-
-* `docs/04_taxonomy/content-taxonomy-spec.md`
-* backend schemas under `apps/api/src/schemas/`
-* backend models under `apps/api/src/models/`
-* normalizer vocabulary constants in `apps/api/src/ai/normalizer.py`
-* hardcoded frontend option lists in the web app
-
-The shared taxonomy package does not yet hold operational taxonomy assets.
+| Layer | File |
+|-------|------|
+| Canonical spec | `docs/04_taxonomy/content-taxonomy-spec.md` |
+| TypeScript source | `packages/shared-taxonomy/src/index.ts` |
+| Python mirror | `apps/api/src/schemas/taxonomy.py` |
+| API validators | `apps/api/src/schemas/recipe.py` |
+| AI normalizer | `apps/api/src/ai/normalizer.py` |
+| Repair drift map | `scripts/import/repair_candidates.py` |
 
 ---
 
-## 6. Current gaps relative to the full taxonomy spec
+## 6. Remaining gaps relative to the full taxonomy spec
 
-The broader taxonomy spec describes a larger and more disciplined taxonomy system than the current runtime implementation provides.
+Not yet implemented:
 
-Not yet fully implemented:
-
-* one shared taxonomy package used by backend and frontend
-* one canonical value source for all controlled vocabularies
-* complete UI support for the broader taxonomy field set
-* complete validation for all controlled taxonomy fields
-* full alignment between spec vocabulary and hardcoded frontend lists
+* Full UI support for the broader taxonomy field set (secondary cuisines, mood tags, storage profile, dietary flags, provision tags, sector, operational class)
+* Taxonomy-aware intake approval validation (candidate values are not revalidated at approve time)
+* Vocabulary enforcement at the `structured_candidates` layer (only `recipes` enforces it today)
 
 ---
 
@@ -175,7 +173,7 @@ Not yet fully implemented:
 
 When working on taxonomy:
 
-* treat this document as the current implementation baseline
-* treat `content-taxonomy-spec.md` as the broader target-state taxonomy reference
-* avoid assuming `packages/shared-taxonomy/` is already wired into the app
-* verify changes against both current runtime code and the canonical taxonomy spec
+* treat `content-taxonomy-spec.md` as the target-state taxonomy reference
+* treat `packages/shared-taxonomy/src/index.ts` and `apps/api/src/schemas/taxonomy.py` as the runtime sources — keep them in sync
+* when adding new drift corrections, update `repair_candidates.py` FIELD_MAPS
+* never introduce new vocabulary values in component-level code; update the shared package first

@@ -138,4 +138,12 @@ Sessions implemented as of 2026-03-30:
 
 - **42** — AI jobs visibility decision: `ai_jobs` is intentionally internal infrastructure — not a surfaced API or UI resource. Decision recorded in `docs/05_ai/implemented-ai.md §4.4` with rationale (single-user archive, results visible inline, no user workflow value). API and AI backlogs updated to mark as resolved.
 
-Sessions **25, 26, 29, 31** (Sprint E) remain unexecuted.
+- **25** — Overlay and transient surfaces: `ConfirmDialog.tsx` created (modal overlay, Escape/backdrop dismiss, `role="dialog"` + `aria-modal`, `autoFocus` on confirm, destructive variant). `archiveRecipe()`/`unarchiveRecipe()` added to `api.ts`. `RecipePage` updated with archive/unarchive button, confirmation dialog wired to both actions, post-archive navigate to `/library`. Zero TypeScript errors.
+
+- **26** — Iconography and route patterns: `Icon.tsx` created (inline SVG component, 9 icons: library, pantry, intake, settings, menu, close, chevron-left, star, star-filled). `SideNav` updated — nav items now carry `icon` field, links render icon + label via flex layout. `AppShell` hamburger replaced with `<Icon name="menu" />`, SideNav close button uses `<Icon name="close" />`. Zero TypeScript errors.
+
+- **29** — Taxonomy validation expansion: `apps/api/src/schemas/taxonomy.py` created — Python `frozenset` constants mirroring all 15 controlled vocabularies from `@galley/shared-taxonomy`. `field_validator` decorators added to both `RecipeCreate` and `RecipeUpdate` for every controlled field; invalid values rejected with HTTP 422. Stale test fixtures using invented values (`"Dinner"` → `"Main"`, `"Passage"` → `"Field Meal"`) updated. 120 tests, 120 passing.
+
+- **31** — Taxonomy cleanup and drift repair: `repair_candidates.py` `FIELD_MAPS` expanded from ~20 to 60+ entries covering gerund forms (`"baking"` → `"Bake"`), old compound values (`"Cure / Preserve"` → `"Cure"`, `"Raw / No-Cook"` → `"Raw"`), broad-bucket cuisines (`"North African"` → null, `"Middle Eastern"` → `"Levantine"`), additional service format and season normalisations. `docs/04_taxonomy/implemented-taxonomy.md` fully rewritten to reflect centralized enforced state (v1.1), including source-of-truth table and updated gap list.
+
+All 44 sessions complete as of 2026-04-01.

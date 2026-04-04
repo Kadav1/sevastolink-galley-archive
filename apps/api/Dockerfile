@@ -6,9 +6,11 @@ WORKDIR /repo/apps/api
 
 # Install dependencies before source is mounted — cached unless pyproject.toml changes
 COPY pyproject.toml ./
-RUN pip install --no-cache-dir -e ".[dev]"
+RUN pip install --no-cache-dir -e "."
+
+RUN addgroup --system galley && adduser --system --ingroup galley galley
+USER galley
 
 EXPOSE 8000
 
-# --reload watches volume-mounted source files for changes
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

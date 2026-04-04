@@ -7,6 +7,9 @@ WORKDIR /repo/apps/web
 COPY package*.json ./
 RUN npm install
 
+RUN addgroup --system galley && adduser --system --ingroup galley galley
+USER galley
+
 EXPOSE 3000
 
 # --host 0.0.0.0 binds to all interfaces so the port is reachable from outside the container

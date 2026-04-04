@@ -53,7 +53,7 @@ async def attach_recipe_media(
     Accepted types: image/jpeg, image/png, image/webp, application/pdf. Max 20 MB.
     Sets recipes.cover_media_asset_id to the new asset id.
     """
-    recipe = recipe_service.get_recipe(db, id_or_slug)
+    recipe = recipe_service.fetch_recipe(db, id_or_slug)
     if recipe is None:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
     asset = media_service.attach_to_recipe(db, recipe, file)
@@ -88,7 +88,9 @@ async def serve_media_file(
     asset = media_service.get_by_id(db, asset_id)
     if asset is None:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Media asset not found."))
-    file_path: Path = settings.media_dir / asset.relative_path
+    file_path = (settings.media_dir / asset.relative_path).resolve()
+    if not file_path.is_relative_to(settings.media_dir.resolve()):
+        raise HTTPException(status_code=403, detail=error_detail("forbidden", "Path rejected."))
     if not file_path.exists():
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Asset file not found on disk."))
     return FileResponse(

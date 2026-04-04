@@ -256,9 +256,9 @@ async def test_list_recipes_filter_sector(client):
 async def test_list_recipes_filter_operational_class(client):
     """operational_class filter returns only matching recipes."""
     async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "operational_class": "Passage"})
-        r_match = await c.get("/api/v1/recipes", params={"operational_class": "Passage"})
-        r_no = await c.get("/api/v1/recipes", params={"operational_class": "Harbor"})
+        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "operational_class": "Field Meal"})
+        r_match = await c.get("/api/v1/recipes", params={"operational_class": "Field Meal"})
+        r_no = await c.get("/api/v1/recipes", params={"operational_class": "Experimental"})
     assert r_match.json()["meta"]["total"] == 1
     assert r_no.json()["meta"]["total"] == 0
 
@@ -283,3 +283,36 @@ async def test_list_recipes_sort_title_desc(client):
         r = await c.get("/api/v1/recipes", params={"sort": "title_desc"})
     titles = [item["title"] for item in r.json()["data"]]
     assert titles == sorted(titles, reverse=True)
+
+
+@pytest.mark.asyncio
+async def test_mutation_does_not_touch_last_viewed_at(db_session):
+    """update_recipe and archive_recipe must not set last_viewed_at — only GET should."""
+    from src.models.recipe import Recipe
+    from src.schemas.recipe import RecipeCreate, RecipeUpdate
+    from src.services import recipe_service
+
+    data = RecipeCreate(**{**MINIMAL_RECIPE, "verification_state": "Unverified"})
+    recipe = recipe_service.create_recipe(db_session, data)
+    assert recipe.last_viewed_at is None, "last_viewed_at should be None after create"
+
+    recipe_service.update_recipe(db_session, recipe.slug, RecipeUpdate(title="Shakshuka Updated"))
+    db_session.expire_all()
+    updated = db_session.get(Recipe, recipe.id)
+    assert updated.last_viewed_at is None, "update_recipe must not touch last_viewed_at"
+
+    recipe_service.archive_recipe(db_session, recipe.slug)
+    db_session.expire_all()
+    archived = db_session.get(Recipe, recipe.id)
+    assert archived.last_viewed_at is None, "archive_recipe must not touch last_viewed_at"
+
+
+@pytest.mark.asyncio
+async def test_search_with_fts5_operators_returns_200(client):
+    """Search queries containing FTS5 operators must not raise a 500."""
+    async with await _client() as c:
+        # These inputs contain raw FTS5 syntax that would cause sqlite3.OperationalError
+        # if passed directly to MATCH. Each must return 200, not 500.
+        for bad_query in ['AND', '"unclosed', 'NEAR(', 'test AND']:
+            r = await c.get("/api/v1/recipes", params={"q": bad_query})
+            assert r.status_code == 200, f"Expected 200 for q={bad_query!r}, got {r.status_code}"

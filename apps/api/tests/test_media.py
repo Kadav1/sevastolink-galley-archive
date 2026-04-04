@@ -238,3 +238,40 @@ async def test_serve_media_file_returns_bytes(client):
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("image/png")
     assert r.content == _FAKE_PNG
+
+
+@pytest.mark.asyncio
+async def test_serve_media_file_rejects_path_traversal(client, db_session):
+    """A stored asset whose relative_path escapes media_dir must return 403."""
+    import uuid
+    from src.models.media import MediaAsset
+
+    evil_asset = MediaAsset(
+        id=str(uuid.uuid4()),
+        asset_kind="source_image",
+        original_filename="evil.png",
+        mime_type="image/png",
+        relative_path="../../outside_media_dir.txt",
+        checksum="deadbeef",
+        byte_size=100,
+    )
+    db_session.add(evil_asset)
+    db_session.commit()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        r = await ac.get(f"/api/v1/media-assets/{evil_asset.id}/file")
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_upload_over_20mb_returns_422(client):
+    """A file exceeding 20 MB is rejected with 422 file_too_large."""
+    oversized = b"\x89PNG\r\n\x1a\n" + b"\x00" * (20 * 1024 * 1024 + 1)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        job_id = await _create_job(ac)
+        r = await ac.post(
+            f"/api/v1/intake-jobs/{job_id}/media",
+            files={"file": ("big.png", io.BytesIO(oversized), "image/png")},
+        )
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "file_too_large"

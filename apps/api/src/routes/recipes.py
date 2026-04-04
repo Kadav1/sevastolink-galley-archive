@@ -187,7 +187,7 @@ async def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)
             status_code=503,
             detail=error_detail("ai_disabled", "AI metadata suggestion is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
-    recipe = recipe_service.get_recipe(db, id_or_slug)
+    recipe = recipe_service.fetch_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 
@@ -225,7 +225,7 @@ async def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)
             status_code=503,
             detail=error_detail("ai_disabled", "AI rewrite is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
-    recipe = recipe_service.get_recipe(db, id_or_slug)
+    recipe = recipe_service.fetch_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 
@@ -264,7 +264,7 @@ async def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Dep
             status_code=503,
             detail=error_detail("ai_disabled", "AI similarity is not enabled. Set LM_STUDIO_ENABLED=true."),
         )
-    recipe = recipe_service.get_recipe(db, id_or_slug)
+    recipe = recipe_service.fetch_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
 

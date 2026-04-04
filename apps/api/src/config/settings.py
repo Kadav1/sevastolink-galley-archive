@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     lm_studio_base_url: str = "http://localhost:1234/v1"
     lm_studio_model: str = ""
 
+    # CORS — configure via CORS_ORIGINS env var as a JSON array for LAN access
+    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
     @property
     def sqlalchemy_database_url(self) -> str:
         url = self.database_url
