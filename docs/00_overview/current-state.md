@@ -242,6 +242,7 @@ Use these documents alongside this one:
 * `docs/09_ops/configuration-reference.md` — current environment and runtime settings
 * `docs/06_architecture/migrations-and-data-lifecycle.md` — current migration and persistence behavior
 * `docs/02_ux/implemented-routes-and-flows.md` — current routed UI surfaces
+* `docs/00_overview/documentation-drift-register.md` — confirmed documentation drift and broader spec-alignment findings
 
 ---
 
