@@ -14,7 +14,8 @@ services:
   # ── API ─────────────────────────────────────────────────────────────────────
   galley-api:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     working_dir: /repo/apps/api
     volumes:
       # Full repo mounted so settings.py can resolve REPO_ROOT via parents[4]

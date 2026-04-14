@@ -3,7 +3,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { IngredientList } from "../components/recipe/IngredientList";
 import { MetadataStrip } from "../components/recipe/MetadataStrip";
+import { MetadataSuggestionPanel } from "../components/recipe/MetadataSuggestionPanel";
 import { NoteBlock } from "../components/recipe/NoteBlock";
+import { RewritePanel } from "../components/recipe/RewritePanel";
+import { SimilarRecipesPanel } from "../components/recipe/SimilarRecipesPanel";
 import { SourcePanel } from "../components/recipe/SourcePanel";
 import { StepList } from "../components/recipe/StepList";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
@@ -12,356 +15,23 @@ import { DEFAULT_SCALE, SCALE_OPTIONS, scaleServings } from "../lib/scaling";
 import type { ScaleFactor } from "../lib/scaling";
 import { useRecipe } from "../hooks/useRecipe";
 import { useFavorite } from "../hooks/useFavorite";
-import { ApiError, archiveRecipe, unarchiveRecipe, patchRecipe } from "../lib/api";
-import { suggestMetadata, rewriteRecipe, findSimilarRecipes } from "../lib/recipe-ai-api";
-import type { MetadataSuggestionOut, ArchiveRewriteOut, SimilarRecipesOut, SimilarityMatchOut } from "../lib/recipe-ai-api";
-
-// ── Metadata suggestion panel ─────────────────────────────────────────────────
-
-const SCALAR_FIELDS: Array<{ key: keyof MetadataSuggestionOut; label: string }> = [
-  { key: "short_description", label: "Short description" },
-  { key: "dish_role", label: "Dish role" },
-  { key: "primary_cuisine", label: "Primary cuisine" },
-  { key: "technique_family", label: "Technique family" },
-  { key: "complexity", label: "Complexity" },
-  { key: "time_class", label: "Time class" },
-  { key: "service_format", label: "Service format" },
-  { key: "season", label: "Season" },
-  { key: "sector", label: "Sector" },
-  { key: "class", label: "Operational class" },
-  { key: "heat_window", label: "Heat window" },
-];
-
-const ARRAY_FIELDS: Array<{ key: keyof MetadataSuggestionOut; label: string }> = [
-  { key: "secondary_cuisines", label: "Secondary cuisines" },
-  { key: "ingredient_families", label: "Ingredient families" },
-  { key: "mood_tags", label: "Mood tags" },
-  { key: "storage_profile", label: "Storage profile" },
-  { key: "dietary_flags", label: "Dietary flags" },
-  { key: "provision_tags", label: "Provision tags" },
-];
-
-interface MetadataSuggestionPanelProps {
-  suggestion: MetadataSuggestionOut;
-  appliedFields: Set<string>;
-  onApply: (field: string, value: unknown) => void;
-  onDismiss: () => void;
-}
-
-function MetadataSuggestionPanel({
-  suggestion,
-  appliedFields,
-  onApply,
-  onDismiss,
-}: MetadataSuggestionPanelProps) {
-  const hasNotes =
-    suggestion.confidence_notes.length > 0 || suggestion.uncertainty_notes.length > 0;
-
-  return (
-    <div style={panelStyles.panel}>
-      <div style={panelStyles.panelHeader}>
-        <span style={panelStyles.panelTitle}>Metadata suggestions</span>
-        <button type="button" onClick={onDismiss} style={panelStyles.dismissBtn}>
-          Dismiss
-        </button>
-      </div>
-
-      <div style={panelStyles.fieldList}>
-        {SCALAR_FIELDS.map(({ key, label }) => {
-          const val = suggestion[key] as string | null;
-          if (!val) return null;
-          const applied = appliedFields.has(key);
-          return (
-            <div key={key} style={panelStyles.fieldRow}>
-              <span style={panelStyles.fieldLabel}>{label}</span>
-              <span style={panelStyles.fieldValue}>{val}</span>
-              <button
-                type="button"
-                style={applied ? panelStyles.applyBtnApplied : panelStyles.applyBtn}
-                disabled={applied}
-                onClick={() => onApply(key, val)}
-              >
-                {applied ? "Applied" : "Apply"}
-              </button>
-            </div>
-          );
-        })}
-
-        {ARRAY_FIELDS.map(({ key, label }) => {
-          const val = suggestion[key] as string[];
-          if (!val || val.length === 0) return null;
-          const applied = appliedFields.has(key);
-          return (
-            <div key={key} style={panelStyles.fieldRow}>
-              <span style={panelStyles.fieldLabel}>{label}</span>
-              <span style={panelStyles.fieldValue}>{val.join(", ")}</span>
-              <button
-                type="button"
-                style={applied ? panelStyles.applyBtnApplied : panelStyles.applyBtn}
-                disabled={applied}
-                onClick={() => onApply(key, val)}
-              >
-                {applied ? "Applied" : "Apply"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-
-      {hasNotes && (
-        <div style={panelStyles.notes}>
-          {suggestion.confidence_notes.map((n, i) => (
-            <p key={i} style={panelStyles.noteItem}>
-              {n}
-            </p>
-          ))}
-          {suggestion.uncertainty_notes.map((n, i) => (
-            <p key={i} style={{ ...panelStyles.noteItem, color: "var(--state-advisory)" }}>
-              ⚠ {n}
-            </p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Rewrite panel ─────────────────────────────────────────────────────────────
-
-interface RewritePanelProps {
-  rewrite: ArchiveRewriteOut;
-  onDismiss: () => void;
-}
-
-function RewritePanel({ rewrite, onDismiss }: RewritePanelProps) {
-  return (
-    <div style={panelStyles.panel}>
-      <div style={panelStyles.panelHeader}>
-        <span style={panelStyles.panelTitle}>Archive rewrite suggestion</span>
-        <button type="button" onClick={onDismiss} style={panelStyles.dismissBtn}>
-          Dismiss
-        </button>
-      </div>
-
-      <p style={panelStyles.rewriteNote}>
-        Read-only preview — does not modify the stored recipe.
-      </p>
-
-      {rewrite.title && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Title</span>
-          <p style={panelStyles.rewriteText}>{rewrite.title}</p>
-        </div>
-      )}
-
-      {rewrite.short_description && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Description</span>
-          <p style={panelStyles.rewriteText}>{rewrite.short_description}</p>
-        </div>
-      )}
-
-      {rewrite.ingredients.length > 0 && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Ingredients</span>
-          <ul style={panelStyles.rewriteList}>
-            {rewrite.ingredients.map((ing, i) => {
-              const parts = [ing.amount, ing.unit, ing.item].filter(Boolean).join(" ");
-              const note = ing.note ? ` — ${ing.note}` : "";
-              return (
-                <li key={i} style={panelStyles.rewriteListItem}>
-                  {parts}
-                  {note}
-                  {ing.optional && " (optional)"}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      {rewrite.steps.length > 0 && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Steps</span>
-          <ol style={panelStyles.rewriteList}>
-            {rewrite.steps.map((step) => (
-              <li key={step.step_number} style={panelStyles.rewriteListItem}>
-                {step.instruction}
-                {step.time_note && (
-                  <span style={panelStyles.rewriteMeta}> [{step.time_note}]</span>
-                )}
-                {step.heat_note && (
-                  <span style={panelStyles.rewriteMeta}> [{step.heat_note}]</span>
-                )}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
-      {rewrite.recipe_notes && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Notes</span>
-          <p style={panelStyles.rewriteText}>{rewrite.recipe_notes}</p>
-        </div>
-      )}
-
-      {rewrite.service_notes && (
-        <div style={panelStyles.rewriteSection}>
-          <span style={panelStyles.rewriteLabel}>Service notes</span>
-          <p style={panelStyles.rewriteText}>{rewrite.service_notes}</p>
-        </div>
-      )}
-
-      {(rewrite.rewrite_notes.length > 0 || rewrite.uncertainty_notes.length > 0) && (
-        <div style={panelStyles.notes}>
-          {rewrite.rewrite_notes.map((n, i) => (
-            <p key={i} style={panelStyles.noteItem}>
-              {n}
-            </p>
-          ))}
-          {rewrite.uncertainty_notes.map((n, i) => (
-            <p key={i} style={{ ...panelStyles.noteItem, color: "var(--state-advisory)" }}>
-              ⚠ {n}
-            </p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Similar recipes panel ─────────────────────────────────────────────────────
-
-const SCORE_BAND_LABEL: Record<string, string> = {
-  very_high: "Very similar",
-  high: "Similar",
-  moderate: "Somewhat similar",
-  low: "Loosely related",
-};
-
-function SimilarMatchRow({ match }: { match: SimilarityMatchOut }) {
-  const bandLabel = SCORE_BAND_LABEL[match.similarity_score_band] ?? match.similarity_score_band;
-  return (
-    <div style={simStyles.row}>
-      <div style={simStyles.rowHeader}>
-        <span style={simStyles.matchTitle}>{match.title}</span>
-        <span style={simStyles.band}>{bandLabel}</span>
-      </div>
-      <p style={simStyles.reason}>{match.primary_similarity_reason}</p>
-      {match.major_differences.length > 0 && (
-        <p style={simStyles.diff}>
-          Differs: {match.major_differences.join("; ")}
-        </p>
-      )}
-    </div>
-  );
-}
-
-interface SimilarRecipesPanelProps {
-  similar: SimilarRecipesOut;
-  onDismiss: () => void;
-}
-
-function SimilarRecipesPanel({ similar, onDismiss }: SimilarRecipesPanelProps) {
-  const hasMatches = similar.top_matches.length > 0 || similar.near_matches.length > 0;
-
-  return (
-    <div style={panelStyles.panel}>
-      <div style={panelStyles.panelHeader}>
-        <span style={panelStyles.panelTitle}>Similar recipes</span>
-        <button type="button" onClick={onDismiss} style={panelStyles.dismissBtn}>
-          Dismiss
-        </button>
-      </div>
-
-      {!hasMatches && (
-        <p style={simStyles.empty}>No similar recipes found in the archive.</p>
-      )}
-
-      {similar.top_matches.length > 0 && (
-        <div style={simStyles.group}>
-          <span style={simStyles.groupLabel}>Top matches</span>
-          {similar.top_matches.map((m, i) => (
-            <SimilarMatchRow key={i} match={m} />
-          ))}
-        </div>
-      )}
-
-      {similar.near_matches.length > 0 && (
-        <div style={simStyles.group}>
-          <span style={simStyles.groupLabel}>Near matches</span>
-          {similar.near_matches.map((m, i) => (
-            <SimilarMatchRow key={i} match={m} />
-          ))}
-        </div>
-      )}
-
-      {similar.confidence_notes.length > 0 && (
-        <div style={panelStyles.notes}>
-          {similar.confidence_notes.map((n, i) => (
-            <p key={i} style={panelStyles.noteItem}>{n}</p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const simStyles = {
-  row: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
-    paddingBlock: "var(--space-3)",
-    borderBottom: "1px solid var(--border-subtle)",
-  },
-  rowHeader: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "var(--space-3)",
-    flexWrap: "wrap" as const,
-  },
-  matchTitle: {
-    fontSize: "var(--text-sm)",
-    fontWeight: 500,
-    color: "var(--text-primary)",
-    flex: 1,
-  },
-  band: {
-    fontSize: "var(--text-xs)",
-    color: "var(--text-tertiary)",
-    flexShrink: 0,
-  },
-  reason: {
-    fontSize: "var(--text-sm)",
-    color: "var(--text-secondary)",
-    lineHeight: "var(--leading-relaxed)",
-  },
-  diff: {
-    fontSize: "var(--text-xs)",
-    color: "var(--text-tertiary)",
-  },
-  group: {
-    display: "flex",
-    flexDirection: "column" as const,
-  },
-  groupLabel: {
-    fontSize: "var(--text-xs)",
-    fontWeight: 500,
-    color: "var(--text-tertiary)",
-    letterSpacing: "var(--tracking-wide)",
-    textTransform: "uppercase" as const,
-    paddingBottom: "var(--space-1)",
-    borderBottom: "1px solid var(--border-subtle)",
-  },
-  empty: {
-    fontSize: "var(--text-sm)",
-    color: "var(--text-tertiary)",
-  },
-} as const;
-
-// ── Main page ─────────────────────────────────────────────────────────────────
+import {
+  ApiError,
+  archiveRecipe,
+  unarchiveRecipe,
+  patchRecipe,
+} from "../lib/api";
+import {
+  suggestMetadata,
+  rewriteRecipe,
+  findSimilarRecipes,
+} from "../lib/recipe-ai-api";
+import { queryKeys } from "../lib/queryKeys";
+import type {
+  MetadataSuggestionOut,
+  ArchiveRewriteOut,
+  SimilarRecipesOut,
+} from "../lib/recipe-ai-api";
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -377,6 +47,7 @@ export function RecipePage() {
   const [metadata, setMetadata] = useState<MetadataSuggestionOut | null>(null);
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadataError, setMetadataError] = useState<string | null>(null);
+  const [applyError, setApplyError] = useState<string | null>(null);
   const [appliedFields, setAppliedFields] = useState<Set<string>>(new Set());
   const [rewrite, setRewrite] = useState<ArchiveRewriteOut | null>(null);
   const [rewriteLoading, setRewriteLoading] = useState(false);
@@ -442,12 +113,15 @@ export function RecipePage() {
   async function applyField(field: string, value: unknown) {
     // Map the "class" alias to "operational_class" for the PATCH body
     const patchField = field === "class" ? "operational_class" : field;
+    setApplyError(null);
     try {
       await patchRecipe(recipe.slug, { [patchField]: value });
-      await queryClient.invalidateQueries({ queryKey: ["recipe", recipe.slug] });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.recipe.detail(recipe.slug),
+      });
       setAppliedFields((prev) => new Set(prev).add(field));
     } catch {
-      // silent — user can retry
+      setApplyError("Failed to apply field. Please try again.");
     }
   }
 
@@ -456,12 +130,18 @@ export function RecipePage() {
     try {
       if (recipe.archived) {
         await unarchiveRecipe(recipe.slug);
-        await queryClient.invalidateQueries({ queryKey: ["recipe", recipe.slug] });
-        await queryClient.invalidateQueries({ queryKey: ["recipes"] });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.recipe.detail(recipe.slug),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.recipes.all(),
+        });
       } else {
         await archiveRecipe(recipe.slug);
         // After archiving, navigate back to library since recipe is no longer visible
-        await queryClient.invalidateQueries({ queryKey: ["recipes"] });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.recipes.all(),
+        });
         navigate("/library");
       }
     } catch {
@@ -524,14 +204,21 @@ export function RecipePage() {
               type="button"
               onClick={() => {
                 if (!favMutation.isPending) {
-                  favMutation.mutate({ slug: recipe.slug, isFavorite: recipe.favorite });
+                  favMutation.mutate({
+                    slug: recipe.slug,
+                    isFavorite: recipe.favorite,
+                  });
                 }
               }}
               style={{
                 ...styles.favBtn,
-                color: recipe.favorite ? "var(--state-favorite)" : "var(--text-tertiary)",
+                color: recipe.favorite
+                  ? "var(--state-favorite)"
+                  : "var(--text-tertiary)",
               }}
-              aria-label={recipe.favorite ? "Remove from favourites" : "Add to favourites"}
+              aria-label={
+                recipe.favorite ? "Remove from favourites" : "Add to favourites"
+              }
               aria-pressed={recipe.favorite}
             >
               {recipe.favorite ? "★" : "☆"}
@@ -541,7 +228,9 @@ export function RecipePage() {
               onClick={() => setShowArchiveConfirm(true)}
               disabled={archivePending}
               style={styles.archiveBtn}
-              aria-label={recipe.archived ? "Unarchive recipe" : "Archive recipe"}
+              aria-label={
+                recipe.archived ? "Unarchive recipe" : "Archive recipe"
+              }
             >
               {recipe.archived ? "Unarchive" : "Archive"}
             </button>
@@ -637,6 +326,7 @@ export function RecipePage() {
         {metadataError && <p style={styles.aiError}>{metadataError}</p>}
         {rewriteError && <p style={styles.aiError}>{rewriteError}</p>}
         {similarError && <p style={styles.aiError}>{similarError}</p>}
+        {applyError && <p style={styles.aiError}>{applyError}</p>}
         {metadata && (
           <MetadataSuggestionPanel
             suggestion={metadata}
@@ -649,7 +339,10 @@ export function RecipePage() {
           <RewritePanel rewrite={rewrite} onDismiss={() => setRewrite(null)} />
         )}
         {similar && (
-          <SimilarRecipesPanel similar={similar} onDismiss={() => setSimilar(null)} />
+          <SimilarRecipesPanel
+            similar={similar}
+            onDismiss={() => setSimilar(null)}
+          />
         )}
       </section>
     </div>
@@ -815,127 +508,5 @@ const styles = {
   aiError: {
     fontSize: "var(--text-sm)",
     color: "var(--state-advisory)",
-  },
-} as const;
-
-const panelStyles = {
-  panel: {
-    background: "var(--bg-panel)",
-    border: "1px solid var(--border-subtle)",
-    borderRadius: "var(--radius-md)",
-    padding: "var(--space-5)",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-4)",
-  },
-  panelHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  panelTitle: {
-    fontSize: "var(--text-sm)",
-    fontWeight: 500,
-    color: "var(--text-secondary)",
-  },
-  dismissBtn: {
-    background: "none",
-    border: "none",
-    color: "var(--text-tertiary)",
-    cursor: "pointer",
-    fontSize: "var(--text-xs)",
-    textDecoration: "underline",
-    padding: 0,
-  } as React.CSSProperties,
-  fieldList: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-2)",
-  },
-  fieldRow: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "var(--space-3)",
-    fontSize: "var(--text-sm)",
-  },
-  fieldLabel: {
-    color: "var(--text-tertiary)",
-    minWidth: 160,
-    flexShrink: 0,
-    fontSize: "var(--text-xs)",
-  },
-  fieldValue: {
-    color: "var(--text-primary)",
-    flex: 1,
-  },
-  applyBtn: {
-    background: "none",
-    border: "1px solid var(--border-subtle)",
-    borderRadius: "var(--radius-sm)",
-    color: "var(--state-info)",
-    cursor: "pointer",
-    fontSize: "var(--text-xs)",
-    padding: "2px var(--space-2)",
-    flexShrink: 0,
-  } as React.CSSProperties,
-  applyBtnApplied: {
-    background: "none",
-    border: "1px solid var(--border-subtle)",
-    borderRadius: "var(--radius-sm)",
-    color: "var(--text-tertiary)",
-    cursor: "default",
-    fontSize: "var(--text-xs)",
-    padding: "2px var(--space-2)",
-    flexShrink: 0,
-  } as React.CSSProperties,
-  notes: {
-    borderTop: "1px solid var(--border-subtle)",
-    paddingTop: "var(--space-3)",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
-  },
-  noteItem: {
-    fontSize: "var(--text-xs)",
-    color: "var(--text-tertiary)",
-    lineHeight: "var(--leading-relaxed)",
-  },
-  rewriteNote: {
-    fontSize: "var(--text-xs)",
-    color: "var(--text-tertiary)",
-    fontStyle: "italic",
-  },
-  rewriteSection: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
-  },
-  rewriteLabel: {
-    fontSize: "var(--text-xs)",
-    fontWeight: 500,
-    color: "var(--text-tertiary)",
-    letterSpacing: "var(--tracking-wide)",
-    textTransform: "uppercase" as const,
-  },
-  rewriteText: {
-    fontSize: "var(--text-sm)",
-    color: "var(--text-primary)",
-    lineHeight: "var(--leading-relaxed)",
-  },
-  rewriteList: {
-    margin: 0,
-    paddingLeft: "var(--space-5)",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "var(--space-1)",
-  },
-  rewriteListItem: {
-    fontSize: "var(--text-sm)",
-    color: "var(--text-primary)",
-    lineHeight: "var(--leading-relaxed)",
-  },
-  rewriteMeta: {
-    color: "var(--text-tertiary)",
-    fontSize: "var(--text-xs)",
   },
 } as const;

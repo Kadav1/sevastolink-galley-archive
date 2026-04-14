@@ -6,9 +6,18 @@ import {
   TIME_CLASS_OPTIONS,
   INGREDIENT_FAMILY_FILTER_OPTIONS,
 } from "@galley/shared-taxonomy";
+import { memo } from "react";
 import type { VerificationState } from "../../types/recipe";
 
-type FilterKey = "verification_state" | "dish_role" | "primary_cuisine" | "technique_family" | "complexity" | "time_class" | "ingredient_family" | "favorite";
+type FilterKey =
+  | "verification_state"
+  | "dish_role"
+  | "primary_cuisine"
+  | "technique_family"
+  | "complexity"
+  | "time_class"
+  | "ingredient_family"
+  | "favorite";
 
 export interface ActiveFilters {
   verification_state?: VerificationState;
@@ -26,7 +35,12 @@ interface Props {
   onChange: (filters: ActiveFilters) => void;
 }
 
-const VERIFICATION_OPTIONS: VerificationState[] = ["Verified", "Unverified", "Draft", "Archived"];
+const VERIFICATION_OPTIONS: VerificationState[] = [
+  "Verified",
+  "Unverified",
+  "Draft",
+  "Archived",
+];
 
 interface FilterGroupProps {
   label: string;
@@ -58,9 +72,13 @@ function FilterGroup({ label, options, value, onSelect }: FilterGroupProps) {
   );
 }
 
-export function FilterPanel({ filters, onChange }: Props) {
-  const hasActive =
-    Object.values(filters).some((v) => v !== undefined && v !== false);
+export const FilterPanel = memo(function FilterPanel({
+  filters,
+  onChange,
+}: Props) {
+  const hasActive = Object.values(filters).some(
+    (v) => v !== undefined && v !== false,
+  );
 
   function set(key: FilterKey, value: string | boolean | undefined) {
     onChange({ ...filters, [key]: value });
@@ -99,7 +117,9 @@ export function FilterPanel({ filters, onChange }: Props) {
         label="State"
         options={VERIFICATION_OPTIONS}
         value={filters.verification_state}
-        onSelect={(v) => set("verification_state", v as VerificationState | undefined)}
+        onSelect={(v) =>
+          set("verification_state", v as VerificationState | undefined)
+        }
       />
       <FilterGroup
         label="Dish Role"
@@ -139,7 +159,7 @@ export function FilterPanel({ filters, onChange }: Props) {
       />
     </aside>
   );
-}
+});
 
 const styles = {
   panel: {
@@ -196,7 +216,8 @@ const styles = {
     color: "var(--text-secondary)",
     fontSize: "var(--text-xs)",
     cursor: "pointer",
-    transition: "background var(--transition-fast), color var(--transition-fast)",
+    transition:
+      "background var(--transition-fast), color var(--transition-fast)",
     lineHeight: 1.4,
   } as React.CSSProperties,
   chipActive: {

@@ -42,5 +42,6 @@ async def update_settings(body: SettingsUpdate, db: Session = Depends(get_db)):
 
     if updates:
         settings_service.update(db, updates)
+        db.commit()
 
     return ApiResponse(data=_build_out(db))

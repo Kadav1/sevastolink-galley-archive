@@ -12,13 +12,13 @@ This document describes the current implemented backup workflow. For the wider o
 
 ## What needs to be backed up
 
-| Path | Contents | Included in backup |
-|---|---|---|
-| `data/db/galley.sqlite` | All recipes, intake jobs, candidates, settings | Yes — always |
-| `data/media/` | Uploaded photos and media assets | Yes |
-| `data/imports/` | Raw source files preserved from intake | Yes |
-| `data/exports/` | User-generated exports | Not included — back up manually if needed |
-| `.env` | Configuration snapshot | Copied as `env.bak` reference; not used by restore |
+| Path                    | Contents                                       | Included in backup                                 |
+| ----------------------- | ---------------------------------------------- | -------------------------------------------------- |
+| `data/db/galley.sqlite` | All recipes, intake jobs, candidates, settings | Yes — always                                       |
+| `data/media/`           | Uploaded photos and media assets               | Yes                                                |
+| `data/imports/`         | Raw source files preserved from intake         | Yes                                                |
+| `data/exports/`         | User-generated exports                         | Not included — back up manually if needed          |
+| `.env`                  | Configuration snapshot                         | Copied as `env.bak` reference; not used by restore |
 
 ---
 
@@ -31,6 +31,7 @@ make backup
 ```
 
 Creates `data/backups/galley-YYYYMMDD-HHMMSS/` containing:
+
 - `galley.sqlite` — database
 - `media/` — media assets
 - `imports/` — raw source files
@@ -56,17 +57,20 @@ make backup-list
 The backup script uses `sqlite3 .backup` when sqlite3 is installed. This command performs an online backup that is safe while the application is running.
 
 If sqlite3 is not available, the script falls back to `cp`. In that case:
+
 - Stop the application before backing up to avoid capturing a partial write
 - `make down && make backup && make up`
 
 ### Running backups regularly
 
 There is no automatic scheduled backup. Run `make backup` before:
+
 - making significant changes to the archive
 - updating or rebuilding the application
 - changing the database schema
 
 For automated backups, add a cron entry on the host:
+
 ```
 # Example: daily backup at 2am
 0 2 * * * cd /path/to/galley && bash scripts/backup/backup.sh >> data/logs/backup.log 2>&1
@@ -89,12 +93,14 @@ make restore BACKUP=data/backups/galley-YYYYMMDD-HHMMSS
 ```
 
 The restore script will:
+
 1. Show what will be overwritten
 2. Warn if current data exists
 3. Ask for confirmation before proceeding
 4. Restore database, media, and imports from the backup
 
 After restore, restart the application:
+
 ```bash
 make up
 ```
@@ -136,11 +142,13 @@ All backups are named `galley-YYYYMMDD-HHMMSS`. Sorting alphabetically gives chr
 ### Pruning old backups
 
 ```bash
-make backup-prune            # remove backups older than 30 days
-make backup-prune KEEP_DAYS=14   # keep last 14 days
+make backup-prune         # keep the 7 most recent backups (default)
+make backup-prune KEEP=14 # keep the 14 most recent backups
 ```
 
-Pruning removes directories from `data/backups/` that are older than the threshold. It does not touch the current day's backups.
+Pruning keeps the N most recent backups, sorted by the directory name timestamp (`galley-YYYYMMDD-HHMMSS`). Age is determined by parsing the name — not filesystem mtime — so the sort order is stable even after copying or rsync'ing backups to another machine.
+
+Only directories matching the `galley-YYYYMMDD-HHMMSS` pattern are considered. Other files or directories in `data/backups/` are left untouched.
 
 **Pruning is manual.** It does not run automatically.
 

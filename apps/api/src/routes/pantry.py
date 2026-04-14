@@ -3,6 +3,8 @@ Pantry suggestion endpoint.
 
 POST /pantry/suggest — AI-powered cooking suggestions based on available ingredients.
 """
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -47,13 +49,14 @@ async def pantry_suggest(body: PantryQueryIn, db: Session = Depends(get_db)):
             "dish_role": r.dish_role,
             "primary_cuisine": r.primary_cuisine,
             "complexity": r.complexity,
-            "ingredients": [],
+            "ingredients": r.ingredient_text.splitlines() if r.ingredient_text else [],
         }
         for r in archive_recipes_orm
     ]
 
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = suggest_pantry(
+    result, err = await asyncio.to_thread(
+        suggest_pantry,
         client,
         available_ingredients=body.available_ingredients,
         archive_recipes=archive_dicts,

@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -95,6 +97,7 @@ async def list_recipes(
 @router.post("", response_model=ApiResponse[RecipeDetail], status_code=status.HTTP_201_CREATED)
 async def create_recipe(data: RecipeCreate, db: Session = Depends(get_db)):
     recipe = recipe_service.create_recipe(db, data)
+    db.commit()
     return ApiResponse(data=_detail(recipe))
 
 
@@ -105,6 +108,7 @@ async def get_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.get_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=_detail(recipe))
 
 
@@ -115,6 +119,7 @@ async def update_recipe(id_or_slug: str, data: RecipeUpdate, db: Session = Depen
     recipe = recipe_service.update_recipe(db, id_or_slug, data)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=_detail(recipe))
 
 
@@ -125,6 +130,7 @@ async def archive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.archive_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=RecipeArchiveResult(
         id=recipe.id,
         verification_state=recipe.verification_state,
@@ -137,6 +143,7 @@ async def unarchive_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.unarchive_recipe(db, id_or_slug)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=RecipeArchiveResult(
         id=recipe.id,
         verification_state=recipe.verification_state,
@@ -151,6 +158,7 @@ async def favorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.set_favorite(db, id_or_slug, True)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=_summary(recipe))
 
 
@@ -159,6 +167,7 @@ async def unfavorite_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     recipe = recipe_service.set_favorite(db, id_or_slug, False)
     if not recipe:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
     return ApiResponse(data=_summary(recipe))
 
 
@@ -169,6 +178,7 @@ async def delete_recipe(id_or_slug: str, db: Session = Depends(get_db)):
     deleted = recipe_service.delete_recipe(db, id_or_slug)
     if not deleted:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Recipe not found."})
+    db.commit()
 
 
 # ── Suggest Metadata (AI-assisted) ───────────────────────────────────────────
@@ -193,7 +203,9 @@ async def suggest_recipe_metadata(id_or_slug: str, db: Session = Depends(get_db)
 
     recipe_dict = _detail(recipe).model_dump()
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = suggest_metadata(client, recipe=recipe_dict, model=settings.lm_studio_model)
+    result, err = await asyncio.to_thread(
+        suggest_metadata, client, recipe=recipe_dict, model=settings.lm_studio_model
+    )
 
     if err is not None:
         if err.kind == MetadataErrorKind.transport_failure:
@@ -231,7 +243,9 @@ async def rewrite_recipe_endpoint(id_or_slug: str, db: Session = Depends(get_db)
 
     recipe_dict = _detail(recipe).model_dump()
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = rewrite_recipe(client, recipe=recipe_dict, model=settings.lm_studio_model)
+    result, err = await asyncio.to_thread(
+        rewrite_recipe, client, recipe=recipe_dict, model=settings.lm_studio_model
+    )
 
     if err is not None:
         if err.kind == RewriteErrorKind.transport_failure:
@@ -277,7 +291,8 @@ async def similar_recipes(id_or_slug: str, body: SimilarityIn, db: Session = Dep
     ][:20]
 
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = find_similar_recipes(
+    result, err = await asyncio.to_thread(
+        find_similar_recipes,
         client,
         source_recipe=source_recipe_dict,
         candidates=candidate_dicts,

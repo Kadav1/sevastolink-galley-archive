@@ -102,8 +102,7 @@ def attach_to_intake_job(db: Session, job_id: str, file: UploadFile) -> MediaAss
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Intake job not found."))
     asset = _create_asset(db, file, "intake")
     job.source_media_asset_id = asset.id
-    db.commit()
-    db.refresh(asset)
+    db.flush()
     return asset
 
 
@@ -111,6 +110,5 @@ def attach_to_recipe(db: Session, recipe: Recipe, file: UploadFile) -> MediaAsse
     """Save an uploaded file, create a MediaAsset record, and set it as the recipe cover."""
     asset = _create_asset(db, file, "recipes")
     recipe.cover_media_asset_id = asset.id
-    db.commit()
-    db.refresh(asset)
+    db.flush()
     return asset

@@ -38,7 +38,7 @@ help:
 	@echo "  make backup          Create timestamped backup under data/backups/"
 	@echo "  make backup-db       Database-only backup (skips media/imports)"
 	@echo "  make backup-list     List available backups"
-	@echo "  make backup-prune    Remove backups older than 30 days (KEEP_DAYS=N)"
+	@echo "  make backup-prune    Keep the N most recent backups (KEEP=7)"
 	@echo "  make restore BACKUP=<path>  Restore from a backup directory"
 	@echo ""
 	@echo "Tests:"
@@ -143,13 +143,13 @@ restore:
 	fi
 	@bash scripts/backup/restore.sh "$(BACKUP)"
 
-# Remove backups older than N days. Defaults to 30 days.
-# Usage: make backup-prune or make backup-prune KEEP_DAYS=14
-KEEP_DAYS ?= 30
+# Keep the N most recent backups; remove the rest.
+# Age is determined by parsing the backup directory name (YYYYMMDD-HHMMSS),
+# not filesystem mtime — so sort order is stable across copies and restores.
+# Usage: make backup-prune or make backup-prune KEEP=14
+KEEP ?= 7
 backup-prune:
-	@echo "Pruning backups older than $(KEEP_DAYS) days from data/backups/..."; \
-	find data/backups/ -maxdepth 1 -type d -name 'galley-*' -mtime +$(KEEP_DAYS) -print -exec rm -rf {} + ; \
-	echo "Done."
+	@bash scripts/backup/prune-backups.sh "$(KEEP)"
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -178,6 +178,7 @@ install-api:
 	    echo "Error: .venv/bin/python not found. Create the repo virtualenv first, e.g. python3 -m venv .venv"; \
 	    exit 1; \
 	fi
+	.venv/bin/pip install -e packages/shared-prompts
 	cd apps/api && ../../.venv/bin/python -m pip install -e ".[dev]"
 
 install-web:

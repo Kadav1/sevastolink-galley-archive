@@ -14,6 +14,7 @@ from typing import Any
 
 from shared_prompts import get_contract, loader as _prompt_loader
 
+from src.ai.base import AiError
 from src.ai.lm_studio_client import LMStudioClient, LMStudioErrorKind
 
 
@@ -33,13 +34,10 @@ class SimilarityErrorKind(str, Enum):
     schema_failure = "schema_failure"
 
 
-@dataclass
-class SimilarityError:
+@dataclass(frozen=True)
+class SimilarityError(AiError):
     kind: SimilarityErrorKind
     message: str
-
-    def __str__(self) -> str:
-        return f"SimilarityError({self.kind.value}): {self.message}"
 
 
 @dataclass

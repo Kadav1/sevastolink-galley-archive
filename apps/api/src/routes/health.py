@@ -1,3 +1,4 @@
+import asyncio
 import sqlite3
 
 from pydantic import BaseModel
@@ -60,7 +61,7 @@ async def health_ai() -> ApiResponse[AiHealthOut]:
         ))
 
     client = LMStudioClient(settings.lm_studio_base_url)
-    ok, err = client.check_availability()
+    ok, err = await asyncio.to_thread(client.check_availability)
 
     return ApiResponse(data=AiHealthOut(
         ai_enabled=True,

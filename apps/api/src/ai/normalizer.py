@@ -23,6 +23,7 @@ from typing import Any
 
 from shared_prompts import get_contract, loader as _prompt_loader
 
+from src.ai.base import AiError
 from src.ai.lm_studio_client import LMStudioClient, LMStudioError, LMStudioErrorKind
 from src.schemas.intake import CandidateUpdate
 from src.schemas.recipe import IngredientIn, StepIn
@@ -44,14 +45,11 @@ class NormalizationErrorKind(str, Enum):
     empty_result = "empty_result"
 
 
-@dataclass
-class NormalizationError:
+@dataclass(frozen=True)
+class NormalizationError(AiError):
     kind: NormalizationErrorKind
     message: str
     warnings: list[str] = field(default_factory=list)
-
-    def __str__(self) -> str:
-        return f"NormalizationError({self.kind.value}): {self.message}"
 
 
 @dataclass
@@ -228,8 +226,8 @@ def _parse_response(
                 return None
             return result
         except (TypeError, ValueError):
-                warnings.append(f"{field} is not an integer — set to null")
-                return None
+            warnings.append(f"{field} is not an integer — set to null")
+            return None
 
     prep_time = safe_int(body.get("prep_time_minutes"), "prep_time_minutes")
     cook_time = safe_int(body.get("cook_time_minutes"), "cook_time_minutes")

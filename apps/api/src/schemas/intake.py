@@ -93,12 +93,16 @@ class CandidateIngredientOut(BaseModel):
     preparation: str | None
     optional: bool
 
+    model_config = {"from_attributes": True}
+
 
 class CandidateStepOut(BaseModel):
     position: int
     instruction: str | None
     time_note: str | None
     equipment_note: str | None
+
+    model_config = {"from_attributes": True}
 
 
 class CandidateOut(BaseModel):
@@ -122,6 +126,8 @@ class CandidateOut(BaseModel):
     steps: list[CandidateStepOut]
     created_at: str
     updated_at: str
+
+    model_config = {"from_attributes": True}
 
 
 # ── Approval ──────────────────────────────────────────────────────────────────

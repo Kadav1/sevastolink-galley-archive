@@ -55,5 +55,5 @@ def update(db: Session, updates: dict[str, str]) -> dict[str, str]:
     for key, value in updates.items():
         if key in DEFAULTS:
             _set(db, key, value)
-    db.commit()
+    db.flush()
     return get_all(db)

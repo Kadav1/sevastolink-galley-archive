@@ -1,59 +1,8 @@
 """
 Recipe endpoint tests.
-Uses a fresh in-memory SQLite DB for each test via override of get_db.
 """
 
 import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from src.db.database import Base, get_db
-from src.db.init_db import init_db
-from src.main import app
-
-# ── Test DB fixture ───────────────────────────────────────────────────────────
-
-TEST_DB_URL = "sqlite:///./data/db/galley_test.sqlite"
-
-
-@pytest.fixture(scope="function")
-def db_session():
-    """Fresh schema for every test function."""
-    from src.config.settings import settings
-    import os
-
-    test_path = "./data/db/galley_test.sqlite"
-    # Remove leftover test DB
-    if os.path.exists(test_path):
-        os.remove(test_path)
-
-    # Run migrations against test DB
-    orig_url = settings.database_url
-    settings.database_url = TEST_DB_URL
-    init_db()
-    settings.database_url = orig_url
-
-    engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    yield session
-    session.close()
-    engine.dispose()
-    if os.path.exists(test_path):
-        os.remove(test_path)
-
-
-@pytest.fixture(scope="function")
-def client(db_session):
-    """HTTPX async client with test DB override."""
-    async def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield  # we create client in each test
-    app.dependency_overrides.clear()
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -80,16 +29,11 @@ FULL_RECIPE = {
 }
 
 
-async def _client():
-    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
-
-
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_list_recipes_empty(client):
-    async with await _client() as c:
-        r = await c.get("/api/v1/recipes")
+async def test_list_recipes_empty(async_client):
+    r = await async_client.get("/api/v1/recipes")
     assert r.status_code == 200
     body = r.json()
     assert body["data"] == []
@@ -99,9 +43,8 @@ async def test_list_recipes_empty(client):
 
 
 @pytest.mark.asyncio
-async def test_create_recipe(client):
-    async with await _client() as c:
-        r = await c.post("/api/v1/recipes", json=FULL_RECIPE)
+async def test_create_recipe(async_client):
+    r = await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
     assert r.status_code == 201
     recipe = r.json()["data"]
     assert recipe["slug"] == "shakshuka"
@@ -113,19 +56,17 @@ async def test_create_recipe(client):
 
 
 @pytest.mark.asyncio
-async def test_get_recipe_by_slug(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r = await c.get("/api/v1/recipes/shakshuka")
+async def test_get_recipe_by_slug(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r = await async_client.get("/api/v1/recipes/shakshuka")
     assert r.status_code == 200
     assert r.json()["data"]["slug"] == "shakshuka"
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_returns_created(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r = await c.get("/api/v1/recipes")
+async def test_list_recipes_returns_created(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r = await async_client.get("/api/v1/recipes")
     assert r.status_code == 200
     body = r.json()
     assert body["meta"]["total"] == 1
@@ -133,40 +74,36 @@ async def test_list_recipes_returns_created(client):
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_fts_search(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r_match = await c.get("/api/v1/recipes", params={"q": "shakshuka"})
-        r_nomatch = await c.get("/api/v1/recipes", params={"q": "bolognese"})
+async def test_list_recipes_fts_search(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r_match = await async_client.get("/api/v1/recipes", params={"q": "shakshuka"})
+    r_nomatch = await async_client.get("/api/v1/recipes", params={"q": "bolognese"})
     assert r_match.json()["meta"]["total"] == 1
     assert r_nomatch.json()["meta"]["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_filter_verification_state(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r_verified = await c.get("/api/v1/recipes", params={"verification_state": "Verified"})
-        r_draft = await c.get("/api/v1/recipes", params={"verification_state": "Draft"})
+async def test_list_recipes_filter_verification_state(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r_verified = await async_client.get("/api/v1/recipes", params={"verification_state": "Verified"})
+    r_draft = await async_client.get("/api/v1/recipes", params={"verification_state": "Draft"})
     assert r_verified.json()["meta"]["total"] == 1
     assert r_draft.json()["meta"]["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_filter_favorite(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "favorite": False})
-        r_fav = await c.get("/api/v1/recipes", params={"favorite": "true"})
-        r_all = await c.get("/api/v1/recipes")
+async def test_list_recipes_filter_favorite(async_client):
+    await async_client.post("/api/v1/recipes", json={**FULL_RECIPE, "favorite": False})
+    r_fav = await async_client.get("/api/v1/recipes", params={"favorite": "true"})
+    r_all = await async_client.get("/api/v1/recipes")
     assert r_fav.json()["meta"]["total"] == 0
     assert r_all.json()["meta"]["total"] == 1
 
 
 @pytest.mark.asyncio
-async def test_update_recipe(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r = await c.patch("/api/v1/recipes/shakshuka", json={"complexity": "Intermediate", "rating": 4})
+async def test_update_recipe(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r = await async_client.patch("/api/v1/recipes/shakshuka", json={"complexity": "Intermediate", "rating": 4})
     assert r.status_code == 200
     data = r.json()["data"]
     assert data["complexity"] == "Intermediate"
@@ -174,10 +111,9 @@ async def test_update_recipe(client):
 
 
 @pytest.mark.asyncio
-async def test_archive_recipe(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r = await c.post("/api/v1/recipes/shakshuka/archive")
+async def test_archive_recipe(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r = await async_client.post("/api/v1/recipes/shakshuka/archive")
     assert r.status_code == 200
     result = r.json()["data"]
     assert result["archived"] is True
@@ -185,55 +121,50 @@ async def test_archive_recipe(client):
 
 
 @pytest.mark.asyncio
-async def test_archived_excluded_from_default_list(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        await c.post("/api/v1/recipes/shakshuka/archive")
-        r_default = await c.get("/api/v1/recipes")
-        r_with_archived = await c.get("/api/v1/recipes", params={"archived": "true"})
+async def test_archived_excluded_from_default_list(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    await async_client.post("/api/v1/recipes/shakshuka/archive")
+    r_default = await async_client.get("/api/v1/recipes")
+    r_with_archived = await async_client.get("/api/v1/recipes", params={"archived": "true"})
     assert r_default.json()["meta"]["total"] == 0
     assert r_with_archived.json()["meta"]["total"] == 1
 
 
 @pytest.mark.asyncio
-async def test_delete_recipe(client):
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=FULL_RECIPE)
-        r_del = await c.delete("/api/v1/recipes/shakshuka")
-        r_get = await c.get("/api/v1/recipes/shakshuka")
+async def test_delete_recipe(async_client):
+    await async_client.post("/api/v1/recipes", json=FULL_RECIPE)
+    r_del = await async_client.delete("/api/v1/recipes/shakshuka")
+    r_get = await async_client.get("/api/v1/recipes/shakshuka")
     assert r_del.status_code == 204
     assert r_get.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_get_recipe_not_found(client):
-    async with await _client() as c:
-        r = await c.get("/api/v1/recipes/nonexistent-recipe")
+async def test_get_recipe_not_found(async_client):
+    r = await async_client.get("/api/v1/recipes/nonexistent-recipe")
     assert r.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_slug_collision(client):
+async def test_slug_collision(async_client):
     """Two recipes with the same title get unique slugs."""
-    async with await _client() as c:
-        r1 = await c.post("/api/v1/recipes", json=MINIMAL_RECIPE)
-        r2 = await c.post("/api/v1/recipes", json=MINIMAL_RECIPE)
+    r1 = await async_client.post("/api/v1/recipes", json=MINIMAL_RECIPE)
+    r2 = await async_client.post("/api/v1/recipes", json=MINIMAL_RECIPE)
     assert r1.status_code == 201
     assert r2.status_code == 201
     assert r1.json()["data"]["slug"] != r2.json()["data"]["slug"]
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_summary_includes_ingredient_count(client):
+async def test_list_recipes_summary_includes_ingredient_count(async_client):
     """RecipeSummaryOut must include ingredient_count."""
     recipe = {**MINIMAL_RECIPE, "ingredients": [
         {"position": 1, "item": "eggs", "quantity": "4"},
         {"position": 2, "item": "olive oil", "quantity": "2 tbsp"},
         {"position": 3, "item": "tomatoes", "quantity": "400 g"},
     ]}
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json=recipe)
-        r = await c.get("/api/v1/recipes")
+    await async_client.post("/api/v1/recipes", json=recipe)
+    r = await async_client.get("/api/v1/recipes")
     assert r.status_code == 200
     summary = r.json()["data"][0]
     assert "ingredient_count" in summary
@@ -241,46 +172,42 @@ async def test_list_recipes_summary_includes_ingredient_count(client):
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_filter_sector(client):
+async def test_list_recipes_filter_sector(async_client):
     """sector filter returns only matching recipes."""
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "sector": "Galley"})
-        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Other Recipe"})
-        r_galley = await c.get("/api/v1/recipes", params={"sector": "Galley"})
-        r_other = await c.get("/api/v1/recipes", params={"sector": "Shoreside"})
+    await async_client.post("/api/v1/recipes", json={**FULL_RECIPE, "sector": "Galley"})
+    await async_client.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Other Recipe"})
+    r_galley = await async_client.get("/api/v1/recipes", params={"sector": "Galley"})
+    r_other = await async_client.get("/api/v1/recipes", params={"sector": "Shoreside"})
     assert r_galley.json()["meta"]["total"] == 1
     assert r_other.json()["meta"]["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_filter_operational_class(client):
+async def test_list_recipes_filter_operational_class(async_client):
     """operational_class filter returns only matching recipes."""
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "operational_class": "Field Meal"})
-        r_match = await c.get("/api/v1/recipes", params={"operational_class": "Field Meal"})
-        r_no = await c.get("/api/v1/recipes", params={"operational_class": "Experimental"})
+    await async_client.post("/api/v1/recipes", json={**FULL_RECIPE, "operational_class": "Field Meal"})
+    r_match = await async_client.get("/api/v1/recipes", params={"operational_class": "Field Meal"})
+    r_no = await async_client.get("/api/v1/recipes", params={"operational_class": "Experimental"})
     assert r_match.json()["meta"]["total"] == 1
     assert r_no.json()["meta"]["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_filter_heat_window(client):
+async def test_list_recipes_filter_heat_window(async_client):
     """heat_window filter returns only matching recipes."""
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**FULL_RECIPE, "heat_window": "No Heat"})
-        r_match = await c.get("/api/v1/recipes", params={"heat_window": "No Heat"})
-        r_no = await c.get("/api/v1/recipes", params={"heat_window": "Open Flame"})
+    await async_client.post("/api/v1/recipes", json={**FULL_RECIPE, "heat_window": "No Heat"})
+    r_match = await async_client.get("/api/v1/recipes", params={"heat_window": "No Heat"})
+    r_no = await async_client.get("/api/v1/recipes", params={"heat_window": "Open Flame"})
     assert r_match.json()["meta"]["total"] == 1
     assert r_no.json()["meta"]["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_recipes_sort_title_desc(client):
+async def test_list_recipes_sort_title_desc(async_client):
     """sort=title_desc returns recipes in reverse alphabetical order."""
-    async with await _client() as c:
-        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Anchovy Toast"})
-        await c.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Zucchini Fritters"})
-        r = await c.get("/api/v1/recipes", params={"sort": "title_desc"})
+    await async_client.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Anchovy Toast"})
+    await async_client.post("/api/v1/recipes", json={**MINIMAL_RECIPE, "title": "Zucchini Fritters"})
+    r = await async_client.get("/api/v1/recipes", params={"sort": "title_desc"})
     titles = [item["title"] for item in r.json()["data"]]
     assert titles == sorted(titles, reverse=True)
 
@@ -308,11 +235,10 @@ async def test_mutation_does_not_touch_last_viewed_at(db_session):
 
 
 @pytest.mark.asyncio
-async def test_search_with_fts5_operators_returns_200(client):
+async def test_search_with_fts5_operators_returns_200(async_client):
     """Search queries containing FTS5 operators must not raise a 500."""
-    async with await _client() as c:
-        # These inputs contain raw FTS5 syntax that would cause sqlite3.OperationalError
-        # if passed directly to MATCH. Each must return 200, not 500.
-        for bad_query in ['AND', '"unclosed', 'NEAR(', 'test AND']:
-            r = await c.get("/api/v1/recipes", params={"q": bad_query})
-            assert r.status_code == 200, f"Expected 200 for q={bad_query!r}, got {r.status_code}"
+    # These inputs contain raw FTS5 syntax that would cause sqlite3.OperationalError
+    # if passed directly to MATCH. Each must return 200, not 500.
+    for bad_query in ['AND', '"unclosed', 'NEAR(', 'test AND']:
+        r = await async_client.get("/api/v1/recipes", params={"q": bad_query})
+        assert r.status_code == 200, f"Expected 200 for q={bad_query!r}, got {r.status_code}"

@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:22-slim
 
 # WORKDIR mirrors the volume-mounted repo path
 WORKDIR /repo/apps/web

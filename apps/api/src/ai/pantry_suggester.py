@@ -13,6 +13,7 @@ from typing import Any
 
 from shared_prompts import get_contract, loader as _prompt_loader
 
+from src.ai.base import AiError
 from src.ai.lm_studio_client import LMStudioClient, LMStudioErrorKind
 
 
@@ -32,13 +33,10 @@ class PantryErrorKind(str, Enum):
     schema_failure = "schema_failure"
 
 
-@dataclass
-class PantryError:
+@dataclass(frozen=True)
+class PantryError(AiError):
     kind: PantryErrorKind
     message: str
-
-    def __str__(self) -> str:
-        return f"PantryError({self.kind.value}): {self.message}"
 
 
 @dataclass

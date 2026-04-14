@@ -44,7 +44,10 @@ def init_db() -> None:
             for row in conn.execute("SELECT version FROM schema_migrations").fetchall()
         }
 
-        migration_files = sorted(MIGRATIONS_DIR.glob("*.sql"))
+        migration_files = sorted(
+            f for f in MIGRATIONS_DIR.glob("*.sql")
+            if not f.name.endswith(".rollback.sql")
+        )
         if not migration_files:
             logger.warning("No migration files found in %s", MIGRATIONS_DIR)
             return

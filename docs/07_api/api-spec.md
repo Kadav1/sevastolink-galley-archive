@@ -10,15 +10,15 @@ This document defines the complete v1 backend API for Sevastolink Galley Archive
 
 It establishes:
 
-* the full resource model and route list
-* request and response shapes for every endpoint group
-* HTTP status codes and error contracts
-* query parameter definitions with types
-* pagination strategy
-* the intake workflow as an API sequence
-* how AI endpoints are isolated from archive mutations
-* authentication model for local home use
-* versioning and forward-compatibility rules
+- the full resource model and route list
+- request and response shapes for every endpoint group
+- HTTP status codes and error contracts
+- query parameter definitions with types
+- pagination strategy
+- the intake workflow as an API sequence
+- how AI endpoints are isolated from archive mutations
+- authentication model for local home use
+- versioning and forward-compatibility rules
 
 This document supersedes API Spec v1.0. It is aligned with schema-spec v2.0 and ai-interaction-spec v1.0.
 
@@ -26,35 +26,44 @@ This is the canonical target-state API reference for the product.
 
 Current implementation note:
 
-* the repository already implements a substantial subset of this API
-* the repository does not yet implement every resource group described here
-* use `docs/07_api/implemented-api.md` for the current runtime API baseline
-* use `docs/07_api/implementation-backlog.md` for the prioritized target-state gap list
+- the repository already implements a substantial subset of this API
+- the repository does not yet implement every resource group described here
+- use `docs/07_api/implemented-api.md` for the current runtime API baseline
+- use `docs/07_api/implementation-backlog.md` for the prioritized target-state gap list
 
 ---
 
 ## Current-state gap note
 
-Implemented today:
+**Implemented:**
 
-* health endpoint
-* recipe CRUD and action routes
-* recipe-list search and filtering
-* intake job workflow endpoints
-* pantry suggestion endpoint
-* several AI-assisted recipe and intake endpoints
+- `GET /health`, `GET /health/ai`
+- `GET /recipes` — list, search (FTS via `q`), all filter params **except** `dietary_flag` and `ingredient`
+- `POST /recipes`, `GET /recipes/:id`, `PATCH /recipes/:id`, `DELETE /recipes/:id`
+- `POST /recipes/:id/{archive,unarchive,favorite,unfavorite}`
+- `GET /recipes/ingredient-families`
+- `POST /recipes/:id/{suggest-metadata,rewrite,similar}` — AI-assisted endpoints
+- `POST /intake-jobs`, `POST /intake-jobs/batch`, `GET /intake-jobs/:id`
+- `PATCH /intake-jobs/:id/candidate`, `POST /intake-jobs/:id/{normalize,evaluate,approve}`
+- `POST /intake-jobs/:id/media`, `POST /recipes/:id/media` — file attachment
+- `POST /pantry/suggest` — AI pantry suggestion
+- `GET /settings`, `PATCH /settings`
+- Uniform error envelope on all routes
 
-Not yet fully implemented today:
+**Not yet implemented (v1 deferred):**
 
-* separate `/search` resource group
-* `/media-assets`
-* `/ai-jobs`
-* `/settings`
-* `/backups`
-* `/system`
-* one fully uniform error envelope across all routes
+- `POST /recipes/:id/mark-cooked` (§7.9)
+- All of §8 — `/search/*` resource group (search is merged into `GET /recipes?q=...`)
+- `GET /intake-jobs` list (§9.3)
+- `GET /intake-jobs/:id/candidate` (§9.7)
+- `POST /intake-jobs/:id/abandon` (§9.10)
+- §10 `/media-assets` CRUD beyond file attachment
+- §11 `/settings/ai/*` — the implemented AI health check is `GET /health/ai`
+- §12 `PATCH /settings` accepts only `default_verification_state` and `library_default_sort`; all other operator config is file-driven
+- `dietary_flag` and `ingredient` filter params on `GET /recipes`
+- `/backups`, `/system`
 
-The remainder of this document should therefore be read as target-state API guidance rather than as a complete description of current runtime behavior.
+The remainder of this document should therefore be read as target-state API guidance rather than as a complete description of current runtime behaviour.
 
 ---
 
@@ -62,11 +71,11 @@ The remainder of this document should therefore be read as target-state API guid
 
 ### Core constraints
 
-* Local-first. The API serves a single local application. It is not a public API.
-* Archive-first. Recipes are the primary resource. All other resources support the archive.
-* Explicit workflow. Raw source, structured candidate, and approved recipe are separate API resources with distinct endpoints.
-* AI is optional. Every AI endpoint has a non-AI fallback path. AI endpoints never mutate approved records.
-* Trust is explicit. Verification state is set by user action through a specific endpoint. It cannot be set implicitly by normalization, AI, or bulk operations.
+- Local-first. The API serves a single local application. It is not a public API.
+- Archive-first. Recipes are the primary resource. All other resources support the archive.
+- Explicit workflow. Raw source, structured candidate, and approved recipe are separate API resources with distinct endpoints.
+- AI is optional. Every AI endpoint has a non-AI fallback path. AI endpoints never mutate approved records.
+- Trust is explicit. Verification state is set by user action through a specific endpoint. It cannot be set implicitly by normalization, AI, or bulk operations.
 
 ### API standard
 
@@ -93,6 +102,7 @@ All request and response bodies use `application/json` except file upload endpoi
 All responses use a consistent envelope:
 
 **Success:**
+
 ```json
 {
   "data": { ... },
@@ -101,6 +111,7 @@ All responses use a consistent envelope:
 ```
 
 **Success — list:**
+
 ```json
 {
   "data": [ ... ],
@@ -113,6 +124,7 @@ All responses use a consistent envelope:
 ```
 
 **Error:**
+
 ```json
 {
   "error": {
@@ -137,10 +149,10 @@ All resource IDs are ULID-format text strings. They are opaque to the client.
 
 All list endpoints support:
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `limit` | integer | `50` | Maximum records to return. Max `200`. |
-| `offset` | integer | `0` | Number of records to skip. |
+| Parameter | Type    | Default | Description                           |
+| --------- | ------- | ------- | ------------------------------------- |
+| `limit`   | integer | `50`    | Maximum records to return. Max `200`. |
+| `offset`  | integer | `0`     | Number of records to skip.            |
 
 Responses include `meta.total` (total matching count), `meta.limit`, and `meta.offset`.
 
@@ -148,10 +160,10 @@ Responses include `meta.total` (total matching count), `meta.limit`, and `meta.o
 
 Where documented, `sort` accepts `field_direction` format:
 
-* `updated_at_desc` (default)
-* `created_at_desc`
-* `title_asc`
-* `last_cooked_at_desc`
+- `updated_at_desc` (default)
+- `created_at_desc`
+- `title_asc`
+- `last_cooked_at_desc`
 
 ### Partial updates
 
@@ -161,41 +173,42 @@ All `PATCH` endpoints accept partial payloads. Only provided fields are updated.
 
 ## 4. HTTP Status Codes
 
-| Code | Usage |
-|---|---|
-| `200 OK` | Successful GET, PATCH, or action |
-| `201 Created` | Successful POST that creates a resource |
-| `204 No Content` | Successful DELETE or action with no response body |
-| `400 Bad Request` | Malformed JSON, missing required fields, invalid enum value |
-| `404 Not Found` | Resource does not exist |
-| `409 Conflict` | Slug collision, duplicate constraint violation |
-| `415 Unsupported Media Type` | Wrong content type |
-| `422 Unprocessable Entity` | Valid JSON but domain validation failed |
-| `500 Internal Server Error` | Unexpected server error |
-| `503 Service Unavailable` | AI backend unavailable (AI-specific routes only) |
+| Code                         | Usage                                                       |
+| ---------------------------- | ----------------------------------------------------------- |
+| `200 OK`                     | Successful GET, PATCH, or action                            |
+| `201 Created`                | Successful POST that creates a resource                     |
+| `204 No Content`             | Successful DELETE or action with no response body           |
+| `400 Bad Request`            | Malformed JSON, missing required fields, invalid enum value |
+| `404 Not Found`              | Resource does not exist                                     |
+| `409 Conflict`               | Slug collision, duplicate constraint violation              |
+| `415 Unsupported Media Type` | Wrong content type                                          |
+| `422 Unprocessable Entity`   | Valid JSON but domain validation failed                     |
+| `500 Internal Server Error`  | Unexpected server error                                     |
+| `503 Service Unavailable`    | AI backend unavailable (AI-specific routes only)            |
 
 ---
 
 ## 5. Error Codes
 
-| Code | Meaning |
-|---|---|
-| `validation_error` | One or more request fields failed validation |
-| `domain_error` | Valid payload but fails product rules |
-| `not_found` | Resource not found |
-| `conflict` | Unique constraint or state conflict |
-| `unsupported_media_type` | Invalid file type for upload |
-| `file_too_large` | Upload exceeds size limit |
-| `ai_not_configured` | AI is not enabled or endpoint is not set |
-| `ai_unavailable` | AI endpoint is configured but not reachable |
-| `ai_response_invalid` | AI returned a response that failed contract validation |
-| `intake_state_error` | Operation is not valid for the current intake job state |
-| `candidate_incomplete` | Candidate is missing required fields for recipe promotion |
-| `backup_failed` | Backup could not be created |
-| `restore_failed` | Restore could not be completed |
-| `internal_error` | Unhandled server-side error |
+| Code                     | Meaning                                                   |
+| ------------------------ | --------------------------------------------------------- |
+| `validation_error`       | One or more request fields failed validation              |
+| `domain_error`           | Valid payload but fails product rules                     |
+| `not_found`              | Resource not found                                        |
+| `conflict`               | Unique constraint or state conflict                       |
+| `unsupported_media_type` | Invalid file type for upload                              |
+| `file_too_large`         | Upload exceeds size limit                                 |
+| `ai_not_configured`      | AI is not enabled or endpoint is not set                  |
+| `ai_unavailable`         | AI endpoint is configured but not reachable               |
+| `ai_response_invalid`    | AI returned a response that failed contract validation    |
+| `intake_state_error`     | Operation is not valid for the current intake job state   |
+| `candidate_incomplete`   | Candidate is missing required fields for recipe promotion |
+| `backup_failed`          | Backup could not be created                               |
+| `restore_failed`         | Restore could not be completed                            |
+| `internal_error`         | Unhandled server-side error                               |
 
 Validation errors include a `details` object with field-level messages:
+
 ```json
 {
   "error": {
@@ -242,28 +255,29 @@ Returns the recipe library. Primary endpoint for archive browse views.
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `q` | string | Text search against title, description, ingredient text, notes |
-| `verification_state` | string | Filter by state: `Draft`, `Unverified`, `Verified`, `Archived` |
-| `favorite` | boolean | `true` returns favorited recipes only |
-| `archived` | boolean | `true` includes archived recipes. Default `false`. |
-| `dish_role` | string | Exact match on `dish_role` |
-| `primary_cuisine` | string | Exact match on `primary_cuisine` |
-| `technique_family` | string | Exact match on `technique_family` |
-| `complexity` | string | Exact match on `complexity` |
-| `time_class` | string | Exact match on `time_class` |
-| `sector` | string | Exact match on `sector` |
-| `operational_class` | string | Exact match on `operational_class` |
-| `heat_window` | string | Exact match on `heat_window` |
-| `ingredient_family` | string | Match within `ingredient_families` JSON array |
-| `dietary_flag` | string | Match within `dietary_flags` JSON array |
-| `ingredient` | string | Substring match on ingredient item names |
-| `sort` | string | Sort order. Default: `updated_at_desc` |
-| `limit` | integer | Default: `50`. Max: `200` |
-| `offset` | integer | Default: `0` |
+| Parameter            | Type    | Description                                                      |
+| -------------------- | ------- | ---------------------------------------------------------------- |
+| `q`                  | string  | Text search against title, description, ingredient text, notes   |
+| `verification_state` | string  | Filter by state: `Draft`, `Unverified`, `Verified`, `Archived`   |
+| `favorite`           | boolean | `true` returns favorited recipes only                            |
+| `archived`           | boolean | `true` includes archived recipes. Default `false`.               |
+| `dish_role`          | string  | Exact match on `dish_role`                                       |
+| `primary_cuisine`    | string  | Exact match on `primary_cuisine`                                 |
+| `technique_family`   | string  | Exact match on `technique_family`                                |
+| `complexity`         | string  | Exact match on `complexity`                                      |
+| `time_class`         | string  | Exact match on `time_class`                                      |
+| `sector`             | string  | Exact match on `sector`                                          |
+| `operational_class`  | string  | Exact match on `operational_class`                               |
+| `heat_window`        | string  | Exact match on `heat_window`                                     |
+| `ingredient_family`  | string  | Match within `ingredient_families` JSON array                    |
+| `dietary_flag`       | string  | Match within `dietary_flags` JSON array _(not yet implemented)_  |
+| `ingredient`         | string  | Substring match on ingredient item names _(not yet implemented)_ |
+| `sort`               | string  | Sort order. Default: `updated_at_desc`                           |
+| `limit`              | integer | Default: `50`. Max: `200`                                        |
+| `offset`             | integer | Default: `0`                                                     |
 
 **Response `200`:**
+
 ```json
 {
   "data": [
@@ -306,6 +320,7 @@ GET /recipes/:id
 Returns the full recipe record including all sub-resources.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -395,6 +410,7 @@ POST /recipes
 Creates a new recipe directly. Used for manual entry intake that bypasses the intake-job workflow.
 
 **Request body:**
+
 ```json
 {
   "title": "Chicken Stock",
@@ -466,6 +482,7 @@ Partial update of an existing recipe. Any combination of top-level fields, ingre
 When `ingredients` or `steps` arrays are provided, they **replace** the existing rows entirely for that recipe. Partial row-level patching within arrays is not supported in v1 — send the full updated array.
 
 **Request body (example — update metadata only):**
+
 ```json
 {
   "complexity": "Intermediate",
@@ -494,6 +511,7 @@ Sets `verification_state` to `Archived` and `archived` flag to `true`. The recip
 **Request body:** none.
 
 **Response `200`:**
+
 ```json
 { "data": { "id": "...", "verification_state": "Archived", "archived": true } }
 ```
@@ -538,6 +556,7 @@ POST /recipes/:id/unfavorite
 Sets `favorite` flag.
 
 **Response `200`:**
+
 ```json
 { "data": { "id": "...", "favorite": true } }
 ```
@@ -553,6 +572,7 @@ POST /recipes/:id/mark-cooked
 Sets `last_cooked_at` to current UTC timestamp.
 
 **Optional request body:**
+
 ```json
 { "cooked_at": "2026-03-24T19:00:00Z" }
 ```
@@ -560,6 +580,7 @@ Sets `last_cooked_at` to current UTC timestamp.
 If `cooked_at` is not provided, the server uses the current time.
 
 **Response `200`:**
+
 ```json
 { "data": { "id": "...", "last_cooked_at": "2026-03-24T19:00:00Z" } }
 ```
@@ -580,9 +601,9 @@ Full-text and structured filter search. Combines FTS query with column filters i
 
 **Sort options when `q` is present:**
 
-* `relevance` (FTS rank, default when query is provided)
-* `updated_at_desc`
-* `title_asc`
+- `relevance` (FTS rank, default when query is provided)
+- `updated_at_desc`
+- `title_asc`
 
 **Response `200`:** Same shape as `GET /recipes` list response. Results include a `score` field in each item when FTS is active:
 
@@ -612,11 +633,12 @@ Returns the available values and counts for filterable fields, scoped to the cur
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter          | Type    | Description                                          |
+| ------------------ | ------- | ---------------------------------------------------- |
 | `include_archived` | boolean | Include archived recipes in counts. Default `false`. |
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -665,12 +687,13 @@ Returns distinct ingredient item names from the archive. Used for autocomplete i
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `q` | string | Substring match on ingredient item names |
-| `limit` | integer | Default: `20`. Max: `50` |
+| Parameter | Type    | Description                              |
+| --------- | ------- | ---------------------------------------- |
+| `q`       | string  | Substring match on ingredient item names |
+| `limit`   | integer | Default: `20`. Max: `50`                 |
 
 **Response `200`:**
+
 ```json
 {
   "data": ["anchovies", "anchovy paste", "chicken breast", "chicken thigh"],
@@ -689,11 +712,13 @@ GET /recipes/:id/related
 Returns recipes related to the given recipe based on shared taxonomy fields. Deterministic in v1 — no AI required.
 
 **Matching logic (in priority order):**
+
 1. Same `dish_role` + shared `primary_cuisine`
 2. Same `technique_family` + shared `ingredient_families`
 3. Same `primary_cuisine`
 
 **Response `200`:**
+
 ```json
 {
   "data": [
@@ -729,6 +754,7 @@ The intake workflow as an API sequence:
 ```
 
 At any point after step 1, the job may also be abandoned:
+
 ```
 POST /intake-jobs/:id/abandon
 ```
@@ -744,6 +770,7 @@ POST /intake-jobs
 Creates a new intake workflow record and captures source material.
 
 **Request body:**
+
 ```json
 {
   "intake_type": "paste_text",
@@ -753,14 +780,15 @@ Creates a new intake workflow record and captures source material.
 }
 ```
 
-| Field | Required | Description |
-|---|---|---|
-| `intake_type` | Yes | `manual`, `paste_text`, `url`, `file` |
+| Field             | Required    | Description                                     |
+| ----------------- | ----------- | ----------------------------------------------- |
+| `intake_type`     | Yes         | `manual`, `paste_text`, `url`, `file`           |
 | `raw_source_text` | Conditional | Required for `paste_text`. Optional for others. |
-| `source_url` | Conditional | Required for `url`. |
-| `source_notes` | No | Free text. |
+| `source_url`      | Conditional | Required for `url`.                             |
+| `source_notes`    | No          | Free text.                                      |
 
 **Response `201`:**
+
 ```json
 {
   "data": {
@@ -788,15 +816,15 @@ GET /intake-jobs
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `status` | string | Filter by intake status |
-| `review_status` | string | Filter by review status |
-| `intake_type` | string | Filter by intake type |
-| `has_recipe` | boolean | `true` = completed jobs only; `false` = incomplete only |
-| `sort` | string | Default: `created_at_desc` |
-| `limit` | integer | Default: `50` |
-| `offset` | integer | Default: `0` |
+| Parameter       | Type    | Description                                             |
+| --------------- | ------- | ------------------------------------------------------- |
+| `status`        | string  | Filter by intake status                                 |
+| `review_status` | string  | Filter by review status                                 |
+| `intake_type`   | string  | Filter by intake type                                   |
+| `has_recipe`    | boolean | `true` = completed jobs only; `false` = incomplete only |
+| `sort`          | string  | Default: `created_at_desc`                              |
+| `limit`         | integer | Default: `50`                                           |
+| `offset`        | integer | Default: `0`                                            |
 
 **Response `200`:** List of intake job summaries.
 
@@ -809,6 +837,7 @@ GET /intake-jobs/:id
 ```
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -845,16 +874,17 @@ Uploads a source file and attaches it to the intake job.
 
 **Form fields:**
 
-| Field | Required | Description |
-|---|---|---|
-| `file` | Yes | The uploaded file |
-| `asset_kind` | No | Default: `source_image`. Options: `source_image`, `source_pdf`, `source_screenshot` |
+| Field        | Required | Description                                                                         |
+| ------------ | -------- | ----------------------------------------------------------------------------------- |
+| `file`       | Yes      | The uploaded file                                                                   |
+| `asset_kind` | No       | Default: `source_image`. Options: `source_image`, `source_pdf`, `source_screenshot` |
 
 **Accepted MIME types:** `image/jpeg`, `image/png`, `image/webp`, `application/pdf`
 
 **Max file size:** Configurable. Default: 20MB.
 
 **Response `201`:**
+
 ```json
 {
   "data": {
@@ -880,24 +910,26 @@ POST /intake-jobs/:id/normalize
 Triggers normalization of the intake job's source material. If AI is enabled and configured, uses AI normalization. Otherwise uses deterministic parsing.
 
 **Request body:**
+
 ```json
 {
   "method": "ai"
 }
 ```
 
-| Field | Required | Description |
-|---|---|---|
-| `method` | No | `ai` or `deterministic`. Default: `ai` if AI is configured, else `deterministic`. |
+| Field    | Required | Description                                                                       |
+| -------- | -------- | --------------------------------------------------------------------------------- |
+| `method` | No       | `ai` or `deterministic`. Default: `ai` if AI is configured, else `deterministic`. |
 
 **Behavior:**
 
-* Creates or replaces the `structured_candidate` for this intake job.
-* Raw source is never modified.
-* Sets `intake_jobs.parse_status` and `ai_status` based on outcome.
-* If AI is unavailable and `method` is `ai`, returns `503` with `ai_unavailable` code. Does not change intake job state. The user may retry with `deterministic` or proceed to manual candidate editing.
+- Creates or replaces the `structured_candidate` for this intake job.
+- Raw source is never modified.
+- Sets `intake_jobs.parse_status` and `ai_status` based on outcome.
+- If AI is unavailable and `method` is `ai`, returns `503` with `ai_unavailable` code. Does not change intake job state. The user may retry with `deterministic` or proceed to manual candidate editing.
 
 **Response `200` (normalization complete, candidate ready):**
+
 ```json
 {
   "data": {
@@ -911,6 +943,7 @@ Triggers normalization of the intake job's source material. If AI is enabled and
 ```
 
 **Response `503`:** AI unavailable.
+
 ```json
 {
   "error": {
@@ -932,6 +965,7 @@ GET /intake-jobs/:id/candidate
 Returns the current structured candidate for the intake job, including all suggested fields, ingredients, and steps.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -995,6 +1029,7 @@ PATCH /intake-jobs/:id/candidate
 Saves user edits to the candidate during review. Full array replacement applies to `ingredients` and `steps` when present.
 
 **Request body (partial example):**
+
 ```json
 {
   "dish_role": "Breakfast",
@@ -1036,6 +1071,7 @@ The trust gate. Creates a new recipe record from the reviewed candidate.
 This endpoint does not edit an existing recipe. It creates a new one. The `resulting_recipe_id` on the intake job is set after successful creation.
 
 **Request body:**
+
 ```json
 {
   "verification_state": "Unverified",
@@ -1046,21 +1082,23 @@ This endpoint does not edit an existing recipe. It creates a new one. The `resul
 }
 ```
 
-| Field | Required | Description |
-|---|---|---|
-| `verification_state` | Yes | The trust state to apply to the new recipe |
-| `overrides` | No | Final field values to apply over the candidate data |
+| Field                | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `verification_state` | Yes      | The trust state to apply to the new recipe          |
+| `overrides`          | No       | Final field values to apply over the candidate data |
 
 **Validation before promotion:**
 
 The API checks that the candidate has:
-* a `title`
-* at least one ingredient row
-* at least one step row
+
+- a `title`
+- at least one ingredient row
+- at least one step row
 
 If any are missing, returns `422` with `candidate_incomplete`.
 
 **Response `201`:**
+
 ```json
 {
   "data": {
@@ -1073,6 +1111,7 @@ If any are missing, returns `422` with `candidate_incomplete`.
 ```
 
 **Response `422`:** Candidate is incomplete.
+
 ```json
 {
   "error": {
@@ -1094,6 +1133,7 @@ POST /intake-jobs/:id/abandon
 Marks the intake job as abandoned. The job and candidate are retained for history but excluded from active workflows.
 
 **Response `200`:**
+
 ```json
 { "data": { "id": "...", "status": "abandoned" } }
 ```
@@ -1110,11 +1150,11 @@ GET /media-assets
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `asset_kind` | string | Filter by kind |
-| `limit` | integer | Default: `50` |
-| `offset` | integer | Default: `0` |
+| Parameter    | Type    | Description    |
+| ------------ | ------- | -------------- |
+| `asset_kind` | string  | Filter by kind |
+| `limit`      | integer | Default: `50`  |
+| `offset`     | integer | Default: `0`   |
 
 **Response `200`:** List of media asset records.
 
@@ -1127,6 +1167,7 @@ GET /media-assets/:id
 ```
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1157,10 +1198,10 @@ Standalone media upload not attached to a specific intake job. Used for recipe p
 
 **Form fields:**
 
-| Field | Required | Description |
-|---|---|---|
-| `file` | Yes | The file |
-| `asset_kind` | No | Default: `recipe_photo` |
+| Field        | Required | Description             |
+| ------------ | -------- | ----------------------- |
+| `file`       | Yes      | The file                |
+| `asset_kind` | No       | Default: `recipe_photo` |
 
 **Response `201`:** Media asset record.
 
@@ -1205,6 +1246,7 @@ GET /settings/ai/status
 Returns the current AI connection state. Does not trigger a connection test — returns the last known state.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1231,6 +1273,7 @@ POST /settings/ai/test-connection
 Triggers an active probe of the configured AI endpoint.
 
 **Response `200` (success):**
+
 ```json
 {
   "data": {
@@ -1243,6 +1286,7 @@ Triggers an active probe of the configured AI endpoint.
 ```
 
 **Response `503` (unreachable):**
+
 ```json
 {
   "error": {
@@ -1264,15 +1308,23 @@ POST /recipes/:id/suggest-metadata
 Requests AI-generated metadata suggestions for an existing recipe. Creates an `ai_job` record. Returns staged suggestions — does not modify the recipe.
 
 **Request body:**
+
 ```json
 {
-  "fields": ["dish_role", "primary_cuisine", "technique_family", "ingredient_families", "mood_tags"]
+  "fields": [
+    "dish_role",
+    "primary_cuisine",
+    "technique_family",
+    "ingredient_families",
+    "mood_tags"
+  ]
 }
 ```
 
 `fields` is optional. If omitted, the AI suggests all missing or low-confidence fields.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1309,6 +1361,7 @@ GET /ai-jobs/:id
 ```
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1338,13 +1391,13 @@ GET /ai-jobs
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `task_type` | string | Filter by task type |
-| `request_state` | string | Filter by state |
-| `source_entity_type` | string | `intake_job`, `structured_candidate`, `recipe` |
-| `limit` | integer | Default: `50` |
-| `offset` | integer | Default: `0` |
+| Parameter            | Type    | Description                                    |
+| -------------------- | ------- | ---------------------------------------------- |
+| `task_type`          | string  | Filter by task type                            |
+| `request_state`      | string  | Filter by state                                |
+| `source_entity_type` | string  | `intake_job`, `structured_candidate`, `recipe` |
+| `limit`              | integer | Default: `50`                                  |
+| `offset`             | integer | Default: `0`                                   |
 
 ---
 
@@ -1357,6 +1410,7 @@ GET /settings
 ```
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1393,6 +1447,7 @@ PATCH /settings/:group
 `group` is one of: `ai`, `archive`, `media`, `app`.
 
 **Request body (example — update AI config):**
+
 ```json
 {
   "enabled": true,
@@ -1419,6 +1474,7 @@ Creates a timestamped backup of the database and media assets.
 **Request body:** none.
 
 **Response `201`:**
+
 ```json
 {
   "data": {
@@ -1486,6 +1542,7 @@ Restores the archive from a selected backup. This is a destructive operation on 
 **Request body:** none.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1532,6 +1589,7 @@ GET /system/health
 Confirms the API is running and the database is reachable.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1556,6 +1614,7 @@ GET /system/info
 Returns application version and environment information.
 
 **Response `200`:**
+
 ```json
 {
   "data": {
@@ -1572,6 +1631,90 @@ Returns application version and environment information.
 
 ---
 
+### 14.3 Implemented health endpoints
+
+> §14.1 and §14.2 describe a speculative `/system/*` design that was not built. The implemented health endpoints use different paths and response shapes; they are documented here as the authoritative contract.
+
+#### Basic health check
+
+```
+GET /api/health
+```
+
+No version prefix. Returns API and database status. Used by Docker health checks and uptime monitors.
+
+**Response `200`:**
+
+```json
+{
+  "status": "ok",
+  "service": "galley-api",
+  "db": "ok"
+}
+```
+
+`status` is `"ok"` when the database is reachable, `"degraded"` otherwise. This endpoint does not use the standard `{"data": …}` envelope — it returns the object directly.
+
+---
+
+#### AI connection health
+
+```
+GET /api/v1/health/ai
+```
+
+Returns the current LM Studio connection status. Does not trigger a recipe operation — safe to poll.
+
+**Response `200` — AI disabled:**
+
+```json
+{
+  "data": {
+    "ai_enabled": false,
+    "reachable": null,
+    "model": null,
+    "error": null
+  }
+}
+```
+
+**Response `200` — AI enabled and reachable:**
+
+```json
+{
+  "data": {
+    "ai_enabled": true,
+    "reachable": true,
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "error": null
+  }
+}
+```
+
+**Response `200` — AI enabled but unreachable:**
+
+```json
+{
+  "data": {
+    "ai_enabled": true,
+    "reachable": false,
+    "model": null,
+    "error": "Connection refused"
+  }
+}
+```
+
+| Field        | Type              | Description                                                  |
+| ------------ | ----------------- | ------------------------------------------------------------ |
+| `ai_enabled` | `boolean`         | Mirrors `LM_STUDIO_ENABLED` env var                          |
+| `reachable`  | `boolean \| null` | `null` when AI is disabled; `true`/`false` when enabled      |
+| `model`      | `string \| null`  | Configured model name; `null` when disabled or unreachable   |
+| `error`      | `string \| null`  | Error message from the availability check; `null` on success |
+
+This endpoint always returns `200`. The `reachable` field carries the status — callers must not treat a `200` as a guarantee that AI is available.
+
+---
+
 ## 15. Authentication
 
 ### v1 model
@@ -1582,10 +1725,10 @@ The server binds to the local network interface configured in deployment. All cl
 
 **What is still required regardless of no-auth:**
 
-* File upload validation (type, size, path traversal protection)
-* No path traversal in file serving endpoints
-* Settings endpoints must not expose raw secrets through API responses (e.g., mask API keys if remote AI providers are configured in v2)
-* Rate limiting on AI endpoints to prevent accidental runaway calls to a local model
+- File upload validation (type, size, path traversal protection)
+- No path traversal in file serving endpoints
+- Settings endpoints must not expose raw secrets through API responses (e.g., mask API keys if remote AI providers are configured in v2)
+- Rate limiting on AI endpoints to prevent accidental runaway calls to a local model
 
 ### LAN access
 
@@ -1611,11 +1754,11 @@ New optional query parameters may be added without a version increment.
 
 ### Breaking changes that require v2
 
-* Removing or renaming a field
-* Changing a field's type
-* Removing an endpoint
-* Changing an endpoint's method
-* Modifying validation rules in a way that rejects previously valid payloads
+- Removing or renaming a field
+- Changing a field's type
+- Removing an endpoint
+- Changing an endpoint's method
+- Modifying validation rules in a way that rejects previously valid payloads
 
 ### AI contract versioning
 
@@ -1655,12 +1798,12 @@ Once an intake job is `approved`, the intake record and its source must remain r
 
 The v1 API succeeds if:
 
-* every recipe in the archive has a retrievable source record
-* trust state can only be set by explicit user-initiated requests
-* AI actions always produce staged suggestions, never direct mutations
-* intake failure at any stage leaves source material intact
-* the archive remains fully operable if LM Studio is not running
-* a backup of the full archive can be created and downloaded without leaving the product
+- every recipe in the archive has a retrievable source record
+- trust state can only be set by explicit user-initiated requests
+- AI actions always produce staged suggestions, never direct mutations
+- intake failure at any stage leaves source material intact
+- the archive remains fully operable if LM Studio is not running
+- a backup of the full archive can be created and downloaded without leaving the product
 
 Any endpoint design that contradicts these conditions is out of standard.
 
@@ -1694,7 +1837,7 @@ Any endpoint design that contradicts these conditions is out of standard.
 
 ## Deliverables Created
 
-* `docs/07_api/api-spec.md` v2.0 — this document (supersedes v1.0)
+- `docs/07_api/api-spec.md` v2.0 — this document (supersedes v1.0)
 
 ---
 
@@ -1704,9 +1847,9 @@ Any endpoint design that contradicts these conditions is out of standard.
 
 This document should define how the canonical API and local application stack are run in development and local production, including:
 
-* backend bind host and port behavior
-* frontend/backend serving strategy
-* SQLite path and media root configuration
-* backup locations
-* optional LM Studio connectivity from the backend
-* localhost versus LAN access rules
+- backend bind host and port behavior
+- frontend/backend serving strategy
+- SQLite path and media root configuration
+- backup locations
+- optional LM Studio connectivity from the backend
+- localhost versus LAN access rules

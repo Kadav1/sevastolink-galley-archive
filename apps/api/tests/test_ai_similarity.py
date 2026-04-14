@@ -1,48 +1,9 @@
 """
 Tests for POST /recipes/{id_or_slug}/similar.
 """
-import os
 from unittest.mock import patch
 import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from src.db.database import get_db
-from src.db.init_db import init_db
-from src.main import app
-
-TEST_DB_URL = "sqlite:///./data/db/galley_sim_test.sqlite"
-TEST_DB_PATH = "./data/db/galley_sim_test.sqlite"
-
-
-@pytest.fixture(scope="function")
-def db_session():
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-    from src.config.settings import settings
-    orig_url = settings.database_url
-    settings.database_url = TEST_DB_URL
-    init_db()
-    settings.database_url = orig_url
-    engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    yield session
-    session.close()
-    engine.dispose()
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-
-
-@pytest.fixture(scope="function")
-def client(db_session):
-    async def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield
-    app.dependency_overrides.clear()
+from httpx import AsyncClient
 
 
 async def _create_recipe(ac: AsyncClient, title: str) -> str:
@@ -57,39 +18,36 @@ async def _create_recipe(ac: AsyncClient, title: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_similar_returns_503_when_ai_disabled(client):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        slug = await _create_recipe(ac, "Pasta Carbonara")
-        r = await ac.post(f"/api/v1/recipes/{slug}/similar", json={})
+async def test_similar_returns_503_when_ai_disabled(async_client):
+    slug = await _create_recipe(async_client, "Pasta Carbonara")
+    r = await async_client.post(f"/api/v1/recipes/{slug}/similar", json={})
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
-async def test_similar_returns_404_for_unknown_recipe(client):
+async def test_similar_returns_404_for_unknown_recipe(async_client):
     from src.config.settings import settings
     with patch.object(settings, "lm_studio_enabled", True):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            r = await ac.post("/api/v1/recipes/does-not-exist/similar", json={})
+        r = await async_client.post("/api/v1/recipes/does-not-exist/similar", json={})
     assert r.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_similar_returns_503_when_lm_studio_unreachable(client):
+async def test_similar_returns_503_when_lm_studio_unreachable(async_client):
     from src.ai.similarity_engine import SimilarityError, SimilarityErrorKind
     from src.config.settings import settings
     transport_err = SimilarityError(SimilarityErrorKind.transport_failure, "Connection refused")
     with patch.object(settings, "lm_studio_enabled", True), \
          patch("src.routes.recipes.find_similar_recipes", return_value=(None, transport_err)):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            slug = await _create_recipe(ac, "Pasta Carbonara")
-            r = await ac.post(f"/api/v1/recipes/{slug}/similar", json={})
+        slug = await _create_recipe(async_client, "Pasta Carbonara")
+        r = await async_client.post(f"/api/v1/recipes/{slug}/similar", json={})
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio
-async def test_similar_returns_ranked_results(client):
+async def test_similar_returns_ranked_results(async_client):
     from src.ai.similarity_engine import SimilarityResult
     from src.config.settings import settings
     mock_result = SimilarityResult(payload={
@@ -109,10 +67,9 @@ async def test_similar_returns_ranked_results(client):
     })
     with patch.object(settings, "lm_studio_enabled", True), \
          patch("src.routes.recipes.find_similar_recipes", return_value=(mock_result, None)):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            slug = await _create_recipe(ac, "Pasta Carbonara")
-            await _create_recipe(ac, "Pasta Amatriciana")
-            r = await ac.post(f"/api/v1/recipes/{slug}/similar", json={})
+        slug = await _create_recipe(async_client, "Pasta Carbonara")
+        await _create_recipe(async_client, "Pasta Amatriciana")
+        r = await async_client.post(f"/api/v1/recipes/{slug}/similar", json={})
     assert r.status_code == 200
     d = r.json()["data"]
     assert len(d["top_matches"]) == 1

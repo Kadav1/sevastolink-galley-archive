@@ -7,10 +7,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@galley/shared-ui-tokens": fileURLToPath(
-        new URL("../../packages/shared-ui-tokens/src/index.ts", import.meta.url)
+        new URL(
+          "../../packages/shared-ui-tokens/src/index.ts",
+          import.meta.url,
+        ),
       ),
       "@galley/shared-taxonomy": fileURLToPath(
-        new URL("../../packages/shared-taxonomy/src/index.ts", import.meta.url)
+        new URL("../../packages/shared-taxonomy/src/index.ts", import.meta.url),
       ),
     },
   },
@@ -27,6 +30,6 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV !== "production",
   },
 });

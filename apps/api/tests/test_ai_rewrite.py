@@ -1,48 +1,9 @@
 """
 Tests for POST /recipes/{id_or_slug}/rewrite.
 """
-import os
 from unittest.mock import patch
 import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from src.db.database import get_db
-from src.db.init_db import init_db
-from src.main import app
-
-TEST_DB_URL = "sqlite:///./data/db/galley_rewrite_test.sqlite"
-TEST_DB_PATH = "./data/db/galley_rewrite_test.sqlite"
-
-
-@pytest.fixture(scope="function")
-def db_session():
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-    from src.config.settings import settings
-    orig_url = settings.database_url
-    settings.database_url = TEST_DB_URL
-    init_db()
-    settings.database_url = orig_url
-    engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    yield session
-    session.close()
-    engine.dispose()
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-
-
-@pytest.fixture(scope="function")
-def client(db_session):
-    async def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield
-    app.dependency_overrides.clear()
+from httpx import AsyncClient
 
 
 async def _create_recipe(ac: AsyncClient) -> str:
@@ -58,39 +19,36 @@ async def _create_recipe(ac: AsyncClient) -> str:
 
 
 @pytest.mark.asyncio
-async def test_rewrite_returns_503_when_ai_disabled(client):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        slug = await _create_recipe(ac)
-        r = await ac.post(f"/api/v1/recipes/{slug}/rewrite")
+async def test_rewrite_returns_503_when_ai_disabled(async_client):
+    slug = await _create_recipe(async_client)
+    r = await async_client.post(f"/api/v1/recipes/{slug}/rewrite")
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "ai_disabled"
 
 
 @pytest.mark.asyncio
-async def test_rewrite_returns_404_for_unknown_recipe(client):
+async def test_rewrite_returns_404_for_unknown_recipe(async_client):
     from src.config.settings import settings
     with patch.object(settings, "lm_studio_enabled", True):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            r = await ac.post("/api/v1/recipes/does-not-exist/rewrite")
+        r = await async_client.post("/api/v1/recipes/does-not-exist/rewrite")
     assert r.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_rewrite_returns_503_when_lm_studio_unreachable(client):
+async def test_rewrite_returns_503_when_lm_studio_unreachable(async_client):
     from src.ai.rewriter import RewriteError, RewriteErrorKind
     from src.config.settings import settings
     transport_err = RewriteError(RewriteErrorKind.transport_failure, "Connection refused")
     with patch.object(settings, "lm_studio_enabled", True), \
          patch("src.routes.recipes.rewrite_recipe", return_value=(None, transport_err)):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            slug = await _create_recipe(ac)
-            r = await ac.post(f"/api/v1/recipes/{slug}/rewrite")
+        slug = await _create_recipe(async_client)
+        r = await async_client.post(f"/api/v1/recipes/{slug}/rewrite")
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "ai_unavailable"
 
 
 @pytest.mark.asyncio
-async def test_rewrite_returns_rewritten_recipe(client):
+async def test_rewrite_returns_rewritten_recipe(async_client):
     from src.ai.rewriter import RewriteResult
     from src.config.settings import settings
     mock_result = RewriteResult(payload={
@@ -111,9 +69,8 @@ async def test_rewrite_returns_rewritten_recipe(client):
     })
     with patch.object(settings, "lm_studio_enabled", True), \
          patch("src.routes.recipes.rewrite_recipe", return_value=(mock_result, None)):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            slug = await _create_recipe(ac)
-            r = await ac.post(f"/api/v1/recipes/{slug}/rewrite")
+        slug = await _create_recipe(async_client)
+        r = await async_client.post(f"/api/v1/recipes/{slug}/rewrite")
     assert r.status_code == 200
     d = r.json()["data"]
     assert d["title"] == "Pasta Bolognese"

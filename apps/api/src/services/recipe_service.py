@@ -11,20 +11,19 @@ Responsibilities:
 
 import json
 import logging
-from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session, selectinload
 
+from src.db.fts_sync import sync_fts as _sync_fts
 from src.models.recipe import Recipe, RecipeIngredient, RecipeNote, RecipeSource, RecipeStep
 from src.schemas.recipe import RecipeCreate, RecipeUpdate, VerificationState
 from src.utils.ids import new_ulid
 from src.utils.slugify import unique_slug
+from src.utils.time_utils import now_utc as _now
 
 logger = logging.getLogger(__name__)
-
-_UTC = timezone.utc
 
 
 def _sanitize_fts_query(q: str) -> str:
@@ -37,37 +36,10 @@ def _sanitize_fts_query(q: str) -> str:
     return " ".join(f'"{t}"' for t in tokens if t)
 
 
-def _now() -> str:
-    return datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 def _build_ingredient_text(ingredients: list[Any]) -> str:
     """Flat string of ingredient item names for FTS index."""
     return " ".join(
         i.item for i in ingredients if hasattr(i, "item") and i.item
-    )
-
-
-def _sync_fts(db: Session, recipe: Recipe) -> None:
-    """Upsert recipe into the standalone FTS5 table."""
-    notes_text = " ".join(n.content for n in recipe.notes) if recipe.notes else ""
-    db.execute(
-        text("DELETE FROM recipe_search_fts WHERE recipe_id = :rid"),
-        {"rid": recipe.id},
-    )
-    db.execute(
-        text(
-            "INSERT INTO recipe_search_fts "
-            "(recipe_id, title, short_description, notes, ingredient_text) "
-            "VALUES (:rid, :title, :desc, :notes, :ingr)"
-        ),
-        {
-            "rid": recipe.id,
-            "title": recipe.title or "",
-            "desc": recipe.short_description or "",
-            "notes": notes_text,
-            "ingr": recipe.ingredient_text or "",
-        },
     )
 
 
@@ -187,8 +159,6 @@ def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
 
     db.flush()
     _sync_fts(db, recipe)
-    db.commit()
-    db.refresh(recipe)
     return recipe
 
 
@@ -206,12 +176,11 @@ def fetch_recipe(db: Session, id_or_slug: str) -> Recipe | None:
 
 
 def get_recipe(db: Session, id_or_slug: str) -> Recipe | None:
-    """Read a recipe and record the view timestamp. Call only from GET route handlers."""
+    """Read a recipe and record the view timestamp. Call only from GET route handlers.
+    The route is responsible for committing the view-tracking write."""
     recipe = _get_recipe(db, id_or_slug)
     if recipe:
         recipe.last_viewed_at = _now()
-        db.commit()
-        db.refresh(recipe)
     return recipe
 
 
@@ -388,8 +357,6 @@ def update_recipe(db: Session, id_or_slug: str, data: RecipeUpdate) -> Recipe | 
     db.flush()
     db.refresh(recipe)
     _sync_fts(db, recipe)
-    db.commit()
-    db.refresh(recipe)
     return recipe
 
 
@@ -400,8 +367,7 @@ def archive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
     recipe.verification_state = VerificationState.archived.value
     recipe.archived = 1
     recipe.updated_at = _now()
-    db.commit()
-    db.refresh(recipe)
+    db.flush()
     return recipe
 
 
@@ -412,8 +378,7 @@ def unarchive_recipe(db: Session, id_or_slug: str) -> Recipe | None:
     recipe.verification_state = VerificationState.unverified.value
     recipe.archived = 0
     recipe.updated_at = _now()
-    db.commit()
-    db.refresh(recipe)
+    db.flush()
     return recipe
 
 
@@ -423,8 +388,7 @@ def set_favorite(db: Session, id_or_slug: str, value: bool) -> Recipe | None:
         return None
     recipe.favorite = 1 if value else 0
     recipe.updated_at = _now()
-    db.commit()
-    db.refresh(recipe)
+    db.flush()
     return recipe
 
 
@@ -437,5 +401,5 @@ def delete_recipe(db: Session, id_or_slug: str) -> bool:
         {"rid": recipe.id},
     )
     db.delete(recipe)
-    db.commit()
+    db.flush()
     return True

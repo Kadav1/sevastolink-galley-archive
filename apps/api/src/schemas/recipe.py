@@ -132,9 +132,149 @@ class SourceOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ── Shared taxonomy validators ────────────────────────────────────────────────
+
+class _TaxonomyValidatorsMixin(BaseModel):
+    """Field validators for taxonomy fields, shared by RecipeCreate and RecipeUpdate.
+
+    List-field validators accept ``None`` so they work for both Create (where
+    the field always has a list default) and Update (where the field may be absent).
+    """
+
+    @field_validator("dish_role", check_fields=False)
+    @classmethod
+    def validate_dish_role(cls, v: str | None) -> str | None:
+        if v is not None and v not in DISH_ROLES:
+            raise ValueError(f"Invalid dish_role: {v!r}")
+        return v
+
+    @field_validator("primary_cuisine", check_fields=False)
+    @classmethod
+    def validate_primary_cuisine(cls, v: str | None) -> str | None:
+        if v is not None and v not in PRIMARY_CUISINES:
+            raise ValueError(f"Invalid primary_cuisine: {v!r}")
+        return v
+
+    @field_validator("secondary_cuisines", mode="before", check_fields=False)
+    @classmethod
+    def validate_secondary_cuisines(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in PRIMARY_CUISINES:
+                raise ValueError(f"Invalid secondary cuisine: {item!r}")
+        return v
+
+    @field_validator("technique_family", check_fields=False)
+    @classmethod
+    def validate_technique_family(cls, v: str | None) -> str | None:
+        if v is not None and v not in TECHNIQUE_FAMILIES:
+            raise ValueError(f"Invalid technique_family: {v!r}")
+        return v
+
+    @field_validator("ingredient_families", mode="before", check_fields=False)
+    @classmethod
+    def validate_ingredient_families(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in INGREDIENT_FAMILIES:
+                raise ValueError(f"Invalid ingredient family: {item!r}")
+        return v
+
+    @field_validator("complexity", check_fields=False)
+    @classmethod
+    def validate_complexity(cls, v: str | None) -> str | None:
+        if v is not None and v not in COMPLEXITY_OPTIONS:
+            raise ValueError(f"Invalid complexity: {v!r}")
+        return v
+
+    @field_validator("time_class", check_fields=False)
+    @classmethod
+    def validate_time_class(cls, v: str | None) -> str | None:
+        if v is not None and v not in TIME_CLASS_OPTIONS:
+            raise ValueError(f"Invalid time_class: {v!r}")
+        return v
+
+    @field_validator("service_format", check_fields=False)
+    @classmethod
+    def validate_service_format(cls, v: str | None) -> str | None:
+        if v is not None and v not in SERVICE_FORMATS:
+            raise ValueError(f"Invalid service_format: {v!r}")
+        return v
+
+    @field_validator("season", check_fields=False)
+    @classmethod
+    def validate_season(cls, v: str | None) -> str | None:
+        if v is not None and v not in SEASONS:
+            raise ValueError(f"Invalid season: {v!r}")
+        return v
+
+    @field_validator("mood_tags", mode="before", check_fields=False)
+    @classmethod
+    def validate_mood_tags(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in MOOD_TAGS:
+                raise ValueError(f"Invalid mood tag: {item!r}")
+        return v
+
+    @field_validator("storage_profile", mode="before", check_fields=False)
+    @classmethod
+    def validate_storage_profile(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in STORAGE_PROFILES:
+                raise ValueError(f"Invalid storage profile: {item!r}")
+        return v
+
+    @field_validator("dietary_flags", mode="before", check_fields=False)
+    @classmethod
+    def validate_dietary_flags(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in DIETARY_FLAGS:
+                raise ValueError(f"Invalid dietary flag: {item!r}")
+        return v
+
+    @field_validator("provision_tags", mode="before", check_fields=False)
+    @classmethod
+    def validate_provision_tags(cls, v: list | None) -> list | None:
+        if v is None:
+            return v
+        for item in v:
+            if item not in PROVISION_TAGS:
+                raise ValueError(f"Invalid provision tag: {item!r}")
+        return v
+
+    @field_validator("sector", check_fields=False)
+    @classmethod
+    def validate_sector(cls, v: str | None) -> str | None:
+        if v is not None and v not in SECTORS:
+            raise ValueError(f"Invalid sector: {v!r}")
+        return v
+
+    @field_validator("operational_class", check_fields=False)
+    @classmethod
+    def validate_operational_class(cls, v: str | None) -> str | None:
+        if v is not None and v not in OPERATIONAL_CLASSES:
+            raise ValueError(f"Invalid operational_class: {v!r}")
+        return v
+
+    @field_validator("heat_window", check_fields=False)
+    @classmethod
+    def validate_heat_window(cls, v: str | None) -> str | None:
+        if v is not None and v not in HEAT_WINDOWS:
+            raise ValueError(f"Invalid heat_window: {v!r}")
+        return v
+
+
 # ── Recipe Create ─────────────────────────────────────────────────────────────
 
-class RecipeCreate(BaseModel):
+class RecipeCreate(_TaxonomyValidatorsMixin):
     title: str = Field(..., min_length=1, max_length=500)
     short_description: str | None = None
 
@@ -175,130 +315,10 @@ class RecipeCreate(BaseModel):
     notes: list[NoteIn] = []
     source: SourceIn | None = None
 
-    # ── Taxonomy validators ──────────────────────────────────────────────────
-
-    @field_validator("dish_role")
-    @classmethod
-    def validate_dish_role(cls, v: str | None) -> str | None:
-        if v is not None and v not in DISH_ROLES:
-            raise ValueError(f"Invalid dish_role: {v!r}")
-        return v
-
-    @field_validator("primary_cuisine")
-    @classmethod
-    def validate_primary_cuisine(cls, v: str | None) -> str | None:
-        if v is not None and v not in PRIMARY_CUISINES:
-            raise ValueError(f"Invalid primary_cuisine: {v!r}")
-        return v
-
-    @field_validator("secondary_cuisines", mode="before")
-    @classmethod
-    def validate_secondary_cuisines(cls, v: list) -> list:
-        for item in v:
-            if item not in PRIMARY_CUISINES:
-                raise ValueError(f"Invalid secondary cuisine: {item!r}")
-        return v
-
-    @field_validator("technique_family")
-    @classmethod
-    def validate_technique_family(cls, v: str | None) -> str | None:
-        if v is not None and v not in TECHNIQUE_FAMILIES:
-            raise ValueError(f"Invalid technique_family: {v!r}")
-        return v
-
-    @field_validator("ingredient_families", mode="before")
-    @classmethod
-    def validate_ingredient_families(cls, v: list) -> list:
-        for item in v:
-            if item not in INGREDIENT_FAMILIES:
-                raise ValueError(f"Invalid ingredient family: {item!r}")
-        return v
-
-    @field_validator("complexity")
-    @classmethod
-    def validate_complexity(cls, v: str | None) -> str | None:
-        if v is not None and v not in COMPLEXITY_OPTIONS:
-            raise ValueError(f"Invalid complexity: {v!r}")
-        return v
-
-    @field_validator("time_class")
-    @classmethod
-    def validate_time_class(cls, v: str | None) -> str | None:
-        if v is not None and v not in TIME_CLASS_OPTIONS:
-            raise ValueError(f"Invalid time_class: {v!r}")
-        return v
-
-    @field_validator("service_format")
-    @classmethod
-    def validate_service_format(cls, v: str | None) -> str | None:
-        if v is not None and v not in SERVICE_FORMATS:
-            raise ValueError(f"Invalid service_format: {v!r}")
-        return v
-
-    @field_validator("season")
-    @classmethod
-    def validate_season(cls, v: str | None) -> str | None:
-        if v is not None and v not in SEASONS:
-            raise ValueError(f"Invalid season: {v!r}")
-        return v
-
-    @field_validator("mood_tags", mode="before")
-    @classmethod
-    def validate_mood_tags(cls, v: list) -> list:
-        for item in v:
-            if item not in MOOD_TAGS:
-                raise ValueError(f"Invalid mood tag: {item!r}")
-        return v
-
-    @field_validator("storage_profile", mode="before")
-    @classmethod
-    def validate_storage_profile(cls, v: list) -> list:
-        for item in v:
-            if item not in STORAGE_PROFILES:
-                raise ValueError(f"Invalid storage profile: {item!r}")
-        return v
-
-    @field_validator("dietary_flags", mode="before")
-    @classmethod
-    def validate_dietary_flags(cls, v: list) -> list:
-        for item in v:
-            if item not in DIETARY_FLAGS:
-                raise ValueError(f"Invalid dietary flag: {item!r}")
-        return v
-
-    @field_validator("provision_tags", mode="before")
-    @classmethod
-    def validate_provision_tags(cls, v: list) -> list:
-        for item in v:
-            if item not in PROVISION_TAGS:
-                raise ValueError(f"Invalid provision tag: {item!r}")
-        return v
-
-    @field_validator("sector")
-    @classmethod
-    def validate_sector(cls, v: str | None) -> str | None:
-        if v is not None and v not in SECTORS:
-            raise ValueError(f"Invalid sector: {v!r}")
-        return v
-
-    @field_validator("operational_class")
-    @classmethod
-    def validate_operational_class(cls, v: str | None) -> str | None:
-        if v is not None and v not in OPERATIONAL_CLASSES:
-            raise ValueError(f"Invalid operational_class: {v!r}")
-        return v
-
-    @field_validator("heat_window")
-    @classmethod
-    def validate_heat_window(cls, v: str | None) -> str | None:
-        if v is not None and v not in HEAT_WINDOWS:
-            raise ValueError(f"Invalid heat_window: {v!r}")
-        return v
-
 
 # ── Recipe Update ─────────────────────────────────────────────────────────────
 
-class RecipeUpdate(BaseModel):
+class RecipeUpdate(_TaxonomyValidatorsMixin):
     title: str | None = Field(None, min_length=1, max_length=500)
     short_description: str | None = None
 
@@ -330,132 +350,6 @@ class RecipeUpdate(BaseModel):
     ingredients: list[IngredientIn] | None = None
     steps: list[StepIn] | None = None
     notes: list[NoteIn] | None = None
-
-    # ── Taxonomy validators ──────────────────────────────────────────────────
-
-    @field_validator("dish_role")
-    @classmethod
-    def validate_dish_role(cls, v: str | None) -> str | None:
-        if v is not None and v not in DISH_ROLES:
-            raise ValueError(f"Invalid dish_role: {v!r}")
-        return v
-
-    @field_validator("primary_cuisine")
-    @classmethod
-    def validate_primary_cuisine(cls, v: str | None) -> str | None:
-        if v is not None and v not in PRIMARY_CUISINES:
-            raise ValueError(f"Invalid primary_cuisine: {v!r}")
-        return v
-
-    @field_validator("secondary_cuisines", mode="before")
-    @classmethod
-    def validate_secondary_cuisines(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in PRIMARY_CUISINES:
-                    raise ValueError(f"Invalid secondary cuisine: {item!r}")
-        return v
-
-    @field_validator("technique_family")
-    @classmethod
-    def validate_technique_family(cls, v: str | None) -> str | None:
-        if v is not None and v not in TECHNIQUE_FAMILIES:
-            raise ValueError(f"Invalid technique_family: {v!r}")
-        return v
-
-    @field_validator("ingredient_families", mode="before")
-    @classmethod
-    def validate_ingredient_families(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in INGREDIENT_FAMILIES:
-                    raise ValueError(f"Invalid ingredient family: {item!r}")
-        return v
-
-    @field_validator("complexity")
-    @classmethod
-    def validate_complexity(cls, v: str | None) -> str | None:
-        if v is not None and v not in COMPLEXITY_OPTIONS:
-            raise ValueError(f"Invalid complexity: {v!r}")
-        return v
-
-    @field_validator("time_class")
-    @classmethod
-    def validate_time_class(cls, v: str | None) -> str | None:
-        if v is not None and v not in TIME_CLASS_OPTIONS:
-            raise ValueError(f"Invalid time_class: {v!r}")
-        return v
-
-    @field_validator("service_format")
-    @classmethod
-    def validate_service_format(cls, v: str | None) -> str | None:
-        if v is not None and v not in SERVICE_FORMATS:
-            raise ValueError(f"Invalid service_format: {v!r}")
-        return v
-
-    @field_validator("season")
-    @classmethod
-    def validate_season(cls, v: str | None) -> str | None:
-        if v is not None and v not in SEASONS:
-            raise ValueError(f"Invalid season: {v!r}")
-        return v
-
-    @field_validator("mood_tags", mode="before")
-    @classmethod
-    def validate_mood_tags(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in MOOD_TAGS:
-                    raise ValueError(f"Invalid mood tag: {item!r}")
-        return v
-
-    @field_validator("storage_profile", mode="before")
-    @classmethod
-    def validate_storage_profile(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in STORAGE_PROFILES:
-                    raise ValueError(f"Invalid storage profile: {item!r}")
-        return v
-
-    @field_validator("dietary_flags", mode="before")
-    @classmethod
-    def validate_dietary_flags(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in DIETARY_FLAGS:
-                    raise ValueError(f"Invalid dietary flag: {item!r}")
-        return v
-
-    @field_validator("provision_tags", mode="before")
-    @classmethod
-    def validate_provision_tags(cls, v: list | None) -> list | None:
-        if v is not None:
-            for item in v:
-                if item not in PROVISION_TAGS:
-                    raise ValueError(f"Invalid provision tag: {item!r}")
-        return v
-
-    @field_validator("sector")
-    @classmethod
-    def validate_sector(cls, v: str | None) -> str | None:
-        if v is not None and v not in SECTORS:
-            raise ValueError(f"Invalid sector: {v!r}")
-        return v
-
-    @field_validator("operational_class")
-    @classmethod
-    def validate_operational_class(cls, v: str | None) -> str | None:
-        if v is not None and v not in OPERATIONAL_CLASSES:
-            raise ValueError(f"Invalid operational_class: {v!r}")
-        return v
-
-    @field_validator("heat_window")
-    @classmethod
-    def validate_heat_window(cls, v: str | None) -> str | None:
-        if v is not None and v not in HEAT_WINDOWS:
-            raise ValueError(f"Invalid heat_window: {v!r}")
-        return v
 
 
 # ── Recipe Summary (list response) ───────────────────────────────────────────

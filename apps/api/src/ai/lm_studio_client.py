@@ -26,7 +26,7 @@ class LMStudioErrorKind(str, Enum):
     no_content = "no_content"        # model returned empty / whitespace content
 
 
-@dataclass
+@dataclass(frozen=True)
 class LMStudioError:
     kind: LMStudioErrorKind
     message: str
@@ -53,11 +53,13 @@ class LMStudioClient:
         read_timeout: float = _DEFAULT_READ_TIMEOUT,
     ) -> None:
         self._base_url = base_url.rstrip("/")
-        self._timeout = httpx.Timeout(
-            connect=connect_timeout,
-            read=read_timeout,
-            write=10.0,
-            pool=5.0,
+        self._client = httpx.Client(
+            timeout=httpx.Timeout(
+                connect=connect_timeout,
+                read=read_timeout,
+                write=10.0,
+                pool=5.0,
+            )
         )
 
     # ── Availability check ────────────────────────────────────────────────────
@@ -68,10 +70,9 @@ class LMStudioClient:
         or (False, LMStudioError) on any failure.
         """
         try:
-            with httpx.Client(timeout=self._timeout) as client:
-                response = client.get(f"{self._base_url}/models")
-                response.raise_for_status()
-                return True, None
+            response = self._client.get(f"{self._base_url}/models")
+            response.raise_for_status()
+            return True, None
         except httpx.ConnectError as exc:
             return False, LMStudioError(LMStudioErrorKind.unavailable, str(exc))
         except httpx.TimeoutException as exc:
@@ -109,13 +110,12 @@ class LMStudioClient:
             payload["response_format"] = response_format
 
         try:
-            with httpx.Client(timeout=self._timeout) as client:
-                response = client.post(
-                    f"{self._base_url}/chat/completions",
-                    content=json.dumps(payload),
-                    headers={"Content-Type": "application/json"},
-                )
-                response.raise_for_status()
+            response = self._client.post(
+                f"{self._base_url}/chat/completions",
+                content=json.dumps(payload),
+                headers={"Content-Type": "application/json"},
+            )
+            response.raise_for_status()
         except httpx.ConnectError as exc:
             return None, LMStudioError(LMStudioErrorKind.unavailable, str(exc))
         except httpx.TimeoutException as exc:

@@ -13,6 +13,7 @@ from typing import Any
 
 from shared_prompts import get_contract, loader as _prompt_loader
 
+from src.ai.base import AiError
 from src.ai.lm_studio_client import LMStudioClient, LMStudioErrorKind
 
 
@@ -35,13 +36,10 @@ class MetadataErrorKind(str, Enum):
     schema_failure = "schema_failure"
 
 
-@dataclass
-class MetadataError:
+@dataclass(frozen=True)
+class MetadataError(AiError):
     kind: MetadataErrorKind
     message: str
-
-    def __str__(self) -> str:
-        return f"MetadataError({self.kind.value}): {self.message}"
 
 
 @dataclass

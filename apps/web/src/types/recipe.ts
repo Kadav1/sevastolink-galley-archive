@@ -1,9 +1,18 @@
 // Sevastolink Galley Archive — Recipe types
 // Mirror of apps/api/src/schemas/recipe.py
 
-export type VerificationState = "Draft" | "Unverified" | "Verified" | "Archived";
+export type VerificationState =
+  | "Draft"
+  | "Unverified"
+  | "Verified"
+  | "Archived";
 
-export type NoteType = "recipe" | "service" | "storage" | "substitution" | "source";
+export type NoteType =
+  | "recipe"
+  | "service"
+  | "storage"
+  | "substitution"
+  | "source";
 
 export interface Ingredient {
   id: string;
@@ -94,11 +103,15 @@ export interface RecipeListParams {
   q?: string;
   verification_state?: VerificationState;
   favorite?: boolean;
+  archived?: boolean;
   dish_role?: string;
   primary_cuisine?: string;
   technique_family?: string;
   complexity?: string;
   time_class?: string;
+  sector?: string;
+  operational_class?: string;
+  heat_window?: string;
   ingredient_family?: string;
   sort?: string;
   limit?: number;

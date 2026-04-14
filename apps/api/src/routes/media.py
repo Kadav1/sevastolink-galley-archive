@@ -36,6 +36,7 @@ async def attach_intake_media(
     Sets intake_jobs.source_media_asset_id to the new asset id.
     """
     asset = media_service.attach_to_intake_job(db, job_id, file)
+    db.commit()
     return ApiResponse(data=MediaAssetOut.model_validate(asset))
 
 
@@ -57,6 +58,7 @@ async def attach_recipe_media(
     if recipe is None:
         raise HTTPException(status_code=404, detail=error_detail("not_found", "Recipe not found."))
     asset = media_service.attach_to_recipe(db, recipe, file)
+    db.commit()
     return ApiResponse(data=MediaAssetOut.model_validate(asset))
 
 

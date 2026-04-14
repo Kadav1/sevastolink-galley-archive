@@ -1,14 +1,6 @@
 import logging
-import sys
 import time
 from contextlib import asynccontextmanager
-from pathlib import Path
-
-# Make packages/shared-prompts importable without a formal pip install.
-# The repo is always present at REPO_ROOT (volume-mounted or local clone).
-_SHARED_PROMPTS_SRC = str(Path(__file__).resolve().parents[3] / "packages" / "shared-prompts" / "src")
-if _SHARED_PROMPTS_SRC not in sys.path:
-    sys.path.insert(0, _SHARED_PROMPTS_SRC)
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError

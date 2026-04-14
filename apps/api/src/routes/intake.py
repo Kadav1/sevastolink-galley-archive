@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -14,9 +16,7 @@ from src.schemas.intake import (
     BatchIntakeIn,
     BatchIntakeJobError,
     BatchIntakeOut,
-    CandidateIngredientOut,
     CandidateOut,
-    CandidateStepOut,
     CandidateUpdate,
     IntakeJobCreate,
     IntakeJobOut,
@@ -27,50 +27,8 @@ from src.services import intake_service
 router = APIRouter(prefix="/intake-jobs", tags=["intake"])
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
-
 def _candidate_out(candidate) -> CandidateOut:
-    return CandidateOut(
-        id=candidate.id,
-        intake_job_id=candidate.intake_job_id,
-        candidate_status=candidate.candidate_status,
-        title=candidate.title,
-        short_description=candidate.short_description,
-        dish_role=candidate.dish_role,
-        primary_cuisine=candidate.primary_cuisine,
-        technique_family=candidate.technique_family,
-        complexity=candidate.complexity,
-        time_class=candidate.time_class,
-        servings=candidate.servings,
-        prep_time_minutes=candidate.prep_time_minutes,
-        cook_time_minutes=candidate.cook_time_minutes,
-        notes=candidate.notes,
-        service_notes=candidate.service_notes,
-        source_credit=candidate.source_credit,
-        ingredients=[
-            CandidateIngredientOut(
-                position=ing.position,
-                group_heading=ing.group_heading,
-                quantity=ing.quantity,
-                unit=ing.unit,
-                item=ing.item,
-                preparation=ing.preparation,
-                optional=bool(ing.optional),
-            )
-            for ing in (candidate.ingredients or [])
-        ],
-        steps=[
-            CandidateStepOut(
-                position=step.position,
-                instruction=step.instruction,
-                time_note=step.time_note,
-                equipment_note=step.equipment_note,
-            )
-            for step in (candidate.steps or [])
-        ],
-        created_at=candidate.created_at,
-        updated_at=candidate.updated_at,
-    )
+    return CandidateOut.model_validate(candidate, from_attributes=True)
 
 
 # ── Create ─────────────────────────────────────────────────────────────────────
@@ -102,13 +60,16 @@ async def batch_create_intake_jobs(body: BatchIntakeIn, db: Session = Depends(ge
 
     for idx, job_create in enumerate(body.jobs):
         try:
+            sp = db.begin_nested()
             if job_create.intake_type == "paste_text" and not job_create.raw_source_text:
                 raise ValueError("raw_source_text is required for paste_text intake.")
             job = intake_service.create_intake_job(db, job_create)
             db.flush()
             db.refresh(job)
+            sp.commit()
             created.append(IntakeJobOut.from_orm(job))
         except Exception as exc:
+            sp.rollback()
             errors.append(BatchIntakeJobError(index=idx, message=str(exc)))
 
     db.commit()
@@ -173,7 +134,8 @@ async def normalize_candidate(job_id: str, db: Session = Depends(get_db)):
         )
 
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = normalize_recipe(
+    result, err = await asyncio.to_thread(
+        normalize_recipe,
         client,
         raw_text=job.raw_source_text,
         source_notes=job.source_notes if hasattr(job, "source_notes") else None,
@@ -269,7 +231,8 @@ async def evaluate_candidate(job_id: str, db: Session = Depends(get_db)):
     candidate_dict = _candidate_out(candidate).model_dump()
 
     client = LMStudioClient(settings.lm_studio_base_url)
-    result, err = evaluate_normalization(
+    result, err = await asyncio.to_thread(
+        evaluate_normalization,
         client,
         raw_source_text=job.raw_source_text,
         candidate=candidate_dict,

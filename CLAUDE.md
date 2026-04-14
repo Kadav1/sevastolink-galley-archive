@@ -26,6 +26,7 @@ This is a **specification-first project** — read the specs before adding featu
 ## Essential Reading
 
 Before implementing anything, read these in order:
+
 1. `docs/01_product/product-brief.md` — Vision, scope, and what this is NOT
 2. `docs/06_architecture/technical-architecture.md` — Complete stack and architectural decisions
 3. `docs/08_database/schema-spec.md` — SQLite schema and data model
@@ -37,7 +38,7 @@ Before implementing anything, read these in order:
 **Frontend:** React + TypeScript, Vite, React Router, TanStack Query, CSS variables
 **AI (optional):** LM Studio HTTP client (OpenAI-compatible endpoint)
 **Infra:** Docker Compose, Nginx (optional), Systemd (optional)
-**Node:** v20
+**Node:** v22
 
 **Primary languages:** TypeScript, Markdown, JSON. Always use TypeScript (not JavaScript) for new code files. CSS changes must respect the existing design token system (`packages/shared-ui-tokens/tokens.css`).
 
@@ -55,9 +56,14 @@ python -m uvicorn src.main:app --reload           # dev server (port 8000)
 npm run type-check    # TypeScript check (no emit)
 npm run dev           # Vite dev server
 npm run build         # production build
+
+# Ops — from repo root
+bash scripts/backup/backup.sh                     # timestamped backup
+make backup-prune KEEP=7                          # keep N most recent (default 7)
+bash scripts/db/rollback-migration.sh             # roll back last migration (interactive)
 ```
 
-Shared packages live in `packages/` (shared-types, shared-taxonomy, shared-ui-tokens) — not yet implemented. `packages/shared-prompts` is implemented and used by all AI modules.
+Shared packages in `packages/`: `shared-prompts` (AI contracts), `shared-taxonomy` (vocabulary constants used by frontend + backend), `shared-ui-tokens` (CSS design tokens) — all implemented. `packages/shared-types` does not exist.
 
 ## Architecture
 
@@ -102,6 +108,7 @@ Verification states (`Draft`, `Unverified`, `Verified`, `Archived`) are user-con
 - Recommended local normalization model: `Qwen/Qwen2.5-7B-Instruct`
 
 **Implemented AI endpoints:**
+
 - `POST /intake-jobs/:id/normalize` — normalize raw source text into a structured candidate
 - `POST /intake-jobs/:id/evaluate` — evaluate a structured candidate against the original raw source
 - `POST /recipes/:id/suggest-metadata` — suggest taxonomy/classification fields for a recipe
@@ -123,6 +130,7 @@ data/logs/                  — Application logs
 ## Environment Configuration
 
 Copy `.env.example` to `.env`. Key variables:
+
 - `DATABASE_URL=sqlite:./data/db/galley.sqlite`
 - `LM_STUDIO_ENABLED=false` — AI is off by default
 - `LM_STUDIO_BASE_URL=http://localhost:1234/v1`
@@ -133,13 +141,14 @@ Copy `.env.example` to `.env`. Key variables:
 
 **Backend (`apps/api/`):** Recipe CRUD + search, intake pipeline (create job → update candidate → approve), 6 AI endpoints (normalize, evaluate, suggest-metadata, rewrite, similar, pantry/suggest), settings API (`GET/PATCH /api/v1/settings`), LM Studio client, `shared-prompts` contract loader.
 
-**Frontend (`apps/web/`):** Library page, Recipe Detail, Kitchen Mode (`/recipe/:slug/kitchen`), Intake Hub, Manual Entry, Paste Text (with AI normalize button), Settings page (real load/save).
+**Frontend (`apps/web/`):** Library page, Recipe Detail, Kitchen Mode (`/recipe/:slug/kitchen`), Intake Hub, Manual Entry, Paste Text (with AI normalize button), Settings page (real load/save). AI result panels (`MetadataSuggestionPanel`, `RewritePanel`, `SimilarRecipesPanel`) live in `src/components/recipe/` with shared styles in `aiPanelStyles.ts`.
 
-**Tests:** 112 tests across `apps/api/tests/` — intake lifecycle, normalize, evaluate, suggest-metadata, rewrite, similar, pantry, settings, error-envelope contract, and recipe list/filter/sort alignment tests.
+**Tests:** 181 tests across `apps/api/tests/` — intake lifecycle, normalize, evaluate, suggest-metadata, rewrite, similar, pantry, settings, error-envelope contract, recipe list/filter/sort, normalizer unit tests (`test_ai_normalizer_unit.py`), media boundary cases, and slug edge cases.
 
 ## Known Gotchas
 
 **DB CHECK constraints** — SQLite enforces enum values at commit time, not at ORM level. Allowed values:
+
 - `intake_jobs.status`: `captured | in_review | approved`
 - `intake_jobs.review_status`: `not_started | in_progress | saved_partial | completed`
 - `structured_candidates.candidate_status`: `pending | in_review | accepted | discarded`
@@ -157,7 +166,7 @@ Copy `.env.example` to `.env`. Key variables:
 
 **Step-text scaling** — `scaleStepText()` in `apps/web/src/lib/scaling.ts`; used by both `StepList` (recipe detail) and `KitchenSteps` (kitchen mode). `KitchenSteps` already accepts `scale: ScaleFactor` prop.
 
-**Favorite toggle** — `apps/web/src/hooks/useFavorite.ts`; used by both `RecipeRow` and `RecipePage`. Invalidates `["recipes"]` and `["recipe", slug]` on success.
+**Favorite toggle** — `apps/web/src/hooks/useFavorite.ts`; used by both `RecipeRow` and `RecipePage`. Use `queryKeys` factory from `apps/web/src/lib/queryKeys.ts` for all TanStack Query key references — never write raw string arrays like `["recipes"]` or `["recipe", slug]`.
 
 **Settings domain** — only `default_verification_state` and `library_default_sort` are persisted in the DB and writable via `PATCH /api/v1/settings`. All operator config (LM Studio URL, DB path, ports, directories) is file-driven only and must not be surfaced as UI-editable. `ai_enabled` in the settings response is read-only (mirrors `LM_STUDIO_ENABLED`). Use `useSettings()` / `useUpdateSettings()` from `apps/web/src/hooks/useSettings.ts` in any page that needs preferences.
 
@@ -174,6 +183,10 @@ Copy `.env.example` to `.env`. Key variables:
 **Error envelope** — all errors use `{"error": {"code": "...", "message": "..."}}`. Use `error_detail(code, message)` from `schemas/common.py` as the `HTTPException.detail`. A custom handler in `main.py` wraps it. Never use bare strings or nested `{"error": {...}}` shapes in `detail`.
 
 **Prettier + tokens.css** — `packages/shared-ui-tokens/tokens.css` uses intentional column-aligned comment headers (`/* ── Section ── */`) and value spacing. A global Prettier hook reformats this file on every write. `packages/shared-ui-tokens/` is listed in `.prettierignore` to protect it.
+
+**Migration rollback files** — Each migration has a companion `<version>_*.rollback.sql` in `src/db/migrations/`. `init_db.py` explicitly excludes `*.rollback.sql` from the forward migration glob — do not rename rollback files or they will be applied as forward migrations. Run rollbacks via `bash scripts/db/rollback-migration.sh [VERSION]`.
+
+**`find -regex` on this system** — requires `-regextype posix-extended` with `{n}` quantifiers. The default emacs type silently produces zero matches without error. Always write `find ... -regextype posix-extended -regex '...'` in scripts.
 
 ## What Is Explicitly Out of Scope (v1)
 

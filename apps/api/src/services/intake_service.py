@@ -10,43 +10,19 @@ Responsibilities:
 
 import json
 import logging
-from datetime import datetime, timezone
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from src.db.fts_sync import sync_fts as _sync_fts
 from src.models.intake import CandidateIngredient, CandidateStep, IntakeJob, StructuredCandidate
 from src.models.recipe import Recipe, RecipeIngredient, RecipeNote, RecipeSource, RecipeStep
 from src.schemas.intake import ApproveIntakeIn, CandidateUpdate, IntakeJobCreate
 from src.utils.ids import new_ulid
 from src.utils.slugify import unique_slug
-from sqlalchemy import text
+from src.utils.time_utils import now_utc as _now
 
 logger = logging.getLogger(__name__)
-
-_UTC = timezone.utc
-
-
-def _now() -> str:
-    return datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def _sync_fts(db: Session, recipe: Recipe) -> None:
-    notes_text = " ".join(n.content for n in recipe.notes) if recipe.notes else ""
-    db.execute(text("DELETE FROM recipe_search_fts WHERE recipe_id = :rid"), {"rid": recipe.id})
-    db.execute(
-        text(
-            "INSERT INTO recipe_search_fts "
-            "(recipe_id, title, short_description, notes, ingredient_text) "
-            "VALUES (:rid, :title, :desc, :notes, :ingr)"
-        ),
-        {
-            "rid": recipe.id,
-            "title": recipe.title or "",
-            "desc": recipe.short_description or "",
-            "notes": notes_text,
-            "ingr": recipe.ingredient_text or "",
-        },
-    )
 
 
 # ── Intake job ────────────────────────────────────────────────────────────────

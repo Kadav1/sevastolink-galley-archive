@@ -14,6 +14,7 @@ from typing import Any
 
 from shared_prompts import get_contract, loader as _prompt_loader
 
+from src.ai.base import AiError
 from src.ai.lm_studio_client import LMStudioClient, LMStudioErrorKind
 
 
@@ -43,13 +44,10 @@ class EvaluationErrorKind(str, Enum):
     schema_failure = "schema_failure"
 
 
-@dataclass
-class EvaluationError:
+@dataclass(frozen=True)
+class EvaluationError(AiError):
     kind: EvaluationErrorKind
     message: str
-
-    def __str__(self) -> str:
-        return f"EvaluationError({self.kind.value}): {self.message}"
 
 
 # ── Result model ──────────────────────────────────────────────────────────────
